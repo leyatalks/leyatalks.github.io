@@ -1,0 +1,472 @@
+@import url('https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@400;700&display=swap');
+
+
+/* 全局样式 */
+:root {
+    --primary-color: #FFF4EB;
+    --secondary-color: #D7BFB0;
+    --third-color: #9a9286;
+    --text-color: #333333;
+    --text-secondary-color: #D8CAAF;
+    --icon-color: #BFB0A0;
+    --active-color: #F1A66A;
+    --border-color: #EEDFCE;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'PingFang SC', 'Helvetica Neue', Arial, sans-serif;
+}
+
+body {
+    background-color: var(--primary-color);
+    color: var(--text-color);
+    font-size: 14px;
+    line-height: 1.5;
+}
+
+.hidden {
+    display: none !important;
+}
+
+#app {
+    width: 100%;
+    height: 100vh;
+    max-width: 480px;
+    margin: 0 auto;
+    position: relative;
+    overflow: hidden;
+}
+
+.ap-page-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    justify-content: center;
+    position: relative;
+}
+
+/* 头部样式 */
+.ap-header {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    padding: 15px;
+    background-color: var(--primary-color);
+    border-bottom: 1px solid var(--border-color);
+    position: relative;
+    z-index: 10;   
+    max-width: 480px;
+
+}
+
+.ap-header-title {
+    text-align: center;
+    flex: 1;
+    font-family: "LXGW WenKai TC", cursive;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 2em;
+}
+
+.logo {
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+.golden-sentence-container {
+    display: flex;
+    flex-direction: row;
+    font-size: 24px;
+    padding-left: 1em;
+    padding-bottom: 0.5em;
+    flex: 1;
+    font-weight: bold;
+    overflow: hidden;
+    border-bottom: 1px solid var(--border-color);
+    
+    .fake{}
+
+    .golden-sentence-icon {
+        font-size: 2em;
+        padding-top: 0.2em;
+        color: var(--icon-color);
+    }
+
+    .golden-sentence {
+        display: flex;
+        flex-direction: column;
+        padding-left: 0.5em;
+
+        h4 {
+            font-size: 1.1em;
+            color: var(--icon-color);
+        }
+
+        p {
+            font-size: 1em;
+            color: var(--third-color);
+        }
+    }
+
+    .share-icon {
+        margin-left: 3em;
+        font-size: 1em;
+        padding-top: 1.6em;
+        color: #AAB8AB;
+
+        .fake{}
+        :hover {
+            color: #53565C;
+            transition: 0.5s;
+            cursor: pointer;
+        }
+    }
+}
+
+
+.logo-img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 8px;
+}
+
+.nav-tabs {
+    display: flex;
+    flex: 1;
+    justify-content: center;
+    position: relative;
+}
+
+.tab {
+    padding: 5px 20px;
+    margin: 0 5px;
+    font-weight: 600;
+    position: relative;
+    cursor: pointer;
+}
+
+.tab.active {
+    color: var(--text-color);
+}
+
+.tab.active:after {
+    content: '';
+    position: absolute;
+    bottom: -16px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background-color: var(--text-color);
+}
+
+.user-icon {
+    font-size: 30px;
+    color: var(--secondary-color);
+    margin-left: auto;
+    margin-right: 1em;
+    cursor: pointer;
+}
+
+/* 内容区域 */
+.content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 10px 0;
+    background-color: var(--primary-color);
+    margin-bottom: 1em;
+    display: flex;
+    width: 100%;
+    /* align-items: center; */
+    justify-content: center;
+}
+
+/* 帖子列表样式 */
+.post-list {
+    padding: 0 15px;
+}
+
+.post-item {
+    display: flex;
+    padding: 15px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.post-avatar {
+    width: 50px;
+    height: 50px;
+    margin-right: 12px;
+}
+
+.post-avatar img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+}
+
+.post-content {
+    flex: 1;
+}
+
+.post-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.post-name {
+    font-weight: 600;
+    margin-right: 5px;
+}
+
+.post-username {
+    color: #999;
+    font-size: 12px;
+}
+
+.post-text {
+    margin-bottom: 5px;
+    font-weight: 500;
+}
+
+.post-subtext {
+    color: #666;
+    font-size: 12px;
+    margin-bottom: 8px;
+}
+
+.post-images {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+}
+
+.post-images img {
+    width: 10em;
+    border-radius: 8px;
+    object-fit: cover;
+}
+
+/* 聊天页面样式 */
+.chat-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    position: relative;
+    background-color: var(--primary-color);
+}
+
+.chat-input-container {
+    position: fixed;
+    bottom: 70px;
+    left: 0;
+    right: 0;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    background-color: var(--primary-color);
+    border-top: 1px solid var(--border-color);
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.chat-input {
+    flex: 1;
+    padding: 12px 15px;
+    border-radius: 20px;
+    border: 1px solid var(--secondary-color);
+    background-color: #fff;
+    font-size: 14px;
+    outline: none;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+}
+
+.send-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    font-size: 1em;
+    background-color: var(--secondary-color);
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: 10px;
+    border: none;
+    cursor: pointer;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.2s;
+}
+
+.send-btn:hover {
+    background-color: var(--active-color);
+}
+
+/* 分类页面样式 */
+.category-list {
+    padding: 20px 15px;
+}
+
+.category-row {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 25px;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 40%;
+    padding-left: 2rem;
+    padding-right: 2rem;
+}
+
+.category-icon {
+    width: 60px;
+    height: 60px;
+    background-color: var(--secondary-color);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    color: white;
+    font-size: 24px;
+}
+
+.category-icon:hover {
+    background-color: var(--icon-color);
+    ;
+    color: white;
+    transition: 0.5s;
+}
+
+.category-name {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.coming-soon .category-icon {
+    background-color: var(--border-color);
+    color: var(--icon-color);
+}
+
+.coming-soon .category-name {
+    color: var(--icon-color);
+}
+
+/* 底部导航 */
+.footer {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    height: 60px;
+    background-color: #fff;
+    border-top: 1px solid var(--border-color);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 10;
+    max-width: 480px;
+    margin: 0 auto;
+    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.nav-item {
+    font-size: 24px;
+    color: var(--icon-color);
+    cursor: pointer;
+    padding: 10px;
+}
+
+.nav-item.active {
+    color: var(--active-color);
+}
+
+.user-page {
+    padding: 20px;
+    background-color: #FFF4EB;
+    /* 背景顏色 */
+}
+
+.user-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.user-avatar {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    margin-right: 20px;
+}
+
+.logout-btn {
+    border-radius: 12px;
+    padding: 1em 2em;
+    border: none;
+    background-color: var(--border-color);
+}
+
+.logout-btn:hover {
+    cursor: pointer;
+    background-color: var(--active-color);
+    transition: 0.3s;
+}
+
+.user-info {
+    flex: 1;
+}
+
+.user-name {
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.user-id {
+    color: #999;
+    font-size: 14px;
+}
+
+.user-quote {
+    margin-top: 20px;
+}
+
+.quote-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.quote-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #D7BFB0;
+    padding: 10px;
+    border-radius: 8px;
+    margin-bottom: 10px;
+    color: white;
+}
+
+.trash-icon {
+    cursor: pointer;
+    margin-left: 10px;
+}
+
+.trash-icon:hover {
+    color: red;
+    transition: 0.7s;
+}
