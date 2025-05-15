@@ -17,7 +17,7 @@ export default defineConfig({
         theme_color: '#000000',
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '/',
+        start_url: 'leyatalks.com',
         icons: [
           {
             src: '/leyalogo.png',
@@ -25,7 +25,7 @@ export default defineConfig({
             type: 'image/png'
           },
           {
-            src: '//leyalogo.png',
+            src: '/leyalogo.png',
             sizes: '512x512',
             type: 'image/png'
           }
