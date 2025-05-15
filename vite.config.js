@@ -17,15 +17,15 @@ export default defineConfig({
         theme_color: '#000000',
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: '/leya-fronted/',
+        start_url: '/',
         icons: [
           {
-            src: '/leya-fronted/leyalogo.png',
+            src: '/leyalogo.png',
             sizes: '192x192',
             type: 'image/png'
           },
           {
-            src: '/leya-fronted/leyalogo.png',
+            src: '//leyalogo.png',
             sizes: '512x512',
             type: 'image/png'
           }
@@ -33,5 +33,5 @@ export default defineConfig({
       }
     })
   ],
-  base: '/leya-fronted',
+  base: '/',
 })
