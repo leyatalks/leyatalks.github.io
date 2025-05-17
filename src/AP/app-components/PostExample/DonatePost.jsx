@@ -14,9 +14,16 @@ function DonatePost({ post }) {
                     <div className="post-username">@LeyaTalks</div>
                 </div>
                 <div className="post-text">{post.content}</div>
-                {post.image_url &&
-                    <div className="post-images">
-                        <img src={post.image_url} alt="贊助圖片" />
+                {post.images && post.images.length > 0 &&
+                    <div className="post-images" style={{display:'flex', gap:8, flexWrap:'wrap'}}>
+                        {post.images.map((url, idx) => (
+                            <img
+                                key={idx}
+                                src={encodeURI(url)}
+                                alt={`贊助圖片${idx+1}`}
+                                style={{ maxWidth: 120, maxHeight: 120, borderRadius: 6, border: '1px solid #ccc' }}
+                            />
+                        ))}
                     </div>
                 }
             </div>

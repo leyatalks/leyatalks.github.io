@@ -4,7 +4,7 @@ function DonateManage({ userInfo }) {
     const [posts, setPosts] = useState([]);
     const [editingPost, setEditingPost] = useState(null);
     const [content, setContent] = useState("");
-    const [imageUrl, setImageUrl] = useState("");
+    const [images, setImages] = useState([""]);
     const [error, setError] = useState("");
 
     // 只允許管理員進入
@@ -31,10 +31,11 @@ function DonateManage({ userInfo }) {
             setError("內容不可空白");
             return;
         }
+        const validImages = images.map(url => url.trim()).filter(url => url).slice(0, 5);
         const payload = {
             user_id: 999,
             content,
-            image_url: imageUrl || null,
+            images: validImages,
         };
         try {
             let res;
@@ -56,7 +57,7 @@ function DonateManage({ userInfo }) {
                 setError(err.message || "操作失敗");
             } else {
                 setContent("");
-                setImageUrl("");
+                setImages([""]);
                 setEditingPost(null);
                 fetchPosts();
             }
@@ -69,7 +70,7 @@ function DonateManage({ userInfo }) {
     const handleEdit = (post) => {
         setEditingPost(post);
         setContent(post.content);
-        setImageUrl(post.image_url || "");
+        setImages(post.images && post.images.length > 0 ? post.images.concat([""]).slice(0, 5) : [""]);
     };
 
     // 刪除
@@ -92,8 +93,23 @@ function DonateManage({ userInfo }) {
     const handleCancel = () => {
         setEditingPost(null);
         setContent("");
-        setImageUrl("");
+        setImages([""]);
         setError("");
+    };
+
+    // 動態圖片網址欄位
+    const handleImageChange = (idx, value) => {
+        const newImages = [...images];
+        newImages[idx] = value;
+        // 自動補一個空欄位（最多5個）
+        if (idx === images.length - 1 && value && images.length < 5) {
+            newImages.push("");
+        }
+        // 移除多餘的空欄位
+        if (value === "" && idx < images.length - 1) {
+            newImages.splice(idx, 1);
+        }
+        setImages(newImages);
     };
 
     return (
@@ -110,13 +126,17 @@ function DonateManage({ userInfo }) {
                     />
                 </div>
                 <div>
-                    <input
-                        type="text"
-                        value={imageUrl}
-                        onChange={e => setImageUrl(e.target.value)}
-                        placeholder="圖片網址（可選）"
-                        style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '1em', borderRadius: '6px' }}
-                    />
+                    <label style={{fontWeight:'bold'}}>圖片網址（最多5張）：</label>
+                    {images.map((url, idx) => (
+                        <input
+                            key={idx}
+                            type="text"
+                            value={url}
+                            onChange={e => handleImageChange(idx, e.target.value)}
+                            placeholder={`圖片網址${idx+1}`}
+                            style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '0.5em', borderRadius: '6px', marginBottom: 4 }}
+                        />
+                    ))}
                 </div>
                 {error && <div style={{ color: "red" }}>{error}</div>}
                 <button type="submit" style={{margin:'1em 1em 1em auto',padding: '1em', backgroundColor: '#D7BFB0', borderRadius:'6px', cursor:'pointer'}}>{editingPost ? "儲存修改" : "新增貼文"}</button>
@@ -128,7 +148,13 @@ function DonateManage({ userInfo }) {
                 {posts.map(post => (
                     <li key={post.id} style={{ marginBottom: 16 }}>
                         <div>內容：{post.content}</div>
-                        {post.image_url && <img src={post.image_url} alt="" style={{ maxWidth: 200 }} />}
+                        {post.images && post.images.length > 0 && (
+                            <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
+                                {post.images.map((url, idx) => (
+                                    <img key={idx} src={url} alt="贊助圖片" style={{ maxWidth: 120, maxHeight: 120, borderRadius: 6, border: '1px solid #ccc' }} />
+                                ))}
+                            </div>
+                        )}
                         <div>
                             <button onClick={() => handleEdit(post)} style={{margin:'1em 1em 1em auto',padding: '1em 1.5em 1em 1.5em', backgroundColor: '#D7BFB0', borderRadius:'6px', cursor:'pointer'}}>編輯</button>
                             <button onClick={() => handleDelete(post.id)} style={{margin:'1em 1em 1em auto',padding: '1em 1.5em 1em 1.5em', backgroundColor: 'red', color: '#fff', borderRadius:'6px', cursor:'pointer'}}>刪除</button>
