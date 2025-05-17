@@ -3,11 +3,11 @@ import React from 'react';
 
 function AdminPage({ activePage, setActivePage, userInfo }) {
     console.log('User Info:', userInfo); // 檢查 userInfo 的內容
-    
-    function handleLogout(){
+
+    function handleLogout() {
         setActivePage('login-page')
     }
-    
+
     return (
         <>
             <div className="user-page">
@@ -15,7 +15,7 @@ function AdminPage({ activePage, setActivePage, userInfo }) {
                     <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png" alt="" className='user-avatar' />
                     <div className="user-info">
                         <h2 className="user-name">{userInfo.nickname}</h2>
-                        <p className="user-id" style={{color: "red"}}>@{userInfo.id}</p>
+                        <p className="user-id" style={{ color: "red" }}>@{userInfo.id}</p>
                     </div>
                     <div
                         className={`nav-item ${activePage === 'login-page' ? 'active' : ''}`}
@@ -28,6 +28,10 @@ function AdminPage({ activePage, setActivePage, userInfo }) {
                 </div>
                 <div>
                     <h3>管理員功能列</h3>
+                    <div
+                        className={`nav-item ${activePage === 'category-page' ? 'active' : ''}`}
+                        onClick={() => setActivePage('category-page')}
+                    >贊助貼文管理</div>
                 </div>
             </div>
         </>

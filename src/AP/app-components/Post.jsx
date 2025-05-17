@@ -1,26 +1,26 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import DonatePost from './PostExample/DonatePost';
 import UserPost from './PostExample/UserPost';
 
-function Post(){
+function Post() {
+    const [posts, setPosts] = useState([]);
+
+    useEffect(() => {
+        fetch("https://leya-backend-vercel.vercel.app/posts")
+            .then(res => res.json())
+            .then(data => setPosts(data));
+    }, []);
+
     return (
-      <>
-        <div class="content-area" id="home-page">
-                <div class="post-list">
-                    <DonatePost />
-                    <UserPost />
-                    <UserPost />
-                    <DonatePost />
-                    <UserPost />
-                    <UserPost />
-                    <UserPost />
-                    <UserPost />
-                    <UserPost />
-                    <UserPost />
-                    <DonatePost />
-                </div>
-            </div>      
-      </>  
+        <div className="content-area" id="home-page">
+            <div className="post-list">
+                {posts.map(post =>
+                    post.user_id === 999
+                        ? <DonatePost key={post.id} post={post} />
+                        : <UserPost key={post.id} post={post} />
+                )}
+            </div>
+        </div>
     );
 }
 
