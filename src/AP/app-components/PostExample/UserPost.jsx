@@ -1,24 +1,27 @@
 import React from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCircleUser } from "@fortawesome/free-solid-svg-icons";
+import { faUser } from "@fortawesome/free-solid-svg-icons";
 
-function UserPost() {
+function UserPost({ post }) {
     return (
-        <>
-            <div class="post-item">
-                <div class="post-avatar">
-                    <FontAwesomeIcon icon={faCircleUser} style={{fontSize: "2.5rem", color: "#c49349"}}/>
-                </div>
-                <div class="post-content">
-                    <div class="post-header">
-                        <div class="post-name">本日金句</div>
-                        <div class="post-username">@userID</div>
-                    </div>
-                    <div class="post-text">明天會更好，夕陽依舊那麼美麗。</div>
-                </div>
+        <div className="post-item">
+            <div className="post-avatar">
+                <FontAwesomeIcon icon={faUser} style={{ fontSize: "2.5rem", color: "#555" }} />
             </div>
-        </>
-    )
+            <div className="post-content">
+                <div className="post-header">
+                    <div className="post-name">{post.nickname || "一般用戶"}</div>
+                    <div className="post-username">@{post.username}</div>
+                </div>
+                <div className="post-text">{post.content}</div>
+                {post.image_url &&
+                    <div className="post-images">
+                        <img src={post.image_url} alt="用戶圖片" />
+                    </div>
+                }
+            </div>
+        </div>
+    );
 }
 
-export default UserPost
+export default UserPost;

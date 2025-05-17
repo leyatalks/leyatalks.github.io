@@ -8,7 +8,7 @@ function DonateManage({ userInfo }) {
     const [error, setError] = useState("");
 
     // 只允許管理員進入
-    if (!userInfo || userInfo.id !== 999) {
+    if (!userInfo || userInfo.id !== 'admin') {
         return <div>只有管理員可以進入此頁面</div>;
     }
 
@@ -98,7 +98,7 @@ function DonateManage({ userInfo }) {
 
     return (
         <div>
-            <h2>贊助貼文管理</h2>
+            <h2 style={{fontSize: '2rem', fontWeight: '800', margin: '1em'}}>贊助貼文管理</h2>
             <form onSubmit={handleSubmit}>
                 <div>
                     <textarea
@@ -106,7 +106,7 @@ function DonateManage({ userInfo }) {
                         onChange={e => setContent(e.target.value)}
                         placeholder="貼文內容"
                         rows={3}
-                        style={{ width: "100%" }}
+                        style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '1em', borderRadius: '6px' }}
                     />
                 </div>
                 <div>
@@ -115,27 +115,28 @@ function DonateManage({ userInfo }) {
                         value={imageUrl}
                         onChange={e => setImageUrl(e.target.value)}
                         placeholder="圖片網址（可選）"
-                        style={{ width: "100%" }}
+                        style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '1em', borderRadius: '6px' }}
                     />
                 </div>
                 {error && <div style={{ color: "red" }}>{error}</div>}
-                <button type="submit">{editingPost ? "儲存修改" : "新增貼文"}</button>
-                {editingPost && <button type="button" onClick={handleCancel}>取消</button>}
+                <button type="submit" style={{margin:'1em 1em 1em auto',padding: '1em', backgroundColor: '#D7BFB0', borderRadius:'6px', cursor:'pointer'}}>{editingPost ? "儲存修改" : "新增貼文"}</button>
+                {editingPost && <button type="button" onClick={handleCancel} style={{margin:'1em 1em 1em auto',padding: '1em 1.5em 1em 1.5em', backgroundColor: 'lightgray', borderRadius:'6px', cursor:'pointer'}}>取消</button>}
             </form>
-            <hr />
-            <h3>所有贊助貼文</h3>
+            <hr style={{margin:'1em auto 1em auto'}}/>
+            <h3 style={{fontSize:'1.8em'}}>所有贊助貼文</h3>
             <ul>
                 {posts.map(post => (
                     <li key={post.id} style={{ marginBottom: 16 }}>
                         <div>內容：{post.content}</div>
                         {post.image_url && <img src={post.image_url} alt="" style={{ maxWidth: 200 }} />}
                         <div>
-                            <button onClick={() => handleEdit(post)}>編輯</button>
-                            <button onClick={() => handleDelete(post.id)}>刪除</button>
+                            <button onClick={() => handleEdit(post)} style={{margin:'1em 1em 1em auto',padding: '1em 1.5em 1em 1.5em', backgroundColor: '#D7BFB0', borderRadius:'6px', cursor:'pointer'}}>編輯</button>
+                            <button onClick={() => handleDelete(post.id)} style={{margin:'1em 1em 1em auto',padding: '1em 1.5em 1em 1.5em', backgroundColor: 'red', color: '#fff', borderRadius:'6px', cursor:'pointer'}}>刪除</button>
                         </div>
                     </li>
                 ))}
             </ul>
+            <div style={{height: 50, width: 100}}></div>
         </div>
     );
 }

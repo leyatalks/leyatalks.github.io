@@ -192,6 +192,7 @@ body {
 /* 帖子列表样式 */
 .post-list {
     padding: 0 15px;
+    width: 100%;
 }
 
 .post-item {

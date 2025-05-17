@@ -10,6 +10,7 @@ import LoginPage from './app-components/Login/LoginPage'
 import RegisterPage from './app-components/Login/Register'
 import Sercet from './app-components/Sand'
 import AdminPage from './app-components/AdminPage'
+import DonateManage from './app-components/Admin-Function/DonateManage'
 
 
 function Application() {
@@ -30,6 +31,8 @@ function Application() {
                 return <UserPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
             case 'admin-page':
                 return <AdminPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
+            case 'donate-manage':
+                return <DonateManage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
             case 'login-page':
                 return <LoginPage activePage={activePage} setActivePage={setActivePage} setUserInfo={setUserInfo} />
             case 'register':

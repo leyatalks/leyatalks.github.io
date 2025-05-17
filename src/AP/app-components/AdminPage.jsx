@@ -1,7 +1,9 @@
 import React from 'react';
+import DonateManage from './Admin-Function/DonateManage';
 
 
 function AdminPage({ activePage, setActivePage, userInfo }) {
+    if (!userInfo) return <div>尚未登入</div>;
     console.log('User Info:', userInfo); // 檢查 userInfo 的內容
 
     function handleLogout() {
@@ -29,8 +31,8 @@ function AdminPage({ activePage, setActivePage, userInfo }) {
                 <div>
                     <h3>管理員功能列</h3>
                     <div
-                        className={`nav-item ${activePage === 'category-page' ? 'active' : ''}`}
-                        onClick={() => setActivePage('category-page')}
+                        className={`nav-item ${activePage === 'donate-manage' ? 'active' : ''}`}
+                        onClick={() => setActivePage('donate-manage')}
                     >贊助貼文管理</div>
                 </div>
             </div>
