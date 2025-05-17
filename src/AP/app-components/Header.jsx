@@ -3,7 +3,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCircleUser } from '@fortawesome/free-solid-svg-icons';
 // import { Link } from 'react-router-dom';
 
-function Header({ setActivePage }) {
+function Header({ setActivePage, userInfo }) {
+    // 判斷是否為管理員
+    const isAdmin = userInfo && userInfo.id === 'admin';
+    
+    const handleUserIconClick = () => {
+        if (isAdmin) {
+            setActivePage('admin-page');
+        } else {
+            setActivePage('user-page');
+        }
+    };
+
     return (
         <>
             <header className="ap-header">
@@ -13,7 +24,7 @@ function Header({ setActivePage }) {
                 <div className='ap-header-title'>
                     樂壓Talks
                 </div>
-                <div className="user-icon" onClick={() => setActivePage('user-page')}>
+                <div className="user-icon" onClick={handleUserIconClick}>
                     <FontAwesomeIcon icon={faCircleUser} />
                 </div>
             </header>

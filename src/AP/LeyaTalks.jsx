@@ -9,6 +9,7 @@ import UserPage from './app-components/UserPage'
 import LoginPage from './app-components/Login/LoginPage'
 import RegisterPage from './app-components/Login/Register'
 import Sercet from './app-components/Sand'
+import AdminPage from './app-components/AdminPage'
 
 
 function Application() {
@@ -27,6 +28,8 @@ function Application() {
                 return <ChatPage />
             case 'user-page':
                 return <UserPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
+            case 'admin-page':
+                return <AdminPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
             case 'login-page':
                 return <LoginPage activePage={activePage} setActivePage={setActivePage} setUserInfo={setUserInfo} />
             case 'register':
@@ -41,7 +44,7 @@ function Application() {
     return (
             <div id='app'>
                 <div className='ap-page-container'>
-                    { !whiteList.includes(activePage) && <Header setActivePage={setActivePage} /> }
+                    { !whiteList.includes(activePage) && <Header setActivePage={setActivePage} userInfo={userInfo} /> }
                     <div className="content-area">
                         {renderPage()}
                     </div>
