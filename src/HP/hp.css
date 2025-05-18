@@ -236,6 +236,17 @@
     background: none;
     border: none;
     cursor: pointer;
+    z-index: 1001; /* 確保漢堡按鈕在最上層 */
+    transition: transform 0.3s ease;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.hp-hamburger:hover {
+    transform: scale(1.1);
 }
 
 /* 大螢幕設備樣式 */
@@ -331,6 +342,13 @@
         flex-direction: row;
         justify-content: space-between;
         padding: 0.8em;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 1000;
+        background-color: #FAEAD3;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
     }
 
     .hp-navbar_logo {
@@ -342,23 +360,40 @@
         flex-direction: column;
         width: 100%;
         background-color: rgba(250, 234, 211, 0.95);
-        position: absolute;
+        position: fixed; /* 改為 fixed 定位 */
         top: 4em;
         left: 0;
+        right: 0; /* 確保寬度與視窗一致 */
         padding: 1em 0;
         margin: 0;
         gap: 1.5em;
-        transform: translateY(-20px);
+        transform: translateY(-100%); /* 初始位置在視窗外 */
         opacity: 0;
         transition: transform 0.3s ease, opacity 0.3s ease;
         box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        max-height: calc(100vh - 4em); /* 最大高度為視窗高度減去導航欄高度 */
+        overflow-y: auto; /* 如果內容過多，允許滾動 */
+        z-index: 999;
     }
 
     .hp-navbar-links.open {
         display: flex;
-        transform: translateY(0);
+        transform: translateY(0); /* 顯示時移動到視窗內 */
         opacity: 1;
         z-index: 1000;
+    }
+
+    /* 下拉選單中的連結樣式 */
+    .hp-navbar-links a {
+        text-align: center;
+        font-size: 1.2rem;
+        padding: 0.8em 0;
+        width: 100%;
+        transition: background-color 0.3s ease;
+    }
+
+    .hp-navbar-links a:hover {
+        background-color: rgba(255, 255, 255, 0.3);
     }
 
     .hp-hamburger {

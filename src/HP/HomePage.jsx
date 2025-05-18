@@ -132,7 +132,16 @@ function HomePage({ handleNavigation }) {
     };
 
     const toggleMenu = () => {
+        // 切換選單狀態
         setMenuOpen(!isMenuOpen);
+
+        // 如果選單即將打開，確保頁面滾動到頂部，以便完整顯示選單
+        if (!isMenuOpen) {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        }
     };
 
     return (
@@ -141,7 +150,7 @@ function HomePage({ handleNavigation }) {
             <div className='hp-navbar'>
                 <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png" alt="LeyaTalks" className='hp-navbar_logo' />
                 <button className='hp-hamburger' onClick={toggleMenu} aria-label="菜單">
-                    ☰
+                    {isMenuOpen ? '✕' : '☰'} {/* 切換漢堡選單圖標 */}
                 </button>
                 <div className={`hp-navbar-links ${isMenuOpen ? 'open' : ''}`}>
                     <a href="#" onClick={handleNavClick}>主頁</a>
@@ -155,6 +164,24 @@ function HomePage({ handleNavigation }) {
                     </a>
                 </div>
             </div>
+
+            {/* 背景遮罩，當選單打開時顯示 */}
+            {isMenuOpen && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0,
+                        left: 0,
+                        right: 0,
+                        bottom: 0,
+                        backgroundColor: 'rgba(0,0,0,0.5)',
+                        zIndex: 998, // 低於選單但高於其他內容
+                        touchAction: 'none' // 防止觸摸事件穿透
+                    }}
+                    onClick={toggleMenu} // 點擊遮罩關閉選單
+                />
+            )}
+
             <IndexContainer isMobile={isMobile} />
         </div>
     )
