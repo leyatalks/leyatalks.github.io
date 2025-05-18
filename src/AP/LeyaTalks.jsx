@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import './ap.css'
 import Header from './app-components/Header'
 import Footer from './app-components/Footer'
@@ -12,10 +12,33 @@ import Sercet from './app-components/Sand'
 import AdminPage from './app-components/AdminPage'
 import DonateManage from './app-components/Admin-Function/DonateManage'
 
+// 下拉刷新功能
+const enablePullToRefresh = () => {
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    document.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+        touchEndY = e.changedTouches[0].clientY;
+        if (window.scrollY === 0 && touchEndY > touchStartY + 100) {
+            // 下拉距離超過100px且在頁面頂部時刷新
+            window.location.reload();
+        }
+    }, { passive: true });
+};
+
 
 function Application() {
     const [activePage, setActivePage] = useState('login-page')
     const [userInfo, setUserInfo] = useState({ nickname: '', id: '' })
+
+    // 啟用下拉刷新功能
+    useEffect(() => {
+        enablePullToRefresh();
+    }, []);
 
     const whiteList = ["login-page", "register"]
 

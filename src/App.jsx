@@ -10,14 +10,14 @@ function App() {
   const handleNavigation = (path) => {
     if (path === "/LeyaTalks") {
       setCurrentPage("leyaTalks");
-    } 
+    }
     else {
       setCurrentPage("home");
     }
   };
 
   return (
-    <div>
+    <div style={{ width: '100%', overflowX: 'hidden', position: 'relative' }}>
       {currentPage === "home" ? (
         <HomePage handleNavigation={handleNavigation} />
       )  : (

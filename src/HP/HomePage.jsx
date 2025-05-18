@@ -4,11 +4,29 @@ import './hp.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4';
 
+// 下拉刷新功能
+const enablePullToRefresh = () => {
+    let touchStartY = 0;
+    let touchEndY = 0;
+
+    document.addEventListener('touchstart', (e) => {
+        touchStartY = e.touches[0].clientY;
+    }, { passive: true });
+
+    document.addEventListener('touchend', (e) => {
+        touchEndY = e.changedTouches[0].clientY;
+        if (window.scrollY === 0 && touchEndY > touchStartY + 100) {
+            // 下拉距離超過100px且在頁面頂部時刷新
+            window.location.reload();
+        }
+    }, { passive: true });
+};
+
 function HomePage({ handleNavigation }) {
     const [isMenuOpen, setMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
-    // 監聽視窗大小變化
+    // 監聽視窗大小變化和啟用下拉刷新
     useEffect(() => {
         const handleResize = () => {
             setIsMobile(window.innerWidth <= 768);
@@ -18,6 +36,10 @@ function HomePage({ handleNavigation }) {
         };
 
         window.addEventListener('resize', handleResize);
+
+        // 啟用下拉刷新功能
+        enablePullToRefresh();
+
         return () => {
             window.removeEventListener('resize', handleResize);
         };
