@@ -6,6 +6,9 @@ function DonateManage({ userInfo }) {
     const [content, setContent] = useState("");
     const [images, setImages] = useState([""]);
     const [error, setError] = useState("");
+    const [donateName, setDonateName] = useState("");
+    const [donateUrl, setDonateUrl] = useState("");
+    const [donateEngname, setDonateEngname] = useState("");
 
     // 只允許管理員進入
     if (!userInfo || userInfo.id !== 'admin') {
@@ -31,11 +34,18 @@ function DonateManage({ userInfo }) {
             setError("內容不可空白");
             return;
         }
+        if (!donateName || !donateUrl || !donateEngname) {
+            setError("贊助商名稱、網址、英文名稱皆為必填");
+            return;
+        }
         const validImages = images.map(url => url.trim()).filter(url => url).slice(0, 5);
         const payload = {
             user_id: 999,
             content,
             images: validImages,
+            donate_name: donateName,
+            donate_url: donateUrl,
+            donate_engname: donateEngname,
         };
         try {
             let res;
@@ -59,6 +69,9 @@ function DonateManage({ userInfo }) {
                 setContent("");
                 setImages([""]);
                 setEditingPost(null);
+                setDonateName("");
+                setDonateUrl("");
+                setDonateEngname("");
                 fetchPosts();
             }
         } catch (err) {
@@ -71,6 +84,9 @@ function DonateManage({ userInfo }) {
         setEditingPost(post);
         setContent(post.content);
         setImages(post.images && post.images.length > 0 ? post.images.concat([""]).slice(0, 5) : [""]);
+        setDonateName(post.donate_name || "");
+        setDonateUrl(post.donate_url || "");
+        setDonateEngname(post.donate_engname || "");
     };
 
     // 刪除
@@ -95,6 +111,9 @@ function DonateManage({ userInfo }) {
         setContent("");
         setImages([""]);
         setError("");
+        setDonateName("");
+        setDonateUrl("");
+        setDonateEngname("");
     };
 
     // 動態圖片網址欄位
@@ -114,7 +133,7 @@ function DonateManage({ userInfo }) {
 
     return (
         <div>
-            <h2 style={{fontSize: '2rem', fontWeight: '800', margin: '1em'}}>贊助貼文管理</h2>
+            <h2 style={{fontSize: '2rem', fontWeight: '800', margin: '1em auto 1em auto', textAlign: 'center'}}>贊助貼文管理</h2>
             <form onSubmit={handleSubmit}>
                 <div>
                     <textarea
@@ -122,7 +141,31 @@ function DonateManage({ userInfo }) {
                         onChange={e => setContent(e.target.value)}
                         placeholder="貼文內容"
                         rows={3}
-                        style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '1em', borderRadius: '6px' }}
+                        style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '1em', borderRadius: '6px', marginBottom: '1em' }}
+                    />
+                </div>
+                <div>
+                    <label style={{fontWeight:'bold', marginBottom: '0.5em', display: 'block'}}>贊助商資訊：</label>
+                    <input
+                        type="text"
+                        value={donateName}
+                        onChange={e => setDonateName(e.target.value)}
+                        placeholder="贊助商名稱"
+                        style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '0.5em', borderRadius: '6px', marginBottom: 4 }}
+                    />
+                    <input
+                        type="text"
+                        value={donateUrl}
+                        onChange={e => setDonateUrl(e.target.value)}
+                        placeholder="贊助商網址 (含 https://)"
+                        style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '0.5em', borderRadius: '6px', marginBottom: 4 }}
+                    />
+                    <input
+                        type="text"
+                        value={donateEngname}
+                        onChange={e => setDonateEngname(e.target.value)}
+                        placeholder="贊助商英文名稱 (@後面)"
+                        style={{ width: "100%", border: 'solid 1px rgba(0,0,0,0.5)', padding: '0.5em', borderRadius: '6px', marginBottom: '1em' }}
                     />
                 </div>
                 <div>
@@ -146,10 +189,13 @@ function DonateManage({ userInfo }) {
             <h3 style={{fontSize:'1.8em'}}>所有贊助貼文</h3>
             <ul>
                 {posts.map(post => (
-                    <li key={post.id} style={{ marginBottom: 16 }}>
-                        <div>內容：{post.content}</div>
+                    <li key={post.id} style={{ marginBottom: 16, borderBottom: '1px solid #eee', paddingBottom: 16 }}>
+                        <div><strong>內容：</strong>{post.content}</div>
+                        {post.donate_name && <div><strong>贊助商名稱：</strong>{post.donate_name}</div>}
+                        {post.donate_url && <div><strong>贊助商網址：</strong>{post.donate_url}</div>}
+                        {post.donate_engname && <div><strong>贊助商英文名稱：</strong>{post.donate_engname}</div>}
                         {post.images && post.images.length > 0 && (
-                            <div style={{display:'flex', gap:8, flexWrap:'wrap'}}>
+                            <div style={{display:'flex', gap:8, flexWrap:'wrap', marginTop: '1em'}}>
                                 {post.images.map((url, idx) => (
                                     <img key={idx} src={url} alt="贊助圖片" style={{ maxWidth: 120, maxHeight: 120, borderRadius: 6, border: '1px solid #ccc' }} />
                                 ))}

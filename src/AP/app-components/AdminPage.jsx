@@ -29,10 +29,13 @@ function AdminPage({ activePage, setActivePage, userInfo }) {
                     </div>
                 </div>
                 <div>
-                    <h3>管理員功能列</h3>
+                    <h3 style={{fontSize: "2rem", fontWeight:"700"}}>
+                        管理員功能列
+                        </h3>
                     <div
                         className={`nav-item ${activePage === 'donate-manage' ? 'active' : ''}`}
                         onClick={() => setActivePage('donate-manage')}
+                        style={{width:"100%", backgroundColor:"#D7BFB0", color:"#fff", borderRadius:"12px"}}
                     >贊助貼文管理</div>
                 </div>
             </div>

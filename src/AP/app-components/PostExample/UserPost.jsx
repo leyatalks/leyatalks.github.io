@@ -14,11 +14,11 @@ function UserPost({ post }) {
                     <div className="post-username">@{post.username}</div>
                 </div>
                 <div className="post-text">{post.content}</div>
-                {post.image_url &&
+                {/* {post.image_url &&
                     <div className="post-images">
                         <img src={post.image_url} alt="用戶圖片" />
                     </div>
-                }
+                } */}
             </div>
         </div>
     );
