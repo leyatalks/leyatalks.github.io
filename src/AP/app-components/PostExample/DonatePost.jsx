@@ -60,7 +60,14 @@ function DonatePost({ post }) {
                                 key={idx}
                                 src={encodeURI(url)}
                                 alt={`贊助圖片${idx+1}`}
-                                style={{ maxHeight: 120, borderRadius: 6, border: '1px solid #ccc', cursor: 'pointer' }}
+                                style={{
+                                    maxHeight: 120,
+                                    maxWidth: '100%',
+                                    borderRadius: 6,
+                                    border: '1px solid #ccc',
+                                    cursor: 'pointer',
+                                    objectFit: 'cover'
+                                }}
                                 onClick={() => handleImgClick(url)}
                             />
                         ))}
@@ -81,17 +88,40 @@ function DonatePost({ post }) {
                     }}
                     onClick={handleClose}
                 >
-                    <img
-                        src={encodeURI(modalImg)}
-                        alt="放大圖片"
-                        style={{
-                            maxWidth: "90vw",
-                            maxHeight: "90vh",
-                            borderRadius: 10,
-                            boxShadow: "0 0 20px #000"
-                        }}
-                        onClick={e => e.stopPropagation()} // 防止點擊圖片關閉
-                    />
+                    <div style={{ position: 'relative', maxWidth: "90vw", maxHeight: "90vh" }}>
+                        <img
+                            src={encodeURI(modalImg)}
+                            alt="放大圖片"
+                            style={{
+                                maxWidth: "100%",
+                                maxHeight: "90vh",
+                                borderRadius: 10,
+                                boxShadow: "0 0 20px #000",
+                                objectFit: "contain"
+                            }}
+                            onClick={e => e.stopPropagation()} // 防止點擊圖片關閉
+                        />
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '10px',
+                                right: '10px',
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '50%',
+                                background: 'rgba(0,0,0,0.5)',
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                fontSize: '18px'
+                            }}
+                            onClick={handleClose}
+                        >
+                            ✕
+                        </div>
+                    </div>
                 </div>
             )}
         </div>
