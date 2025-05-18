@@ -243,6 +243,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    padding-bottom: 2em;
+    padding-right: 2em;
 }
 
 .hp-hamburger:hover {
@@ -349,6 +351,7 @@
         z-index: 1000;
         background-color: #FAEAD3;
         box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        max-height: 4.8em;
     }
 
     .hp-navbar_logo {
@@ -403,6 +406,7 @@
     .hp-slogan {
         font-size: 2.5rem;
         padding: 1rem;
+        margin-top: 1rem;
     }
 
     .hp-content-container {
