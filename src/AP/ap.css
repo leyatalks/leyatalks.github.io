@@ -58,7 +58,7 @@ body {
     background-color: var(--primary-color);
     border-bottom: 1px solid var(--border-color);
     position: relative;
-    z-index: 10;   
+    z-index: 10;
     max-width: 480px;
 
 }
@@ -82,17 +82,17 @@ body {
 }
 
 .golden-sentence-container {
-    display: flex;
-    flex-direction: row;
-    font-size: 24px;
-    padding-left: 1em;
-    padding-bottom: 0.5em;
-    flex: 1;
-    font-weight: bold;
-    overflow: hidden;
-    border-bottom: 1px solid var(--border-color);
-    
-    .fake{}
+    & {
+        display: flex;
+        flex-direction: row;
+        font-size: 24px;
+        padding-left: 1em;
+        padding-bottom: 0.5em;
+        flex: 1;
+        font-weight: bold;
+        overflow: hidden;
+        border-bottom: 1px solid var(--border-color);
+    }
 
     .golden-sentence-icon {
         font-size: 2em;
@@ -101,9 +101,11 @@ body {
     }
 
     .golden-sentence {
-        display: flex;
-        flex-direction: column;
-        padding-left: 0.5em;
+        & {
+            display: flex;
+            flex-direction: column;
+            padding-left: 0.5em;
+        }
 
         h4 {
             font-size: 1.1em;
@@ -117,12 +119,13 @@ body {
     }
 
     .share-icon {
-        margin-left: 3em;
-        font-size: 1em;
-        padding-top: 1.6em;
-        color: #AAB8AB;
+        & {
+            margin-left: 3em;
+            font-size: 1em;
+            padding-top: 1.6em;
+            color: #AAB8AB;
+        }
 
-        .fake{}
         :hover {
             color: #53565C;
             transition: 0.5s;
