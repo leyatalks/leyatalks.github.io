@@ -62,7 +62,6 @@ function DonatePost({ post }) {
                                 alt={`贊助圖片${idx+1}`}
                                 style={{ maxHeight: 120, borderRadius: 6, border: '1px solid #ccc', cursor: 'pointer' }}
                                 onClick={() => handleImgClick(url)}
-                                crossOrigin="anonymous" // 保持這行
                             />
                         ))}
                     </div>
