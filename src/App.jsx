@@ -17,7 +17,14 @@ function App() {
   };
 
   return (
-    <div style={{ width: '100%', overflowX: 'hidden', position: 'relative' }}>
+    <div style={{
+      width: '100%',
+      maxWidth: '100vw',
+      overflowX: 'hidden',
+      position: 'relative',
+      boxSizing: 'border-box',
+      touchAction: 'pan-y' // 只允許垂直滑動，禁止水平滑動
+    }}>
       {currentPage === "home" ? (
         <HomePage handleNavigation={handleNavigation} />
       )  : (

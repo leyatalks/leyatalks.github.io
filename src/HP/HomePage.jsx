@@ -4,20 +4,89 @@ import './hp.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4';
 
-// 下拉刷新功能
-const enablePullToRefresh = () => {
+// 下拉刷新功能 - 使用自定義事件而非頁面重載
+const enablePullToRefresh = (callback) => {
     let touchStartY = 0;
     let touchEndY = 0;
+    let refreshIndicator = null;
 
+    // 創建刷新指示器
+    const createRefreshIndicator = () => {
+        if (!refreshIndicator) {
+            refreshIndicator = document.createElement('div');
+            refreshIndicator.style.position = 'fixed';
+            refreshIndicator.style.top = '0';
+            refreshIndicator.style.left = '0';
+            refreshIndicator.style.width = '100%';
+            refreshIndicator.style.height = '50px';
+            refreshIndicator.style.backgroundColor = '#FAEAD3';
+            refreshIndicator.style.display = 'flex';
+            refreshIndicator.style.justifyContent = 'center';
+            refreshIndicator.style.alignItems = 'center';
+            refreshIndicator.style.transform = 'translateY(-50px)';
+            refreshIndicator.style.transition = 'transform 0.3s ease';
+            refreshIndicator.style.zIndex = '1000';
+            refreshIndicator.textContent = '下拉刷新';
+            document.body.appendChild(refreshIndicator);
+        }
+        return refreshIndicator;
+    };
+
+    // 觸摸開始
     document.addEventListener('touchstart', (e) => {
         touchStartY = e.touches[0].clientY;
+        createRefreshIndicator();
     }, { passive: true });
 
+    // 觸摸移動
+    document.addEventListener('touchmove', (e) => {
+        if (window.scrollY === 0) {
+            const currentY = e.touches[0].clientY;
+            const diff = currentY - touchStartY;
+
+            if (diff > 0) {
+                // 防止頁面滾動
+                // e.preventDefault(); // 注意：在 passive 事件中不能使用 preventDefault
+
+                // 顯示刷新指示器
+                const indicator = createRefreshIndicator();
+                const pullDistance = Math.min(diff * 0.5, 50); // 限制最大下拉距離
+                indicator.style.transform = `translateY(${pullDistance - 50}px)`;
+
+                if (pullDistance > 40) {
+                    indicator.textContent = '釋放刷新';
+                } else {
+                    indicator.textContent = '下拉刷新';
+                }
+            }
+        }
+    }, { passive: true });
+
+    // 觸摸結束
     document.addEventListener('touchend', (e) => {
         touchEndY = e.changedTouches[0].clientY;
-        if (window.scrollY === 0 && touchEndY > touchStartY + 100) {
-            // 下拉距離超過100px且在頁面頂部時刷新
-            window.location.reload();
+        const diff = touchEndY - touchStartY;
+
+        if (window.scrollY === 0 && diff > 100) {
+            // 下拉距離超過100px且在頁面頂部時觸發刷新
+            const indicator = createRefreshIndicator();
+            indicator.textContent = '正在刷新...';
+            indicator.style.transform = 'translateY(0)';
+
+            // 執行回調函數而不是重新加載頁面
+            if (typeof callback === 'function') {
+                setTimeout(() => {
+                    callback();
+
+                    // 隱藏刷新指示器
+                    setTimeout(() => {
+                        indicator.style.transform = 'translateY(-50px)';
+                    }, 500);
+                }, 1000);
+            }
+        } else if (refreshIndicator) {
+            // 如果沒有觸發刷新，隱藏指示器
+            refreshIndicator.style.transform = 'translateY(-50px)';
         }
     }, { passive: true });
 };
@@ -37,8 +106,18 @@ function HomePage({ handleNavigation }) {
 
         window.addEventListener('resize', handleResize);
 
-        // 啟用下拉刷新功能
-        enablePullToRefresh();
+        // 定義刷新回調函數
+        const refreshCallback = () => {
+            // 這裡可以執行任何需要在刷新時進行的操作
+            // 例如重新獲取數據等
+            console.log('頁面已刷新');
+
+            // 如果需要，可以強制重新渲染組件
+            setIsMobile(window.innerWidth <= 768);
+        };
+
+        // 啟用下拉刷新功能，並傳入回調函數
+        enablePullToRefresh(refreshCallback);
 
         return () => {
             window.removeEventListener('resize', handleResize);
