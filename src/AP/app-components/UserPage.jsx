@@ -2,9 +2,13 @@ import React from 'react';
 import UserPostSimple from './PostExample/UserPostSimple';
 
 
-function UserPage({ activePage, setActivePage, userInfo, handleLogout }) {
+function UserPage({ activePage, setActivePage, userInfo }) {
     console.log('User Info:', userInfo); // 檢查 userInfo 的內容
-
+    
+    function handleLogout(){
+        setActivePage('login-page')
+    }
+    
     return (
         <>
             <div className="user-page">
