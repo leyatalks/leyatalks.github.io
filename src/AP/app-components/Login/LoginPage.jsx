@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import "./login.css";
 
 function LoginPage({ activePage, setActivePage, setUserInfo }) {
@@ -28,7 +28,26 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
             if (response.ok) {
                 const data = await response.json();
                 console.log('登入成功:', data);
-                setUserInfo({ nickname: data.nickname, id: data.id });
+
+                // 創建用戶信息對象
+                const userInfoData = {
+                    nickname: data.nickname,
+                    id: data.id
+                };
+
+                // 保存用戶信息到 sessionStorage
+                sessionStorage.setItem('userInfo', JSON.stringify(userInfoData));
+
+                // 如果後端返回了 token，也保存它
+                if (data.token) {
+                    sessionStorage.setItem('token', data.token);
+                } else {
+                    // 如果後端沒有返回 token，我們可以創建一個簡單的標記
+                    sessionStorage.setItem('token', 'logged-in-' + Date.now());
+                }
+
+                // 更新應用狀態
+                setUserInfo(userInfoData);
                 setActivePage('home-page');
             } else {
                 // 當登入失敗時，設置錯誤訊息
@@ -76,7 +95,7 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
             <div className="signup">
                 還沒有帳號？<a href="#" className={`signup ${activePage === 'register' ? 'active' : ''}`} onClick={() => handle('register')}>註冊</a>
             </div>
-            
+
             <div className="login-donate">
                 <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/shu.png" alt="世新大學校徽" className='shu' />
                 <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/ics.png" alt="資傳系徽" className='ics' />

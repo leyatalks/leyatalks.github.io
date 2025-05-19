@@ -93,32 +93,47 @@ const enablePullToRefresh = (callback) => {
 
 function HomePage({ handleNavigation }) {
     const [isMenuOpen, setMenuOpen] = useState(false);
-    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    // 確保在組件掛載時正確檢測設備類型
+    const [isMobile, setIsMobile] = useState(() => {
+        return window.innerWidth <= 768;
+    });
 
     // 監聽視窗大小變化和啟用下拉刷新
     useEffect(() => {
+        // 定義處理視窗大小變化的函數
         const handleResize = () => {
-            setIsMobile(window.innerWidth <= 768);
-            if (window.innerWidth > 768) {
+            const isMobileView = window.innerWidth <= 768;
+            setIsMobile(isMobileView);
+
+            // 如果不是移動設備，確保選單關閉
+            if (!isMobileView) {
                 setMenuOpen(false);
+            }
+
+            // 確保漢堡選單在正確的設備上顯示
+            const hamburgerBtn = document.querySelector('.hp-hamburger');
+            if (hamburgerBtn) {
+                hamburgerBtn.style.display = isMobileView ? 'flex' : 'none';
             }
         };
 
+        // 初始執行一次以確保正確的初始狀態
+        handleResize();
+
+        // 添加視窗大小變化監聽器
         window.addEventListener('resize', handleResize);
 
         // 定義刷新回調函數
         const refreshCallback = () => {
-            // 這裡可以執行任何需要在刷新時進行的操作
-            // 例如重新獲取數據等
             console.log('頁面已刷新');
-
-            // 如果需要，可以強制重新渲染組件
-            setIsMobile(window.innerWidth <= 768);
+            // 刷新時重新檢測設備類型
+            handleResize();
         };
 
         // 啟用下拉刷新功能，並傳入回調函數
         enablePullToRefresh(refreshCallback);
 
+        // 清理函數
         return () => {
             window.removeEventListener('resize', handleResize);
         };
@@ -149,20 +164,42 @@ function HomePage({ handleNavigation }) {
             <FakeNavbar />
             <div className='hp-navbar'>
                 <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png" alt="LeyaTalks" className='hp-navbar_logo' />
-                <button className='hp-hamburger' onClick={toggleMenu} aria-label="菜單">
+                <button
+                    className='hp-hamburger'
+                    onClick={toggleMenu}
+                    aria-label="菜單"
+                    style={{ display: isMobile ? 'flex' : 'none' }} // 只在移動設備上顯示
+                >
                     {isMenuOpen ? '✕' : '☰'} {/* 切換漢堡選單圖標 */}
                 </button>
-                <div className={`hp-navbar-links ${isMenuOpen ? 'open' : ''}`}>
-                    <a href="#" onClick={handleNavClick}>主頁</a>
-                    <a href="#concept" onClick={handleNavClick}>專題理念</a>
-                    <a href="#planning" onClick={handleNavClick}>專題企劃</a>
-                    <a onClick={() => {
-                        handleNavigation("/LeyaTalks");
-                        handleNavClick();
-                    }} className='hp-arrow-link'>
-                        <FontAwesomeIcon icon={faCircleRight} />
-                    </a>
-                </div>
+                {/* 桌面版導航 */}
+                {!isMobile && (
+                    <div className='hp-navbar-links' style={{ display: 'flex', flexDirection: 'row', position: 'static', transform: 'none', opacity: 1, background: 'transparent', boxShadow: 'none' }}>
+                        <a href="#" onClick={handleNavClick}>主頁</a>
+                        <a href="#concept" onClick={handleNavClick}>專題理念</a>
+                        <a href="#planning" onClick={handleNavClick}>專題企劃</a>
+                        <a onClick={() => {
+                            handleNavigation("/LeyaTalks");
+                            handleNavClick();
+                        }} className='hp-arrow-link'>
+                            <FontAwesomeIcon icon={faCircleRight} />
+                        </a>
+                    </div>
+                )}
+                {/* 移動版導航 */}
+                {isMobile && (
+                    <div className={`hp-navbar-links ${isMenuOpen ? 'open' : ''}`}>
+                        <a href="#" onClick={handleNavClick}>主頁</a>
+                        <a href="#concept" onClick={handleNavClick}>專題理念</a>
+                        <a href="#planning" onClick={handleNavClick}>專題企劃</a>
+                        <a onClick={() => {
+                            handleNavigation("/LeyaTalks");
+                            handleNavClick();
+                        }} className='hp-arrow-link'>
+                            <FontAwesomeIcon icon={faCircleRight} />
+                        </a>
+                    </div>
+                )}
             </div>
 
             {/* 背景遮罩，當選單打開時顯示 */}

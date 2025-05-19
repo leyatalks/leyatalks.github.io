@@ -100,15 +100,69 @@ const enablePullToRefresh = (callback) => {
 function Application() {
     const [activePage, setActivePage] = useState('login-page')
     const [userInfo, setUserInfo] = useState({ nickname: '', id: '' })
+    const [isLoading, setIsLoading] = useState(true)
+
+    // 檢查用戶是否已登入
+    useEffect(() => {
+        // 從 sessionStorage 獲取用戶信息
+        const savedUserInfo = sessionStorage.getItem('userInfo');
+        const savedToken = sessionStorage.getItem('token');
+
+        if (savedUserInfo && savedToken) {
+            try {
+                const parsedUserInfo = JSON.parse(savedUserInfo);
+                setUserInfo(parsedUserInfo);
+                setActivePage('home-page');
+
+                // 驗證 token 是否有效（可選）
+                validateToken(savedToken);
+            } catch (error) {
+                console.error('解析用戶信息時出錯:', error);
+                // 清除無效的存儲數據
+                sessionStorage.removeItem('userInfo');
+                sessionStorage.removeItem('token');
+            }
+        }
+
+        setIsLoading(false);
+    }, []);
+
+    // 驗證 token 是否有效的函數
+    const validateToken = async (token) => {
+        try {
+            const response = await fetch('https://leya-backend-vercel.vercel.app/validate-token', {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+
+            if (!response.ok) {
+                // Token 無效，登出用戶
+                handleLogout();
+            }
+        } catch (error) {
+            console.error('驗證 token 時出錯:', error);
+            // 網絡錯誤時，我們可以選擇保留用戶登入狀態
+        }
+    };
+
+    // 登出函數
+    const handleLogout = () => {
+        // 清除 sessionStorage 中的用戶信息和 token
+        sessionStorage.removeItem('userInfo');
+        sessionStorage.removeItem('token');
+
+        // 重置狀態
+        setUserInfo({ nickname: '', id: '' });
+        setActivePage('login-page');
+    };
 
     // 啟用下拉刷新功能
     useEffect(() => {
         // 定義刷新回調函數
         const refreshCallback = () => {
-            // 這裡可以執行任何需要在刷新時進行的操作
             console.log('應用頁面已刷新');
-
-            // 如果需要，可以強制重新渲染組件
             setActivePage(prev => prev); // 這會觸發重新渲染但不改變狀態
         };
 
@@ -123,21 +177,45 @@ function Application() {
             case 'home-page':
                 return <Post />
             case 'category-page':
-                return <CategoryPage  activePage={activePage} setActivePage={setActivePage} />
+                return <CategoryPage activePage={activePage} setActivePage={setActivePage} />
             case 'chat-page':
                 return <ChatPage />
             case 'user-page':
-                return <UserPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
+                return <UserPage
+                    activePage={activePage}
+                    setActivePage={setActivePage}
+                    userInfo={userInfo}
+                    handleLogout={handleLogout}
+                />
             case 'admin-page':
-                return <AdminPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
+                return <AdminPage
+                    activePage={activePage}
+                    setActivePage={setActivePage}
+                    userInfo={userInfo}
+                    handleLogout={handleLogout}
+                />
             case 'donate-manage':
-                return <DonateManage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
+                return <DonateManage
+                    activePage={activePage}
+                    setActivePage={setActivePage}
+                    userInfo={userInfo}
+                />
             case 'login-page':
-                return <LoginPage activePage={activePage} setActivePage={setActivePage} setUserInfo={setUserInfo} />
+                return <LoginPage
+                    activePage={activePage}
+                    setActivePage={setActivePage}
+                    setUserInfo={setUserInfo}
+                />
             case 'register':
-                return <RegisterPage activePage={activePage} setActivePage={setActivePage}/>
+                return <RegisterPage
+                    activePage={activePage}
+                    setActivePage={setActivePage}
+                />
             case 'secret':
-                return <Sercet activePage={activePage} setActivePage={setActivePage}/>
+                return <Sercet
+                    activePage={activePage}
+                    setActivePage={setActivePage}
+                />
             default:
                 return <Post />
         }
@@ -145,13 +223,31 @@ function Application() {
 
     return (
             <div id='app'>
-                <div className='ap-page-container'>
-                    { !whiteList.includes(activePage) && <Header setActivePage={setActivePage} userInfo={userInfo} /> }
-                    <div className="content-area">
-                        {renderPage()}
+                {isLoading ? (
+                    <div className="loading-container">
+                        <div className="loading-spinner"></div>
+                        <p>載入中...</p>
                     </div>
-                    { !whiteList.includes(activePage) && <Footer activePage={activePage} setActivePage={setActivePage} /> }
-                </div>
+                ) : (
+                    <div className='ap-page-container'>
+                        { !whiteList.includes(activePage) &&
+                            <Header
+                                setActivePage={setActivePage}
+                                userInfo={userInfo}
+                                handleLogout={handleLogout}
+                            />
+                        }
+                        <div className="content-area">
+                            {renderPage()}
+                        </div>
+                        { !whiteList.includes(activePage) &&
+                            <Footer
+                                activePage={activePage}
+                                setActivePage={setActivePage}
+                            />
+                        }
+                    </div>
+                )}
             </div>
     )
 }

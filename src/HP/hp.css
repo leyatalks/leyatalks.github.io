@@ -32,6 +32,7 @@
     padding: 1em;
     box-sizing: border-box;
     overflow-x: hidden;
+    overflow-y: hidden;
 }
 
 .hp-navbar_logo {
@@ -240,11 +241,8 @@
     transition: transform 0.3s ease;
     width: 40px;
     height: 40px;
-    display: flex;
     align-items: center;
     justify-content: center;
-    padding-bottom: 1.5em;
-    padding-right: 2em;
 }
 
 .hp-hamburger:hover {
@@ -401,7 +399,7 @@
     }
 
     .hp-hamburger {
-        display: block;
+        display: flex; /* 在移動設備上顯示漢堡選單 */
     }
 
     .hp-slogan {

@@ -2,13 +2,9 @@ import React from 'react';
 import DonateManage from './Admin-Function/DonateManage';
 
 
-function AdminPage({ activePage, setActivePage, userInfo }) {
+function AdminPage({ activePage, setActivePage, userInfo, handleLogout }) {
     if (!userInfo) return <div>尚未登入</div>;
     console.log('User Info:', userInfo); // 檢查 userInfo 的內容
-
-    function handleLogout() {
-        setActivePage('login-page')
-    }
 
     return (
         <>
