@@ -257,7 +257,7 @@ function Content({ id, isMobile }) {
                 <>
                     <div className="hp-half-container">
                         <div className="hp-content-top">
-                            <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/tempcontent.png" alt="專題理念圖片" />
+                            <img src="https://raw.githubusercontent.com/leyatalks/leya_images/refs/heads/main/hp-first.webp?token=GHSAT0AAAAAADE7XWU4VJ5YMJTZ7UT5WO2Y2CMHUBA" alt="專題理念圖片" />
                         </div>
                         <div className="hp-content-bottom"></div>
                     </div>
@@ -276,7 +276,7 @@ function Content({ id, isMobile }) {
                 <>
                     <div className="hp-half-container">
                         <div className="hp-content-top">
-                            <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/tempcontent.png" alt="專題理念圖片" />
+                            <img src="https://raw.githubusercontent.com/leyatalks/leya_images/refs/heads/main/hp-first.webp?token=GHSAT0AAAAAADE7XWU4VJ5YMJTZ7UT5WO2Y2CMHUBA" alt="專題理念圖片" />
                         </div>
                     </div>
                     <div className="hp-half-container">
@@ -313,7 +313,7 @@ function Content_Reverse({ id, isMobile }) {
                     </div>
                     <div className="hp-half-container">
                         <div className="hp-content-top">
-                            <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/tempcontent.png" alt="專題企劃圖片" />
+                            <img src="https://raw.githubusercontent.com/leyatalks/leya_images/refs/heads/main/hp-second.webp?token=GHSAT0AAAAAADE7XWU573ZYKHI4AEI3LWDQ2CMHVZQ" alt="專題企劃圖片" />
                         </div>
                         <div className="hp-content-bottom"></div>
                     </div>
@@ -322,7 +322,7 @@ function Content_Reverse({ id, isMobile }) {
                 <>
                     <div className="hp-half-container">
                         <div className="hp-content-top">
-                            <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/tempcontent.png" alt="專題企劃圖片" />
+                            <img src="https://raw.githubusercontent.com/leyatalks/leya_images/refs/heads/main/hp-second.webp?token=GHSAT0AAAAAADE7XWU573ZYKHI4AEI3LWDQ2CMHVZQ" alt="專題企劃圖片" />
                         </div>
                     </div>
                     <div className="hp-half-container">
