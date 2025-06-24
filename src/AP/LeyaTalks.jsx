@@ -125,7 +125,7 @@ function Application() {
             case 'category-page':
                 return <CategoryPage  activePage={activePage} setActivePage={setActivePage} />
             case 'chat-page':
-                return <ChatPage />
+                return <ChatPage userInfo={userInfo} />
             case 'user-page':
                 return <UserPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo} />
             case 'admin-page':

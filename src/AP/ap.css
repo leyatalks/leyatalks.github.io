@@ -274,6 +274,72 @@ body {
     height: 100%;
     position: relative;
     background-color: var(--primary-color);
+    width: 100%;
+}
+
+.chat-history {
+    flex: 1;
+    max-height: 85%;
+    overflow-y: auto;
+    margin-bottom: 1rem;
+}
+
+/* 聊天訊息外層 */
+.chat-message {
+    margin: 8px 0;
+}
+.chat-message-user {
+    text-align: right;
+}
+.chat-message-bot {
+    text-align: left;
+}
+
+/* 聊天氣泡 */
+.chat-bubble {
+    display: inline-block;
+    border-radius: 8px;
+    padding: 8px 12px;
+    max-width: 80%;
+    word-break: break-all;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+/* 頭貼 */
+.chat-avatar {
+    width: 50px;
+    height: 50px;
+    padding: 0.3em;
+    /* border-radius: 50%; */
+    margin-bottom: 0.5em;
+}
+
+.chat-avatar-user {
+    /* background-color: #e0f7fa; */
+    margin-left: auto;
+}
+.chat-avatar-bot {
+    /* background-color: #f1f8e9; */
+}
+
+.chat-bubble-user {
+    background: #e0f7fa;
+}
+.chat-bubble-bot {
+    background: #f1f8e9;
+}
+
+/* bot 額外資訊 */
+.chat-bot-extra {
+    font-size: 0.9em;
+    color: #888;
+    margin-top: 4px;
+}
+
+/* loading 樣式 */
+.chat-loading {
+    color: #888;
 }
 
 .chat-input-container {
@@ -560,3 +626,4 @@ body {
         font-size: 11px;
     }
 }
+
