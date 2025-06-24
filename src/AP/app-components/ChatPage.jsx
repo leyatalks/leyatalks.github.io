@@ -3,24 +3,33 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faHandHoldingHeart, faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
 
 function ChatPage({ userInfo }) {
-    const username = userInfo?.nickname || 'visitor';
-    const storageKey = `chat-messages-${username}`;
+    const username = userInfo?.id || 'visitor';
 
-    const [messages, setMessages] = useState(() => {
-        const saved = localStorage.getItem(storageKey);
-        return saved ? JSON.parse(saved) : [];
-    });
+    const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
 
+    // 只從後端讀取訊息
     useEffect(() => {
-        const saved = localStorage.getItem(storageKey);
-        setMessages(saved ? JSON.parse(saved) : []);
-    }, [storageKey]);
+        if (!username) return; // 沒有 username 不 fetch
+        async function fetchHistory() {
+            const res = await fetch(`https://leya-backend-vercel.vercel.app/chat-history?username=${username}`);
+            const history = await res.json();
+            console.log('history:', history);
+            // 轉換成 messages 陣列格式
+            const msgs = [];
+            history.forEach(item => {
+                msgs.push({ role: 'user', text: item.user_message });
+                msgs.push({ role: 'bot', text: item.bot_message, encouragement: item.encourage_text, emotion: item.emotion });
+            });
+            setMessages(msgs);
+        }
+        fetchHistory();
+    }, [username]);
 
     useEffect(() => {
-        localStorage.setItem(storageKey, JSON.stringify(messages));
-    }, [messages, storageKey]);
+        console.log('fetch username:', username);
+    }, [username]);
 
     const handleInputChange = (e) => {
         setInput(e.target.value);
@@ -28,15 +37,16 @@ function ChatPage({ userInfo }) {
 
     const handleSend = async () => {
         if (!input.trim()) return;
-        const userMessage = { role: 'user', text: input };
-        setMessages((prev) => [...prev, userMessage]);
+        const userMessage = input;
+        setMessages((prev) => [...prev, { role: 'user', text: userMessage }]);
         setInput("");
         setLoading(true);
         try {
+            // 1. 先呼叫 /chat 拿到 bot 回覆
             const res = await fetch("https://leya-backend-vercel.vercel.app/chat", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: userMessage.text })
+                body: JSON.stringify({ message: userMessage, userId: username })
             });
             const data = await res.json();
             const botMessage = {
@@ -46,6 +56,19 @@ function ChatPage({ userInfo }) {
                 emotion: data.emotion
             };
             setMessages((prev) => [...prev, botMessage]);
+
+            // 2. 呼叫 /chat-history 儲存這一組訊息
+            await fetch("https://leya-backend-vercel.vercel.app/chat-history", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                    username: username,
+                    user_message: userMessage,
+                    bot_message: data.reply,
+                    encourage_text: data.encouragement,
+                    emotion: data.emotion
+                })
+            });
         } catch (err) {
             setMessages((prev) => [...prev, { role: 'bot', text: '伺服器錯誤，請稍後再試。' }]);
         } finally {

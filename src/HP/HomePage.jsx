@@ -4,6 +4,10 @@ import './hp.css'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4';
 
+//首頁圖片
+const firstImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-first.webp";
+const secondImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-second.webp";
+
 // 下拉刷新功能 - 使用自定義事件而非頁面重載
 const enablePullToRefresh = (callback) => {
     let touchStartY = 0;
@@ -93,27 +97,23 @@ const enablePullToRefresh = (callback) => {
 
 function HomePage({ handleNavigation }) {
     const [isMenuOpen, setMenuOpen] = useState(false);
-    // 確保在組件掛載時正確檢測設備類型
-    const [isMobile, setIsMobile] = useState(() => {
-        return window.innerWidth <= 768;
-    });
+    const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
 
     // 監聽視窗大小變化和啟用下拉刷新
     useEffect(() => {
         // 定義處理視窗大小變化的函數
         const handleResize = () => {
-            const isMobileView = window.innerWidth <= 768;
-            setIsMobile(isMobileView);
+            setIsMobile(window.innerWidth <= 768);
 
             // 如果不是移動設備，確保選單關閉
-            if (!isMobileView) {
+            if (!isMobile) {
                 setMenuOpen(false);
             }
 
             // 確保漢堡選單在正確的設備上顯示
             const hamburgerBtn = document.querySelector('.hp-hamburger');
             if (hamburgerBtn) {
-                hamburgerBtn.style.display = isMobileView ? 'flex' : 'none';
+                hamburgerBtn.style.display = isMobile ? 'flex' : 'none';
             }
         };
 
@@ -234,7 +234,7 @@ function FakeNavbar() {
 function IndexContainer({ isMobile }) {
     return (
         <div className='hp-container'>
-            <Slogan />
+            <Slogan isMobile={isMobile} />
             <Content id="concept" isMobile={isMobile} />
             <Content_Reverse id="planning" isMobile={isMobile} />
             <Footer />
@@ -242,10 +242,20 @@ function IndexContainer({ isMobile }) {
     )
 }
 
-function Slogan() {
+function Slogan({ isMobile }) {
     return (
         <div className='hp-slogan'>
-            樂壓Talks 溫暖你的心
+            {!isMobile ? (
+                <>
+                    樂壓Talks 溫暖你的心
+                </>
+            ) : (
+                <>
+                    樂壓Talks
+                    <br />
+                    溫暖你的心
+                </>
+            )}
         </div>
     )
 }
@@ -257,7 +267,7 @@ function Content({ id, isMobile }) {
                 <>
                     <div className="hp-half-container">
                         <div className="hp-content-top">
-                            <img src="https://raw.githubusercontent.com/leyatalks/leya_images/refs/heads/main/hp-first.webp?token=GHSAT0AAAAAADE7XWU4VJ5YMJTZ7UT5WO2Y2CMHUBA" alt="專題理念圖片" />
+                            <img src={firstImg} alt="專題理念圖片" />
                         </div>
                         <div className="hp-content-bottom"></div>
                     </div>
@@ -265,7 +275,7 @@ function Content({ id, isMobile }) {
                         <div className="hp-content">
                             在快節奏的現代生活中，許多人外表看似正常，<br />
                             內心卻早已身心俱疲，這正是韓國所稱的「Toast-out」狀態。<br />
-                            我們的專題網站樂壓Talk’s，便以此為靈感出發，<br />
+                            我們的專題網站樂壓Talk's，便以此為靈感出發，<br />
                             致力於打造一個能隨時隨地提供心理支持的網站，<br />
                             協助使用者識別壓力來源、釋放情緒，<br />
                             讓心理健康成為日常生活的一部分。
@@ -276,7 +286,7 @@ function Content({ id, isMobile }) {
                 <>
                     <div className="hp-half-container">
                         <div className="hp-content-top">
-                            <img src="https://raw.githubusercontent.com/leyatalks/leya_images/refs/heads/main/hp-first.webp?token=GHSAT0AAAAAADE7XWU4VJ5YMJTZ7UT5WO2Y2CMHUBA" alt="專題理念圖片" />
+                            <img src={firstImg} alt="專題理念圖片" />
                         </div>
                     </div>
                     <div className="hp-half-container">
@@ -285,7 +295,7 @@ function Content({ id, isMobile }) {
                             許多人外表看似正常<br />
                             內心卻早已身心俱疲<br />
                             這正是韓國所稱的「Toast-out」狀態<br />
-                            我們的專題網站樂壓Talk’s便以此為靈感出發<br />
+                            我們的專題網站樂壓Talk's便以此為靈感出發<br />
                             致力於打造一個能隨時隨地提供心理支持的網站<br />
                             協助使用者識別壓力來源、釋放情緒<br />
                             讓心理健康成為日常生活的一部分
@@ -313,7 +323,7 @@ function Content_Reverse({ id, isMobile }) {
                     </div>
                     <div className="hp-half-container">
                         <div className="hp-content-top">
-                            <img src="https://raw.githubusercontent.com/leyatalks/leya_images/refs/heads/main/hp-second.webp?token=GHSAT0AAAAAADE7XWU573ZYKHI4AEI3LWDQ2CMHVZQ" alt="專題企劃圖片" />
+                            <img src={secondImg} alt="專題企劃圖片" />
                         </div>
                         <div className="hp-content-bottom"></div>
                     </div>
@@ -322,7 +332,7 @@ function Content_Reverse({ id, isMobile }) {
                 <>
                     <div className="hp-half-container">
                         <div className="hp-content-top">
-                            <img src="https://raw.githubusercontent.com/leyatalks/leya_images/refs/heads/main/hp-second.webp?token=GHSAT0AAAAAADE7XWU573ZYKHI4AEI3LWDQ2CMHVZQ" alt="專題企劃圖片" />
+                            <img src={secondImg} alt="專題企劃圖片" />
                         </div>
                     </div>
                     <div className="hp-half-container">
