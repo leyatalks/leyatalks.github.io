@@ -8,6 +8,8 @@ function ChatPage({ userInfo }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [showModal, setShowModal] = useState(false);
+    const [modalImg, setModalImg] = useState("");
 
     // 只從後端讀取訊息
     useEffect(() => {
@@ -20,7 +22,13 @@ function ChatPage({ userInfo }) {
             const msgs = [];
             history.forEach(item => {
                 msgs.push({ role: 'user', text: item.user_message });
-                msgs.push({ role: 'bot', text: item.bot_message, encouragement: item.encourage_text, emotion: item.emotion });
+                msgs.push({ 
+                    role: 'bot', 
+                    text: item.bot_message, 
+                    encouragement: item.encourage_text, 
+                    emotion: item.emotion,
+                    image_url: item.image_url
+                });
             });
             setMessages(msgs);
         }
@@ -69,6 +77,27 @@ function ChatPage({ userInfo }) {
                     emotion: data.emotion
                 })
             });
+
+            // 3. 啟動輪詢，直到最新一筆 bot 訊息有 image_url
+            const pollForImage = () => {
+                const interval = setInterval(async () => {
+                    const res = await fetch(`https://leya-backend-vercel.vercel.app/chat-history?username=${username}`);
+                    const history = await res.json();
+                    // 找到最後一筆有 bot_message 的訊息
+                    for (let i = history.length - 1; i >= 0; i--) {
+                        const item = history[i];
+                        if (item.bot_message) {
+                            if (item.image_url) {
+                                setModalImg(item.image_url);
+                                setShowModal(true);
+                                clearInterval(interval);
+                            }
+                            break;
+                        }
+                    }
+                }, 3000); // 每 3 秒查一次
+            };
+            pollForImage();
         } catch (err) {
             setMessages((prev) => [...prev, { role: 'bot', text: '伺服器錯誤，請稍後再試。' }]);
         } finally {
@@ -78,6 +107,15 @@ function ChatPage({ userInfo }) {
 
     const handleKeyDown = (e) => {
         if (e.key === 'Enter') handleSend();
+    };
+
+    const handleEncouragementClick = async (msg) => {
+        if (msg.image_url) {
+            setModalImg(msg.image_url);
+            setShowModal(true);
+        } else {
+            alert("暫無圖片");
+        }
     };
 
     const userAvatar = "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png";
@@ -108,12 +146,19 @@ function ChatPage({ userInfo }) {
                                 {/* 聊天氣泡 */}
                                 <div className={msg.role === 'user' ? 'chat-bubble chat-bubble-user' : 'chat-bubble chat-bubble-bot'}> 
                                     <span>{msg.text}</span>
-                                    {/* {msg.role === 'bot' && (
+                                    {msg.role === 'bot' && (
                                         <div className="chat-bot-extra">
-                                            {msg.encouragement && <div>鼓勵：{msg.encouragement}</div>}
-                                            {msg.emotion && <div>情緒：{msg.emotion}</div>}
+                                            {msg.encouragement && (
+                                                <div
+                                                    style={{ cursor: "pointer", textDecoration: "none" }}
+                                                    onClick={() => handleEncouragementClick(msg)}
+                                                >
+                                                    {msg.encouragement}
+                                                </div>
+                                            )}
+                                            {/* {msg.emotion && <div>情緒：{msg.emotion}</div>} */}
                                         </div>
-                                    )} */}
+                                    )}
                                 </div>
                             </div>
                         ))}
@@ -135,6 +180,55 @@ function ChatPage({ userInfo }) {
                     </div>
                 </div>
             </div>
+            {showModal && (
+                <div
+                    style={{
+                        position: "fixed",
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        background: "rgba(0,0,0,0.7)",
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                        zIndex: 9999
+                    }}
+                    onClick={() => setShowModal(false)}
+                >
+                    <div style={{ position: 'relative', maxWidth: "90vw", maxHeight: "90vh" }}>
+                        <img
+                            src={modalImg}
+                            alt="勵志語圖片"
+                            style={{
+                                maxWidth: "100%",
+                                maxHeight: "90vh",
+                                borderRadius: 10,
+                                boxShadow: "0 0 20px #000",
+                                objectFit: "contain"
+                            }}
+                            onClick={e => e.stopPropagation()}
+                        />
+                        <div
+                            style={{
+                                position: 'absolute',
+                                top: '10px',
+                                right: '10px',
+                                width: '30px',
+                                height: '30px',
+                                borderRadius: '50%',
+                                background: 'rgba(0,0,0,0.5)',
+                                color: 'white',
+                                display: 'flex',
+                                alignItems: 'center',
+                                justifyContent: 'center',
+                                cursor: 'pointer',
+                                fontSize: '18px'
+                            }}
+                            onClick={() => setShowModal(false)}
+                        >
+                            ✕
+                        </div>
+                    </div>
+                </div>
+            )}
         </>
     );
 }
