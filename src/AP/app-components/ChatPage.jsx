@@ -118,6 +118,33 @@ function ChatPage({ userInfo }) {
         }
     };
 
+    // 下載圖片（不開新分頁）
+    const handleDownload = async (imgUrl) => {
+        try {
+            const response = await fetch(imgUrl);
+            const blob = await response.blob();
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'leya-encourage.png';
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+        } catch (e) {
+            alert('下載失敗');
+        }
+    };
+
+    // IG分享（複製網址並嘗試打開IG App的story camera）
+    const handleShareIG = (imgUrl) => {
+        navigator.clipboard.writeText(imgUrl);
+        window.location.href = 'instagram://story-camera';
+        setTimeout(() => {
+            alert('圖片網址已複製，請在 IG 貼上或選擇圖片！');
+        }, 1000);
+    };
+
     const userAvatar = "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png";
     const botAvatar = "https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png";
 
@@ -206,6 +233,54 @@ function ChatPage({ userInfo }) {
                             }}
                             onClick={e => e.stopPropagation()}
                         />
+                        <div style={{
+                            position: 'absolute',
+                            bottom: '10px',
+                            left: '50%',
+                            transform: 'translateX(-50%)',
+                            display: 'flex',
+                            gap: '16px',
+                            zIndex: 10000
+                        }}>
+                            {/* 下載按鈕 */}
+                            <button
+                                style={{
+                                    background: '#fff',
+                                    borderRadius: '6px',
+                                    padding: '6px 16px',
+                                    border: 'none',
+                                    color: '#333',
+                                    fontWeight: 'bold',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    handleDownload(modalImg);
+                                }}
+                            >
+                                下載圖片
+                            </button>
+                            {/* IG分享按鈕 */}
+                            <button
+                                style={{
+                                    background: '#fff',
+                                    borderRadius: '6px',
+                                    padding: '6px 16px',
+                                    border: 'none',
+                                    color: '#E1306C',
+                                    fontWeight: 'bold',
+                                    boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+                                    cursor: 'pointer'
+                                }}
+                                onClick={e => {
+                                    e.stopPropagation();
+                                    handleShareIG(modalImg);
+                                }}
+                            >
+                                分享到IG
+                            </button>
+                        </div>
                         <div
                             style={{
                                 position: 'absolute',
