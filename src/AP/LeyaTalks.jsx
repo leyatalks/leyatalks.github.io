@@ -11,6 +11,7 @@ import RegisterPage from './app-components/Login/Register'
 import Sercet from './app-components/Sand'
 import AdminPage from './app-components/AdminPage'
 import DonateManage from './app-components/Admin-Function/DonateManage'
+import MoodPage from './app-components/MoodPage'
 
 // 下拉刷新功能 - 使用自定義事件而非頁面重載
 const enablePullToRefresh = (callback) => {
@@ -98,8 +99,22 @@ const enablePullToRefresh = (callback) => {
 
 
 function Application() {
-    const [activePage, setActivePage] = useState('login-page')
-    const [userInfo, setUserInfo] = useState({ nickname: '', id: '' })
+    const [activePage, setActivePage] = useState(() => {
+        try {
+            const saved = localStorage.getItem('leyaActivePage')
+            return saved || 'login-page'
+        } catch (err) {
+            return 'login-page'
+        }
+    })
+    const [userInfo, setUserInfo] = useState(() => {
+        try {
+            const saved = localStorage.getItem('leyaUserInfo')
+            return saved ? JSON.parse(saved) : { nickname: '', id: '' }
+        } catch (err) {
+            return { nickname: '', id: '' }
+        }
+    })
 
     // 啟用下拉刷新功能
     useEffect(() => {
@@ -115,6 +130,24 @@ function Application() {
         // 啟用下拉刷新功能，並傳入回調函數
         enablePullToRefresh(refreshCallback);
     }, []);
+
+    // 同步 userInfo 到 localStorage（登入後能持久化，刷新仍有 username）
+    useEffect(() => {
+        try {
+            localStorage.setItem('leyaUserInfo', JSON.stringify(userInfo))
+        } catch (err) {
+            // 忽略持久化錯誤
+        }
+    }, [userInfo])
+
+    // 同步 activePage 到 localStorage
+    useEffect(() => {
+        try {
+            localStorage.setItem('leyaActivePage', activePage)
+        } catch (err) {
+            // 忽略持久化錯誤
+        }
+    }, [activePage])
 
     const whiteList = ["login-page", "register"]
 
@@ -138,6 +171,8 @@ function Application() {
                 return <RegisterPage activePage={activePage} setActivePage={setActivePage}/>
             case 'secret':
                 return <Sercet activePage={activePage} setActivePage={setActivePage}/>
+            case 'mood-page':
+                return <MoodPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo}/>
             default:
                 return <Post />
         }

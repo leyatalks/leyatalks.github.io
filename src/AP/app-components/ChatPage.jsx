@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faPaperPlane, faHandHoldingHeart, faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
 
@@ -10,6 +10,8 @@ function ChatPage({ userInfo }) {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalImg, setModalImg] = useState("");
+
+    const chatHistoryRef = useRef(null);
 
     // 只從後端讀取訊息
     useEffect(() => {
@@ -38,6 +40,12 @@ function ChatPage({ userInfo }) {
     useEffect(() => {
         console.log('fetch username:', username);
     }, [username]);
+
+    useEffect(() => {
+        if (chatHistoryRef.current) {
+            chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
+        }
+    }, [messages]);
 
     const handleInputChange = (e) => {
         setInput(e.target.value);
@@ -163,7 +171,7 @@ function ChatPage({ userInfo }) {
                     </div>
                 </div> */}
                 <div className="chat-container">
-                    <div className="chat-history">
+                    <div className="chat-history" ref={chatHistoryRef} style={{overflowY: 'auto', maxHeight: '60vh'}}>
                         {messages.map((msg, idx) => (
                             <div key={idx} className={msg.role === 'user' ? 'chat-message chat-message-user' : 'chat-message chat-message-bot'}>
                                 {/* 頭貼 */}

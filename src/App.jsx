@@ -1,11 +1,18 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import HomePage from "./HP/HomePage";
 import SandPage from "./AP/app-components/Sand";
 import LeyaTalks from "./AP/LeyaTalks";
 
 //主要Return
 function App() {
-  const [currentPage, setCurrentPage] = useState("home");
+  const [currentPage, setCurrentPage] = useState(() => {
+    try {
+      const saved = localStorage.getItem("currentPage");
+      return saved || "home";
+    } catch (err) {
+      return "home";
+    }
+  });
 
   const handleNavigation = (path) => {
     if (path === "/LeyaTalks") {
@@ -15,6 +22,14 @@ function App() {
       setCurrentPage("home");
     }
   };
+
+  useEffect(() => {
+    try {
+      localStorage.setItem("currentPage", currentPage);
+    } catch (err) {
+      // 忽略持久化錯誤
+    }
+  }, [currentPage]);
 
   return (
     <div style={{

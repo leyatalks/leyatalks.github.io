@@ -279,7 +279,7 @@ body {
 
 .chat-history {
     flex: 1;
-    max-height: 85%;
+    max-height: 87%;
     overflow-y: auto;
     margin-bottom: 1rem;
 }

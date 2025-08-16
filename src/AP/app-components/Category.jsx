@@ -10,31 +10,33 @@ function CategoryPage({ activePage, setActivePage }) {
                 <div className="category-list">
                     <div className="category-row">
                         <div className="category-item">
+                            <div className="category-icon"
+                                onClick={() => setActivePage('mood-page')}
+                                style={{cursor: "pointer"}}>
+                                <FontAwesomeIcon icon={faClock} />
+                            </div>
+                            <div className="category-name">心情日記</div>
+                        </div>
+                        <div className="category-item coming-soon">
                             <div className="category-icon">
                                 <FontAwesomeIcon icon={faBrain} />
                             </div>
                             <div className="category-name">正念</div>
                         </div>
-                        <div className="category-item">
+                        <div className="category-item coming-soon">
                             <div className="category-icon">
                                 <FontAwesomeIcon icon={faCloudMoon} />
                             </div>
                             <div className="category-name">冥想</div>
-                        </div>
-                        <div className="category-item">
-                            <div className="category-icon">
-                                <FontAwesomeIcon icon={faClipboardCheck} />
-                            </div>
-                            <div className="category-name">心理測驗</div>
                         </div>
                     </div>
 
                     <div className="category-row">
                         <div className="category-item coming-soon">
                             <div className="category-icon">
-                                <FontAwesomeIcon icon={faClock} />
+                                <FontAwesomeIcon icon={faClipboardCheck} />
                             </div>
-                            <div className="category-name">即將新增</div>
+                            <div className="category-name">心理測驗</div>
                         </div>
                         <div className="category-item coming-soon">
                             <div className="category-icon">
