@@ -20,11 +20,11 @@ function MoodPage() {
 	})
 
 	const MOODS = [
-		{ key: '開心', src: `${imagesBase}/開心.png` },
-		{ key: '平靜', src: `${imagesBase}/平靜.png` },
-		{ key: '傷心', src: `${imagesBase}/傷心.png` },
-		{ key: '憤怒', src: `${imagesBase}/憤怒.png` },
-		{ key: '焦慮', src: `${imagesBase}/焦慮.png` },
+		{ key: '開心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E9%96%8B%E5%BF%83.PNG" },
+		{ key: '平靜', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%B9%B3%E9%9D%9C.PNG" },
+		{ key: '傷心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%82%B7%E5%BF%83.PNG" },
+		{ key: '憤怒', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E6%86%A4%E6%80%92.PNG" },
+		{ key: '焦慮', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E7%84%A6%E6%85%AE.PNG" },
 	]
 
 	function todayStr() {
@@ -121,7 +121,7 @@ function MoodPage() {
 				.nav-btn:hover{background:var(--accent-hover)}
 				.quick-moods{margin:14px 0 6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
 				.mood-btn{background:transparent;border:none;padding:4px;cursor:pointer;transition:transform .12s ease}
-				.mood-btn img{width:42px;height:42px;object-fit:contain;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.06))}
+				.mood-btn img{width:70px;height:70px;object-fit:contain;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.06))}
 				.mood-btn:hover{transform:translateY(-2px)}
 				.month-label{font-weight:700;font-size:18px;text-align:center;margin-top:8px}
 				.weekday-row{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:16px}
@@ -131,7 +131,7 @@ function MoodPage() {
 				.day-cell:hover{background:var(--tile-hover)}
 				.day-num{font-weight:700;opacity:.9}
 				.emoji{margin-top:6px;display:flex;align-items:center;justify-content:center;min-height:28px;width:100%}
-				.emoji img{width:28px;height:28px;object-fit:contain;display:block;margin:auto;filter:drop-shadow(0 2px 3px rgba(0,0,0,.08))}
+				.emoji img{width:100%;object-fit:contain;display:block;margin:auto;filter:drop-shadow(0 2px 3px rgba(0,0,0,.08))}
 				.disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.15)}
 				.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:${isModalOpen ? 'block' : 'none'}}
 				.modal{position:fixed;inset:0;display:${isModalOpen ? 'grid' : 'none'};place-items:center;z-index:10}
