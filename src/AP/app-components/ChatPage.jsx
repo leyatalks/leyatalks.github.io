@@ -171,7 +171,7 @@ function ChatPage({ userInfo }) {
                     </div>
                 </div> */}
                 <div className="chat-container">
-                    <div className="chat-history" ref={chatHistoryRef} style={{overflowY: 'auto', maxHeight: '60vh'}}>
+                    <div className="chat-history" ref={chatHistoryRef} style={{overflowY: 'auto'}}>
                         {messages.map((msg, idx) => (
                             <div key={idx} className={msg.role === 'user' ? 'chat-message chat-message-user' : 'chat-message chat-message-bot'}>
                                 {/* 頭貼 */}
