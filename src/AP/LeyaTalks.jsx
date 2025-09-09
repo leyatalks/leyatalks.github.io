@@ -101,7 +101,7 @@ const enablePullToRefresh = (callback) => {
 };
 
 
-function Application() {
+function Application({handleNavigation}) {
     const [activePage, setActivePage] = useState(() => {
         try {
             const saved = localStorage.getItem('leyaActivePage')
@@ -159,7 +159,7 @@ function Application() {
             case 'home-page':
                 return <Post />
             case 'category-page':
-                return <CategoryPage  activePage={activePage} setActivePage={setActivePage} />
+                return <CategoryPage  activePage={activePage} setActivePage={setActivePage} handleNavigation={handleNavigation} />
             case 'chat-page':
                 return <ChatPage userInfo={userInfo} />
             case 'user-page':

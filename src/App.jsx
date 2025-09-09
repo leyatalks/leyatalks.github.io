@@ -43,7 +43,7 @@ function App() {
       {currentPage === "home" ? (
         <HomePage handleNavigation={handleNavigation} />
       )  : (
-        <LeyaTalks currentPage={currentPage} setCurrentPage={setCurrentPage} />
+        <LeyaTalks currentPage={currentPage} setCurrentPage={setCurrentPage} handleNavigation={handleNavigation}/>
       )}
     </div>
   );

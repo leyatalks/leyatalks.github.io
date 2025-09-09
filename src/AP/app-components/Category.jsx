@@ -3,7 +3,7 @@ import { faBrain, faCloudMoon, faClipboardCheck, faClock, faEarthAmericas, faHea
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 
 
-function CategoryPage({ activePage, setActivePage }) {
+function CategoryPage({ activePage, setActivePage, handleNavigation }) {
     return (
         <>
             <div id="category-page">
@@ -73,11 +73,12 @@ function CategoryPage({ activePage, setActivePage }) {
                             <div className="category-name">即將新增</div>
                         </div>
                         <div className="category-item">
-                            <a href="/leya-fronted">
-                                <div className="category-icon">
+                                <div className="category-icon" 
+                                onClick={() => handleNavigation('home')}
+                                style={{ cursor: "pointer" }}
+                                >
                                     <FontAwesomeIcon icon={faEarthAmericas} />
                                 </div>
-                            </a>
                             <div className="category-name">樂壓Talks<br />介紹頁面</div>
                         </div>
                     </div>
