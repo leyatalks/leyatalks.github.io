@@ -12,6 +12,9 @@ import Sercet from './app-components/Sand'
 import AdminPage from './app-components/AdminPage'
 import DonateManage from './app-components/Admin-Function/DonateManage'
 import MoodPage from './app-components/MoodPage'
+import StressMindMap from './app-components/StressMindMap'
+import MeditationPage from './app-components/MeditationPage'
+
 
 // 下拉刷新功能 - 使用自定義事件而非頁面重載
 const enablePullToRefresh = (callback) => {
@@ -173,6 +176,10 @@ function Application() {
                 return <Sercet activePage={activePage} setActivePage={setActivePage}/>
             case 'mood-page':
                 return <MoodPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo}/>
+            case 'stress-mind-map':
+                return <StressMindMap activePage={activePage} setActivePage={setActivePage} userInfo={userInfo}/>
+            case 'meditation-page':
+                return <MeditationPage activePage={activePage} setActivePage={setActivePage} userInfo={userInfo}/>
             default:
                 return <Post />
         }

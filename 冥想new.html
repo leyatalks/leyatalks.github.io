@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>冥想網頁</title>
+<style>
+    body, html {
+        margin: 0;
+        padding: 0;
+        height: 100%;
+        font-family: "Noto Sans TC", sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(to bottom, #a1c4fd, #c2e9fb);
+        color: #fff;
+        transition: background 0.5s;
+    }
+
+    /* 呼吸圓圈 */
+    .breath-circle-container {
+        width: 200px;
+        height: 200px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .breath-circle {
+        width: 150px;
+        height: 150px;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.3);
+        animation: breath 4s infinite alternate ease-in-out;
+    }
+
+    @keyframes breath {
+        0% { transform: scale(1); opacity: 0.7; }
+        50% { transform: scale(1.5); opacity: 1; }
+        100% { transform: scale(1); opacity: 0.7; }
+    }
+
+    #breathText {
+        position: absolute;
+        font-size: 1.5rem;
+        font-weight: bold;
+    }
+
+    #timer {
+        font-size: 2rem;
+        margin-bottom: 20px;
+    }
+
+    input, button, select {
+        padding: 12px 18px;
+        margin: 8px;
+        border: none;
+        border-radius: 25px;
+        font-size: 1.1rem;
+        cursor: pointer;
+        max-width: 80%;
+    }
+
+    button {
+        background-color: rgba(255,255,255,0.3);
+        color: #fff;
+        transition: background-color 0.3s;
+    }
+
+    button:hover {
+        background-color: rgba(255,255,255,0.5);
+    }
+
+    input, select {
+        border-radius: 15px;
+    }
+
+    /* 黑屏模式 */
+.focus-mode {
+    position: fixed;       /* 固定整個螢幕 */
+    top: 0;
+    left: 0;
+    width: 100vw;          /* 全螢幕寬 */
+    height: 100vh;         /* 全螢幕高 */
+    background: #000 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff !important;
+    z-index: 9999;         /* 確保在最上層 */
+}
+
+/* 呼吸圈顏色改黑灰 */
+.focus-mode .breath-circle {
+    background: rgba(166, 166, 166, 0.3);
+}
+
+/* 其他 UI 隱藏 */
+.focus-mode *:not(.breath-circle-container) {
+    display: none;
+}
+
+/* 呼吸圈容器保持居中 */
+.focus-mode .breath-circle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+</style>
+</head>
+<body>
+    <div class="breath-circle-container">
+        <div class="breath-circle"></div>
+        <div id="breathText">吸氣</div>
+    </div>
+
+    <div>
+        <label for="timeInput">設定冥想時間(分鐘): </label>
+        <input type="number" id="timeInput" value="5" min="1" max="120">
+    </div>
+
+    <div id="timer">05:00</div>
+    <div>
+        <button id="startBtn">開始冥想</button>
+        <button id="restartBtn">重新開始</button>
+        <button id="focusModeBtn">黑屏模式</button>
+    </div>
+
+    <div>
+        <label for="soundSelect">選擇引導音效: </label>
+        <select id="soundSelect">
+            <option value="water">水滴聲</option>
+            <option value="metronome">蟬聲</option>
+            <option value="fire">火焰</option>
+        </select>
+    </div>
+
+    <!-- 引導音效 -->
+    <audio id="water" loop>
+        <source src="https://actions.google.com/sounds/v1/water/small_stream_flowing.ogg" type="audio/ogg">
+    </audio>
+    <audio id="metronome" loop>
+        <source src="https://actions.google.com/sounds/v1/alarms/radiation_meter.ogg" type="audio/ogg">
+    </audio>
+    <audio id="fire" loop>
+        <source src="https://actions.google.com/sounds/v1/ambiences/fire.ogg?hl=zh-tw" type="audio/ogg">
+    </audio>
+
+    <!-- 結束提示音 -->
+    <audio id="countdownSound">
+        <source src="https://actions.google.com/sounds/v1/alarms/digital_watch_alarm_long.ogg" type="audio/ogg">
+    </audio>
+
+<script>
+    // === 倒數計時器 ===
+    let countdown;
+    let isRunning = false;
+    let timeLeft = 300;
+
+    const timerDisplay = document.getElementById('timer');
+    const startBtn = document.getElementById('startBtn');
+    const restartBtn = document.getElementById('restartBtn');
+    const timeInput = document.getElementById('timeInput');
+    const endSound = document.getElementById('endSound');
+
+    // 音效
+    const soundSelect = document.getElementById('soundSelect');
+    let currentSound = document.getElementById(soundSelect.value);
+
+    function updateTimerDisplay(seconds){
+        let minutes = Math.floor(seconds / 60);
+        let secs = seconds % 60;
+        timerDisplay.textContent = `${minutes.toString().padStart(2,'0')}:${secs.toString().padStart(2,'0')}`;
+    }
+    
+
+    function startCountdown(){
+        countdown = setInterval(() => {
+            timeLeft--;
+            updateTimerDisplay(timeLeft);
+
+        if(timeLeft <= 3 && timeLeft > 0){
+            countdownSound.currentTime = 0;
+            countdownSound.play();
+        }
+
+        // 冥想結束
+        if(timeLeft <= 0){
+            clearInterval(countdown);
+            currentSound.pause();
+            countdownSound.pause();  // 確保倒數提示音也停止
+            
+            alert("冥想結束，放鬆一下！");
+            isRunning = false;
+            startBtn.textContent = "開始冥想";
+        }
+        }, 1000);
+    }
+
+    function playSelectedSound(){
+        if(!currentSound.paused){ currentSound.pause(); }
+        currentSound = document.getElementById(soundSelect.value);
+        currentSound.currentTime = 0;
+        currentSound.play();
+    }
+
+    startBtn.addEventListener('click', () => {
+        if(!isRunning){
+            // 開始或繼續
+            if(timeLeft <= 0 || timeLeft === (parseInt(timeInput.value)||5)*60){
+                let userMinutes = parseInt(timeInput.value);
+                if(isNaN(userMinutes) || userMinutes < 1) userMinutes = 5;
+                timeLeft = userMinutes * 60;
+                updateTimerDisplay(timeLeft);
+            }
+            startCountdown();
+            playSelectedSound();
+            isRunning = true;
+            startBtn.textContent = "暫停";
+        } else {
+            // 暫停
+            clearInterval(countdown);
+            currentSound.pause();
+            isRunning = false;
+            startBtn.textContent = "繼續";
+        }
+    });
+
+    restartBtn.addEventListener('click', () => {
+        clearInterval(countdown);
+        let userMinutes = parseInt(timeInput.value);
+        if(isNaN(userMinutes) || userMinutes < 1) userMinutes = 5;
+        timeLeft = userMinutes * 60;
+        updateTimerDisplay(timeLeft);
+        playSelectedSound();
+        startCountdown();
+        isRunning = true;
+        startBtn.textContent = "暫停";
+    });
+
+    // === 呼吸文字提示 ===
+    const breathText = document.getElementById('breathText');
+    let inhale = true;
+    setInterval(() => {
+        breathText.textContent = inhale ? "吸氣" : "呼氣";
+        inhale = !inhale;
+    }, 4000); // 與動畫週期同步
+
+    // === 黑屏模式 ===
+   const breathCircleContainer = document.querySelector(".breath-circle-container");
+const focusModeBtn = document.getElementById('focusModeBtn');
+let isFocusMode = false;
+
+// 切換黑屏模式
+function toggleFocusMode(){
+    if(!isFocusMode){
+        document.body.classList.add("focus-mode");
+    } else {
+        document.body.classList.remove("focus-mode");
+    }
+    isFocusMode = !isFocusMode;
+}
+
+// 點呼吸圈切換黑屏模式
+breathCircleContainer.addEventListener("click", toggleFocusMode);
+
+// 如果保留按鈕切換
+focusModeBtn.addEventListener('click', toggleFocusMode);
+
+
+</script>
+</body>
+</html>

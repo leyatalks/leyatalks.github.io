@@ -19,6 +19,7 @@
     "@fortawesome/react-fontawesome": "^0.2.2",
     "@tailwindcss/vite": "^4.1.6",
     "bootstrap": "^5.3.6",
+    "d3": "^7.9.0",
     "leya-fronted": "file:",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.10",

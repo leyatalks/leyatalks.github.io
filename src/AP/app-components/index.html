@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>侵害行為</title>
+  <script src="https://d3js.org/d3.v6.min.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@100..900&display=swap" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      font-family: "Noto Sans TC",Arial, sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+      -moz-user-select: none;
+      -ms-user-select: none;
+    }
+    body:active {
+        cursor: grabbing;  /* 當點擊並拖曳時，顯示 grabbing 狀態 */
+      }
+    .links line {
+      stroke: #999;
+      stroke-opacity: 0.6;
+    }
+    .nodes circle {
+        stroke: #fff;
+        stroke-width: 1.5px;
+        cursor: pointer;  /* 當指到點的時候游標變成 pointer */
+      }
+      
+      .nodes circle:active {
+        cursor: grabbing;  /* 開始拖曳時游標變成 grab */
+      }
+    .node-label {
+      font-size: 10px;
+      font-family: Arial, sans-serif;
+      pointer-events: none;
+    }
+    svg {
+      display: block;
+      margin: 0 auto;
+    }
+    #controls {
+      position: fixed;
+      top: 20px;
+      left: 20px;
+      background: rgba(255, 255, 255, 0.9);
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+    button, select {
+      padding: 8px 12px;
+      border: none;
+      border-radius: 5px;
+      background-color: #4CAF50;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    button:hover, select:hover {
+      background-color: #45a049;
+    }
+    select {
+      background-color: #3498db;
+    }
+    select:hover {
+      background-color: #2980b9;
+    }
+  
+    .tooltip {
+      position: absolute;
+      background-color: rgba(255, 255, 255, 0.9);
+      border: 1px solid #ddd;
+      border-radius: 5px;
+      padding: 10px;
+      font-size: 12px;
+      max-width: 300px;
+      max-height: 200px;
+      overflow-y: auto;
+      pointer-events: auto;
+      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+    }
+    .tooltip h4 {
+      margin-top: 0;
+      margin-bottom: 5px;
+    }
+    .tooltip p {
+      margin: 0;
+    }
+  </style>
+</head>
+<body>
+  <div id="controls">
+    <button id="zoomIn">放大</button>
+    <button id="zoomOut">縮小</button>
+    <button id="resetZoom">重置</button>
+    <button onclick="location.href='location.html'">發生地點</button>
+    <select id="filterGroup">
+      <option value="all">All</option>
+      <option value="1">加害者</option>
+      <option value="2">侵害行為</option>
+      <option value="3">受害者</option>
+    </select>
+  </div>
+  <svg></svg>
+  <script>
+    // 定義數據
+    const data = [
+    { aggressor: "其他", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "未知", victimGender: "女性", note: "最高法院 99 年度台上字第 5942 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "國中", victimGender: "女性", note: "最高法院 101 年度台上字第 4610 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "國中", victimGender: "女性", note: "最高法院107年度台上字第3348號" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "未知", victimGender: "未知", note: "最高法院102年台上字第1607號" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "國中", victimGender: "男性", note: "最高法院 108 年台上字第 564 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "高中", victimGender: "其他", note: "最高法院 109 年台上字第 1752 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "專科", victimGender: "女性", note: "最高法院 110 年台上字第 673 號民事裁定" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "高中", victimGender: "未知", note: "最高法院 110 年台上字第 1514 號民事裁定" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "未知", victimGender: "女性", note: "最高法院112年台上字第1358號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "高中", victimGender: "女性", note: "最高法院 112 年台聲字第 1401 號民事裁定" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "乘機猥褻", victim: "大學", victimGender: "女性", note: "臺灣花蓮地方法院 106 年易字第 288 號" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "小學", victimGender: "女性", note: "臺灣高等法院 112 年上字第 1 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "小學", victimGender: "女性", note: "臺灣高等法院 高雄分院 100 年侵上訴字第 1822 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "國中", victimGender: "女性", note: "臺灣高等法院 高雄分院 106 年侵上易字第 1 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "國中", victimGender: "女性", note: "臺灣高等法院 高雄分院 107 年侵上訴字第 8 號刑事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "小學", victimGender: "女性", note: "臺灣高等法院 高雄分院 106 年侵上訴字第 40 號刑事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "未知", victimGender: "女性", note: "臺灣高等法院 高雄分院 106 年侵上訴字第 58 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "國中", victimGender: "女性", note: "臺灣高等法院 高雄分院 108 年侵上訴字第 16 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "大學", victimGender: "女性", note: "臺灣高等法院 高雄分院 110 年上訴字第 738 號刑事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "國中", victimGender: "女性", note: "臺灣高等法院 高雄分院 111 年侵上訴字第 43 號刑事判決" },
+  { aggressor: "校長", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "小學", victimGender: "女性", note: "臺灣高等法院 高雄分院 111 年侵上訴字第 51 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "大學", victimGender: "女性", note: "臺灣高等法院 高雄分院 109 年重勞上字第 10 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "大學", victimGender: "女性", note: "臺灣高等法院 高雄分院 110 年上字第 282 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "高中", victimGender: "女性", note: "臺灣高等法院 臺中分院 95 年上國易字第 8 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "小學", victimGender: "女性", note: "臺灣高等法院 臺中分院 98 年上訴字第 1265 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "小學", victimGender: "男性", note: "臺灣高等法院 高雄分院 112 年侵聲再字第 9 號刑事裁定" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "大學", victimGender: "女性", note: "臺灣高等法院 臺中分院 100 年侵上訴字第 1944 號刑事判決" },
+  { aggressor: "校長", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "職員", victimGender: "女性", note: "臺灣高等法院 臺中分院 99 年勞上字第 2 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "職員", victimGender: "女性", note: "臺灣高等法院 臺中分院 103 年重勞上字第 4 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "乘機猥褻", victim: "高中", victimGender: "男性", note: "臺灣高等法院 臺中分院 103 年侵上訴字第 30 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "乘機性交", victim: "大學", victimGender: "男性", note: "臺灣高等法院 臺中分院 105 年侵上訴字第 81 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "國中", victimGender: "女性", note: "臺灣高等法院 臺中分院 106 年侵上訴字第 117 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "未知", location: "性騷擾", place: "言語騷擾", victim: "小學", victimGender: "未知", note: "臺灣高等法院 臺中分院 104 年上易字第 95 號民事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "其他", victimGender: "女性", note: "臺灣高等法院 臺中分院 105 年上易字第 464 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "職員", victimGender: "女性", note: "臺灣高等法院 臺中分院 105 年上易字第 538 號民事判決" },
+  { aggressor: "教師", aggressorGender: "未知", location: "性侵害", place: "多重侵害行為", victim: "大學", victimGender: "未知", note: "臺灣高等法院 臺中分院 112 年勞上字第 10 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "國中", victimGender: "女性", note: "臺灣高等法院 臺南分院 99 年上國字第 1 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "小學", victimGender: "男性", note: "臺灣高等法院 臺南分院 103 年上國字第 7 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "高中", victimGender: "女性", note: "臺灣高等法院 臺中分院 108 年重勞上字第 16 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "高中", victimGender: "女性", note: "臺灣高等法院 臺中分院 110 年侵上訴字第 30 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "未知", location: "性侵害", place: "未知", victim: "高中", victimGender: "未知", note: "臺灣高等法院 臺南分院 105 年上國易字第 3 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "高中", victimGender: "未知", note: "臺灣高等法院 臺南分院 105 年上國易字第 3 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "小學", victimGender: "女性", note: "臺灣高等法院 臺南分院 104 年侵上訴字第 798 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "小學", victimGender: "女性", note: "臺灣高等法院 臺南分院 105 年上國易字第 2 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "國中", victimGender: "男性", note: "臺灣高等法院 臺南分院 111 年上國易字第 4 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "乘機性交", victim: "小學", victimGender: "女性", note: "臺灣高雄地方法院 98 年訴字第 1711 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "教師", victimGender: "女性", note: "臺灣高等法院 臺南分院 107 年勞上易字第 9 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "高中", victimGender: "其他", note: "臺灣高等法院 臺南分院 109 年重勞上更一字第 1 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "高中", victimGender: "女性", note: "臺灣高雄地方法院 103 年勞訴字第 122 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "大學", victimGender: "未知", note: "臺灣高雄地方法院 104 年訴字第 1128 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "大學", victimGender: "未知", note: "臺灣高雄地方法院 106 年重勞訴字第 2 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "高中", victimGender: "女性", note: "臺灣高雄地方法院 103 年侵訴字第 1 號刑事判決" },
+  { aggressor: "行政人員", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "教師", victimGender: "女性", note: "臺灣高雄地方法院 107 年簡上字第 81 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "國中", victimGender: "女性", note: "臺灣高雄地方法院 108 年國字第 3 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "大學", victimGender: "男性", note: "臺灣高雄地方法院 109 年易字第 82 號刑事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "國中", victimGender: "女性", note: "臺灣高雄地方法院 109 年易字第 246 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "教師", victimGender: "女性", note: "臺灣高雄地方法院 106 年聲判字第 15 號刑事裁定" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "其他", victimGender: "女性", note: "臺灣基隆地方法院 106 年易字第 382 號刑事判決" },
+  { aggressor: "職員", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "其他", victimGender: "女性", note: "臺灣基隆地方法院 111 年基簡字第 960 號民事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "其他", victimGender: "女性", note: "臺灣雲林地方法院 105 年易字第 1096 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "小學", victimGender: "女性", note: "臺灣新北地方法院 100 年國字第 8 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "大學", victimGender: "女性", note: "臺灣新北地方法院 102 年侵訴字第 180 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "小學", victimGender: "未知", note: "臺灣新北地方法院 105 年原國字第 1 號民事判決" },
+  { aggressor: "教練", aggressorGender: "男性", location: "性侵害", place: "未知", victim: "高中", victimGender: "女性", note: "臺灣新北地方法院 105 年訴字第 580 號民事判決" },
+  { aggressor: "教師", aggressorGender: "女性", location: "性騷擾", place: "未知", victim: "國中", victimGender: "男性", note: "臺灣新北地方法院 103 年侵訴字第 83 號刑事判決" },
+  { aggressor: "行政人員", aggressorGender: "未知", location: "性騷擾", place: "未知", victim: "職員", victimGender: "女性", note: "臺灣新北地方法院 110 年勞簡字第 120 號民事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "高中", victimGender: "女性", note: "臺灣新北地方法院 111 年勞訴字第 103 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "高中", victimGender: "女性", note: "臺灣新竹地方法院 100 年侵訴字第 51 號刑事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "其他", victimGender: "女性", note: "臺灣新竹地方法院 107 年侵訴字第 1 號刑事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "職員", victimGender: "女性", note: "臺灣新竹地方法院 110 年勞訴字第 5 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "研究生", victimGender: "女性", note: "臺灣新竹地方法院 104 年國字第 5 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "研究生", victimGender: "女性", note: "臺灣新竹地方法院 104 年訴字第 654 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "高中", victimGender: "未知", note: "臺灣嘉義地方法院 104 年勞訴字第 14 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "高中", victimGender: "女性", note: "臺灣嘉義地方法院 105 年侵訴字第 1 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "大學", victimGender: "未知", note: "臺灣新竹地方法院 111 年勞訴字第 19 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "乘機猥褻", victim: "小學", victimGender: "女性", note: "臺灣嘉義地方法院 101 年侵訴字第 52 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "高中", victimGender: "女性", note: "臺灣嘉義地方法院 111 年簡上字第 21 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "高中", victimGender: "女性", note: "臺灣嘉義地方法院 111 年再易字第 12 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "大學", victimGender: "女性", note: "臺灣嘉義地方法院 111 年易字第 140 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "乘機猥褻", victim: "國中", victimGender: "女性", note: "臺灣彰化地方法院 105 年侵訴字第 27 號刑事判決" },
+  { aggressor: "其他", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "大學", victimGender: "未知", note: "臺灣彰化地方法院 109 年簡字第 704 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "職員", victimGender: "女性", note: "臺灣彰化地方法院 101 年勞訴字第 19 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "乘機性交", victim: "學生", victimGender: "男性", note: "臺灣彰化地方法院 104 年侵訴字第 48 號刑事判決" },
+  { aggressor: "未知", aggressorGender: "未知", location: "性騷擾", place: "肢體騷擾", victim: "未知", victimGender: "未知", note: "臺灣臺中地方法院 109 年訴字第 2411 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "國中", victimGender: "女性", note: "臺灣臺中地方法院 109 年訴字第 2411 號民事判決" },
+  { aggressor: "教師", aggressorGender: "未知", location: "性騷擾", place: "未知", victim: "教師", victimGender: "未知", note: "臺灣臺中地方法院 105 年訴字第 1395 號" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "乘機猥褻", victim: "高中", victimGender: "男性", note: "臺灣臺中地方法院 106 年侵訴字第 105 號" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "高中", victimGender: "女性", note: "臺灣臺中地方法院 106 年侵訴字第 70 號" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "小學", victimGender: "女性", note: "臺灣臺中地方法院 110 年訴字第 1887 號民事判決" },
+  { aggressor: "教師", aggressorGender: "未知", location: "性侵害", place: "強制猥褻", victim: "研究生", victimGender: "女性", note: "臺灣臺中地方法院 111 年侵訴字第 122 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "大學", victimGender: "男性", note: "臺灣臺中地方法院 110 年侵訴字第 98 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "小學", victimGender: "女性", note: "臺灣臺中地方法院 110 年訴字第 982 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "學生", victimGender: "女性", note: "臺灣臺中地方法院 112 年簡字第 23 號刑事判決" },
+  { aggressor: "職員", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "職員", victimGender: "女性", note: "臺灣臺北地方法院 101 年訴字第 1523 號民事判決" },
+  { aggressor: "職員", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "職員", victimGender: "女性", note: "臺灣臺北地方法院 105 年重勞訴字第35號民事判決" },
+  { aggressor: "未知", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "小學", victimGender: "女性", note: "臺灣臺北地方法院 103 年國字第10號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "國中", victimGender: "女性", note: "臺灣臺北地方法院 108 年簡上字第 394 號民事判決" },
+  { aggressor: "職員", aggressorGender: "男性", location: "性騷擾", place: "多重騷擾行為", victim: "職員", victimGender: "女性", note: "臺灣臺北地方法院 109 年勞訴字第 403 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性騷擾", place: "肢體騷擾", victim: "大學", victimGender: "女性", note: "臺灣臺北地方法院 106 年易字第 851 號刑事判決" },
+  { aggressor: "校長", aggressorGender: "男性", location: "性騷擾", place: "言語騷擾", victim: "其他", victimGender: "女性", note: "臺灣臺北地方法院 112 年簡上字第 187 號民事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "學生", victimGender: "女性", note: "臺灣臺南地方法院 97 年國字第 9 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "乘機性交", victim: "高中", victimGender: "女性", note: "臺灣臺南地方法院 103 年訴字第777號" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "未知", victim: "小學", victimGender: "女性", note: "臺灣臺南地方法院 104 年侵訴字第 11 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性騷擾", place: "未知", victim: "國中", victimGender: "女性", note: "臺灣橋頭地方法院 109 年訴字第 167 號民事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制性交", victim: "小學", victimGender: "女性", note: "臺灣臺南地方法院 112 年侵訴緝字第 1 號刑事判決" },
+  { aggressor: "教師", aggressorGender: "男性", location: "性侵害", place: "強制猥褻", victim: "國中", victimGender: "男性", note: "臺灣橋頭地方法院 109 年侵訴字第 26 號刑事判決" },
+  { aggressor: "學生", aggressorGender: "男性", location: "性侵害", place: "多重侵害行為", victim: "高中", victimGender: "男性", note: "臺灣橋頭地方法院 110 年訴字第958號" }
+
+    ];
+
+    // 提取唯一值
+    const aggressors = [...new Set(data.map(d => d.aggressor))];
+    const aggressorGenders = [...new Set(data.map(d => d.aggressorGender))];
+    const locations = [...new Set(data.map(d => d.location))];
+    const places = [...new Set(data.map(d => d.place))];
+    const victims = [...new Set(data.map(d => d.victim))];
+    const victimGenders = [...new Set(data.map(d => d.victimGender))];
+
+    // 建立節點數據
+    const nodes = [
+      ...aggressors.map(aggressor => ({ group: 1, id: `aggressor-${aggressor}`, name: aggressor, type: "加害者" })),
+      ...aggressorGenders.map(aggressorGender => ({ group: 1, id: `aggressorGender-${aggressorGender}`, name: aggressorGender, type: "加害者性別" })),
+      ...locations.map(location => ({ group: 2, id: `location-${location}`, name: location, type: "侵害類型" })),
+      ...places.map(place => ({ group: 2, id: `place-${place}`, name: place, type: "侵害行為" })),
+      ...victims.map(victim => ({ group: 3, id: `victim-${victim}`, name: victim, type: "受害者" })),
+      ...victimGenders.map(victimGender => ({ group: 3, id: `victimGender-${victimGender}`, name: victimGender, type: "受害者性別" }))
+    ];
+
+    // 創建連線數據，並確保每對節點只有一條連線，並計算次數
+    const linkCounts = new Map();
+    const links = [];
+
+    data.forEach(d => {
+      const pairs = [
+        { source: `aggressor-${d.aggressor}`, target: `aggressorGender-${d.aggressorGender}` },
+        { source: `aggressorGender-${d.aggressorGender}`, target: `location-${d.location}` },
+        { source: `location-${d.location}`, target: `place-${d.place}` },
+        { source: `place-${d.place}`, target: `victim-${d.victim}` },
+        { source: `victim-${d.victim}`, target: `victimGender-${d.victimGender}` }
+      ];
+
+      pairs.forEach(pair => {
+        const key = `${pair.source}-${pair.target}`;
+        if (!linkCounts.has(key)) {
+          linkCounts.set(key, { ...pair, value: 0, cases: [] });
+        }
+        linkCounts.get(key).value += 1;
+        linkCounts.get(key).cases.push(d);
+      });
+    });
+
+    linkCounts.forEach(link => {
+      links.push(link);
+    });
+
+    let width = window.innerWidth;
+    let height = window.innerHeight;
+
+    const svg = d3.select("svg")
+      .attr("width", width)
+      .attr("height", height);
+
+    const g = svg.append("g");
+// 定义缩放范围
+const minZoom = 0.5;
+const maxZoom = 2;
+
+// 创建缩放行为
+const zoom = d3.zoom()
+  .scaleExtent([minZoom, maxZoom])
+  .on("zoom", (event) => {
+    g.attr("transform", event.transform);
+  });
+
+svg.call(zoom);
+
+// 禁用鼠标滚轮缩放
+svg.on('wheel.zoom', (event) => {
+  if (event.ctrlKey || event.metaKey) {
+    event.preventDefault();
+  }
+});
+
+// 禁用双击缩放
+svg.on('dblclick.zoom', null);
+
+// 缩放按钮功能
+function zoomIn() {
+  svg.transition().call(zoom.scaleBy, 1.2);
+}
+
+function zoomOut() {
+  svg.transition().call(zoom.scaleBy, 0.8);
+}
+
+function resetZoom() {
+  svg.transition().call(zoom.transform, d3.zoomIdentity);
+}
+
+// 假设您有相应的HTML按钮，您需要为它们添加事件监听器
+document.getElementById('zoomIn').addEventListener('click', zoomIn);
+document.getElementById('zoomOut').addEventListener('click', zoomOut);
+document.getElementById('resetZoom').addEventListener('click', resetZoom);
+
+    const color = d3.scaleOrdinal(d3.schemeCategory10);
+
+    const simulation = d3.forceSimulation(nodes)
+      .force("link", d3.forceLink(links).id(d => d.id).distance(150))
+      .force("charge", d3.forceManyBody().strength(-500))
+      .force("center", d3.forceCenter(width / 2, height / 2))
+      .force("collide", d3.forceCollide().radius(30));
+
+    const link = g.append("g")
+      .attr("class", "links")
+      .selectAll("line")
+      .data(links)
+      .join("line")
+      .attr("stroke-width", d => Math.sqrt(d.value));
+
+    const node = g.append("g")
+      .attr("class", "nodes")
+      .selectAll("circle")
+      .data(nodes)
+      .join("circle")
+      .attr("r", 7)
+      .attr("fill", d => color(d.group))
+      .call(drag(simulation));
+
+    const label = g.append("g")
+      .attr("class", "labels")
+      .selectAll("text")
+      .data(nodes)
+      .join("text")
+      .attr("class", "node-label")
+      .attr("dy", 15)
+      .text(d => d.name)
+      .style("text-anchor", "middle")
+      .style("fill", "#333")
+      .style("text-shadow", "0 1px 0 #fff, 1px 0 0 #fff, 0 -1px 0 #fff, -1px 0 0 #fff");
+
+    // 創建工具提示
+    const tooltip = d3.select("body").append("div")
+      .attr("class", "tooltip")
+      .style("opacity", 0);
+
+    // 使用防抖函數來優化工具提示的顯示
+    const debounce = (func, wait) => {
+      let timeout;
+      return function executedFunction(...args) {
+        const later = () => {
+          clearTimeout(timeout);
+          func(...args);
+        };
+        clearTimeout(timeout);
+        timeout = setTimeout(later, wait);
+      };
+    };
+
+    const showTooltip = debounce((event, d) => {
+      tooltip.transition()
+        .duration(200)
+        .style("opacity", .9);
+      tooltip.html(`<h4>${d.name}</h4><p>類型: ${d.type}</p>`)
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 10) + "px");
+    }, 100);
+
+    const showLinkTooltip = debounce((event, d) => {
+      let content = `<h4>相關案件: ${d.value}</h4>`;
+      d.cases.forEach((case_, index) => {
+        if (index < 5) {  // 只顯示前5個案例
+          content += `<p>${case_.note}</p>`;
+        }
+      });
+      if (d.cases.length > 5) {
+        content += `<p>...及其他 ${d.cases.length - 5} 個案例</p>`;
+      }
+      tooltip.transition()
+        .duration(200)
+        .style("opacity", .9);
+      tooltip.html(content)
+        .style("left", (event.pageX + 10) + "px")
+        .style("top", (event.pageY - 10) + "px");
+    }, 100);
+
+    node.on("mouseover", function(event, d) {
+      d3.select(this).attr("r", 9);
+      showTooltip(event, d);
+    }).on("mouseout", function() {
+      d3.select(this).attr("r", 7);
+      hideTooltip();
+    });
+
+    link.on("mouseover", function(event, d) {
+      d3.select(this).attr("stroke-width", Math.sqrt(d.value) + 2);
+      showLinkTooltip(event, d);
+    }).on("mouseout", function(event, d) {
+      d3.select(this).attr("stroke-width", Math.sqrt(d.value));
+      hideTooltip();
+    });
+
+    function hideTooltip() {
+      tooltip.transition()
+        .duration(500)
+        .style("opacity", 0);
+    }
+
+    // 使用requestAnimationFrame來優化更新
+    let ticking = false;
+    simulation.on("tick", () => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          updatePositions();
+          ticking = false;
+        });
+        ticking = true;
+      }
+    });
+
+    function updatePositions() {
+      link
+        .attr("x1", d => d.source.x)
+        .attr("y1", d => d.source.y)
+        .attr("x2", d => d.target.x)
+        .attr("y2", d => d.target.y);
+
+      node
+        .attr("cx", d => d.x)
+        .attr("cy", d => d.y);
+
+      label
+        .attr("x", d => d.x)
+        .attr("y", d => d.y);
+    }
+
+    d3.select("#zoomIn").on("click", () => {
+      svg.transition().call(zoom.scaleBy, 1.5);
+    });
+
+    d3.select("#zoomOut").on("click", () => {
+      svg.transition().call(zoom.scaleBy, 0.75);
+    });
+
+    d3.select("#resetZoom").on("click", () => {
+      svg.transition().call(zoom.transform, d3.zoomIdentity);
+    });
+
+    d3.select("#filterGroup").on("change", function() {
+      const selectedGroup = this.value;
+      node.style("display", d => selectedGroup === "all" || d.group.toString() === selectedGroup ? null : "none");
+      label.style("display", d => selectedGroup === "all" || d.group.toString() === selectedGroup ? null : "none");
+      link.style("display", d => selectedGroup === "all" || (d.source.group.toString() === selectedGroup || d.target.group.toString() === selectedGroup) ? null : "none");
+      simulation.alpha(1).restart();
+    });
+
+    function drag(simulation) {
+      function dragstarted(event) {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        event.subject.fx = event.subject.x;
+        event.subject.fy = event.subject.y;
+      }
+      
+      function dragged(event) {
+        event.subject.fx = event.x;
+        event.subject.fy = event.y;
+      }
+      
+      function dragended(event) {
+        if (!event.active) simulation.alphaTarget(0);
+        event.subject.fx = null;
+        event.subject.fy = null;
+      }
+      
+      return d3.drag()
+        .on("start", dragstarted)
+        .on("drag", dragged)
+        .on("end", dragended);
+    }
+
+    // 使用節流函數來優化resize事件處理
+    function throttle(func, limit) {
+      let inThrottle;
+      return function() {
+        const args = arguments;
+        const context = this;
+        if (!inThrottle) {
+          func.apply(context, args);
+          inThrottle = true;
+          setTimeout(() => inThrottle = false, limit);
+        }
+      }
+    }
+
+    window.addEventListener('resize', throttle(() => {
+      width = window.innerWidth;
+      height = window.innerHeight;
+      svg.attr("width", width).attr("height", height);
+      simulation.force("center", d3.forceCenter(width / 2, height / 2)).alpha(0.3).restart();
+    }, 100));
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,123 @@
+.meditation-container {
+    margin: 0;
+    padding: 0;
+    min-height: 100%;
+    width: 100%;
+    font-family: "Noto Sans TC", sans-serif;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background: linear-gradient(to bottom, #FFF4EB,#FFF2E4, #FFF4EB);
+    color: #6a6258;
+    transition: background 0.5s;
+}
+
+.breath-circle-container {
+    width: 200px;
+    height: 200px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 40px;
+    position: relative;
+    cursor: pointer;
+}
+
+.breath-circle {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    background: #FAEAD3;
+    animation: breath 4s infinite alternate ease-in-out;
+}
+
+@keyframes breath {
+    0% { transform: scale(1); opacity: 0.7; }
+    50% { transform: scale(1.5); opacity: 1; }
+    100% { transform: scale(1); opacity: 0.7; }
+}
+
+.breath-text {
+    position: absolute;
+    font-size: 1.5rem;
+    font-weight: bold;
+}
+
+.timer {
+    font-size: 2rem;
+    margin-bottom: 20px;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 15px;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+input, button, select {
+    padding: 12px 18px;
+    margin: 8px;
+    border: none;
+    border-radius: 25px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    max-width: 80%;
+}
+
+button {
+    background-color: #FAEAD3;
+    color: #6a6258;
+    transition: background-color 0.3s;
+}
+
+button:hover {
+    background-color: rgba(255,255,255,0.5);
+}
+
+input, select {
+    border-radius: 15px;
+}
+
+.button-group {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    justify-content: center;
+}
+
+/* 黑屏模式 */
+.focus-mode {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: #000 !important;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff !important;
+    z-index: 9999;
+}
+
+.focus-mode .breath-circle {
+    background: rgba(166, 166, 166, 0.3);
+}
+
+.focus-mode .controls {
+    display: none;
+}
+
+.focus-mode .breath-circle-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
