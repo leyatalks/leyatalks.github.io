@@ -1,8 +1,9 @@
-import { useEffect, useMemo, useRef } from 'react';
-import * as d3 from 'd3';
+import React, { useState, useEffect } from 'react';
+import StressMapContent from './StressMapContent';
 
-// 假資料：之後可改為從 API 取得
-// 節點類型：來源類型(category)，來源細項(source)，影響面向(impact)，感受(emotion)
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'https://leya-backend-vercel.vercel.app';
+
+// 假資料
 const demoData = [
   { category: '學業', source: '考試壓力', impact: '睡眠', emotion: '焦慮', note: '期末考臨近、準備不足' },
   { category: '學業', source: '報告負荷', impact: '時間管理', emotion: '壓迫', note: '同週多科報告' },
@@ -16,233 +17,190 @@ const demoData = [
   { category: '未來', source: '職涯不確定', impact: '決策困難', emotion: '迷惘', note: '缺乏明確方向' },
 ];
 
-// 轉為心智圖的階層資料：使用者 -> 來源類型 -> 來源細項
-function buildHierarchy(records) {
-  const categories = [...new Set(records.map(r => r.category))];
-  const categoryToSources = new Map();
-  const sourceToCount = new Map();
-  records.forEach(r => {
-    if (!categoryToSources.has(r.category)) categoryToSources.set(r.category, new Set());
-    categoryToSources.get(r.category).add(r.source);
-    sourceToCount.set(r.source, (sourceToCount.get(r.source) || 0) + 1);
-  });
+function StressMindMap({ userInfo }) {
+  const username = userInfo?.id || null;
+  const userNickname = userInfo?.nickname || '使用者';
+  const [analysisData, setAnalysisData] = useState(demoData);
+  const [isLoading, setIsLoading] = useState(false);
+  const [isAnalyzing, setIsAnalyzing] = useState(false);
+  const [error, setError] = useState(null);
 
-  const root = {
-    name: '使用者',
-    type: '根節點',
-    group: 0,
-    children: categories.map(cat => ({
-      name: cat,
-      type: '來源類型',
-      group: 1,
-      children: [...(categoryToSources.get(cat) || [])].map(src => ({
-        name: src,
-        type: '來源細項',
-        group: 2,
-        count: sourceToCount.get(src) || 1,
-      }))
-    }))
+  // 載入用戶的壓力來源分析記錄
+  useEffect(() => {
+    if (!username) return;
+
+    const fetchAnalysisData = async () => {
+      setIsLoading(true);
+      setError(null);
+      try {
+        const response = await fetch(`${API_BASE_URL}/emotion-analysis?username=${encodeURIComponent(username)}`);
+        const result = await response.json();
+        
+        if (result.success && result.records && result.records.length > 0) {
+          setAnalysisData(result.records);
+        } else {
+          // 如果沒有記錄，使用假資料
+          setAnalysisData(demoData);
+        }
+      } catch (err) {
+        console.error('取得壓力分析記錄失敗:', err);
+        setError('無法載入分析記錄');
+        setAnalysisData(demoData);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchAnalysisData();
+  }, [username]);
+
+  // 執行壓力來源分析
+  const handleAnalyzeStress = async () => {
+    if (!username) {
+      alert('請先登入');
+      return;
+    }
+
+    setIsAnalyzing(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/analyze-stress`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ username }),
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        setAnalysisData(result.records);
+        alert(`分析完成！找到 ${result.count} 條壓力來源記錄`);
+      } else {
+        setError(result.message || '分析失敗');
+        alert(result.message || '分析失敗');
+      }
+    } catch (err) {
+      console.error('壓力分析錯誤:', err);
+      setError('分析過程發生錯誤');
+      alert('分析過程發生錯誤，請稍後再試');
+    } finally {
+      setIsAnalyzing(false);
+    }
   };
 
-  return { root, sourceToCount };
-}
-
-export default function StressMindMap({ data = demoData, height = 600, maxDepth }) {
-  const svgRef = useRef(null);
-  const containerRef = useRef(null);
-
-  const { root: hierarchyData, sourceToCount } = useMemo(() => buildHierarchy(data), [data]);
-
-  useEffect(() => {
-    const container = containerRef.current;
-    const svgEl = d3.select(svgRef.current);
-    svgEl.selectAll('*').remove();
-
-    const width = container?.clientWidth ?? 960;
-    const svg = svgEl.attr('width', width).attr('height', height);
-
-    const containerG = svg.append('g');
-    const g = containerG.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`);
-
-    const zoom = d3.zoom()
-      .scaleExtent([0.5, 2.5])
-      .translateExtent([[0, 0], [width, height]])
-      .on('zoom', (event) => containerG.attr('transform', event.transform));
-    svg.call(zoom);
-    svg.on('dblclick.zoom', null);
-    svg.on('wheel.zoom', (event) => { if (event.ctrlKey || event.metaKey) event.preventDefault(); });
-
-    // 建立階層與徑向 cluster 佈局
-    const root = d3.hierarchy(hierarchyData);
-    // 若有設定最大層級，剪裁超出層級的子節點（root.depth=0）
-    if (Number.isFinite(maxDepth)) {
-      root.eachBefore((node) => {
-        if (node.depth >= maxDepth) {
-          node.children = null; // 刪除更深層
-        }
-      });
-    }
-    const computeCluster = (w, h) => {
-      const radius = Math.min(w, h) / 2 - 24; // 留白
-      const cluster = d3.cluster().size([2 * Math.PI, radius]);
-      cluster(root);
-    };
-    computeCluster(width, height);
-
-    // 來源細項大小依頻率（放大點尺寸）
-    const sourceCounts = Array.from(sourceToCount.values());
-    const extent = d3.extent(sourceCounts.length ? sourceCounts : [1]);
-    const safeDomain = extent[0] === extent[1] ? [0, extent[1] || 1] : extent;
-    const radiusScale = d3.scaleLinear().domain(safeDomain).range([12, 26]).clamp(true);
-    const getNodeRadius = (d) => {
-      if (d.depth === 0) return 16; // 使用者
-      if (d.data.type === '來源細項') return radiusScale(d.data.count || 1);
-      return 12; // 來源類型
-    };
-
-    const color = d3.scaleOrdinal().domain([0, 1, 2]).range(d3.schemeSet2);
-
-    // 計算極座標 -> 直角座標，讓線與文字使用相同座標
-    const toXY = (d) => {
-      const angle = d.x - Math.PI / 2;
-      return { x: Math.cos(angle) * d.y, y: Math.sin(angle) * d.y };
-    };
-
-  const linksData = root.links();
-    const linkSel = g.append('g')
-      .attr('class', 'links')
-      .selectAll('line')
-      .data(linksData)
-      .join('line')
-      .attr('x1', d => toXY(d.source).x)
-      .attr('y1', d => toXY(d.source).y)
-      .attr('x2', d => toXY(d.target).x)
-      .attr('y2', d => toXY(d.target).y)
-      .attr('stroke', '#9aa0a6')
-      .attr('stroke-opacity', 0.55)
-      .attr('stroke-width', 1.5);
-
-    const nodesData = root.descendants();
-
-    const nodeCircleSel = g.append('g')
-      .attr('class', 'nodes')
-      .selectAll('circle')
-      .data(nodesData)
-      .join('circle')
-      .attr('cx', d => toXY(d).x)
-      .attr('cy', d => toXY(d).y)
-      .attr('r', d => getNodeRadius(d))
-      .attr('fill', d => color(d.depth))
-      .attr('stroke', '#fff')
-      .attr('stroke-width', 1.5)
-      .style('filter', 'drop-shadow(0 1px 1px rgba(0,0,0,0.15))')
-      .style('cursor', 'pointer');
-
-    const labelsSel = g.append('g')
-      .attr('class', 'labels')
-      .selectAll('text')
-      .data(nodesData)
-      .join('text')
-      .attr('x', d => {
-        const p = toXY(d);
-        const offset = (p.x >= 0 ? 10 : -10);
-        return p.x + offset;
-      })
-      .attr('y', d => toXY(d).y)
-      .attr('text-anchor', d => {
-        const p = toXY(d);
-        return p.x >= 0 ? 'start' : 'end';
-      })
-      .style('dominant-baseline', 'middle')
-      .style('font-size', '12px')
-      .style('fill', '#2b2b2b')
-      .style('paint-order', 'stroke')
-      .style('stroke', 'white')
-      .style('stroke-width', '3px')
-      .style('stroke-linejoin', 'round')
-      .style('pointer-events', 'none')
-      .text(d => d.data.name);
-
-    const tooltip = d3.select(container)
-      .append('div')
-      .style('position', 'absolute')
-      .style('background', 'rgba(255,255,255,0.95)')
-      .style('border', '1px solid #ddd')
-      .style('border-radius', '8px')
-      .style('padding', '8px 10px')
-      .style('font-size', '12px')
-      .style('box-shadow', '0 4px 10px rgba(0,0,0,0.08)')
-      .style('max-width', '320px')
-      .style('max-height', '220px')
-      .style('overflow-y', 'auto')
-      .style('opacity', 0)
-      .style('pointer-events', 'none');
-
-    const showTooltip = (event, html) => {
-      tooltip.html(html)
-        .style('left', `${event.offsetX + 12}px`)
-        .style('top', `${event.offsetY - 12}px`)
-        .transition().duration(120)
-        .style('opacity', 1);
-    };
-    const hideTooltip = () => tooltip.transition().duration(180).style('opacity', 0);
-
-    // Tooltip 綁定在節點圓圈
-    nodeCircleSel.on('mouseover', (event, d) => {
-      const circle = d3.select(event.currentTarget);
-      circle.attr('r', getNodeRadius(d) + 2);
-      const extra = d.data.type === '來源細項' ? `<div>出現次數：${d.data.count || 1}</div>` : '';
-      showTooltip(event, `<strong>${d.data.name}</strong><div>類型：${d.data.type || '節點'}</div>${extra}`);
-    }).on('mouseout', (event, d) => {
-      d3.select(event.currentTarget).attr('r', getNodeRadius(d));
-      hideTooltip();
-    });
-
-    const handleResize = () => {
-      const newWidth = container?.clientWidth ?? width;
-      svg.attr('width', newWidth).attr('height', height);
-      // 重新計算 cluster 佈局與更新座標（保留邊距空間讓文字不出框）
-      computeCluster(newWidth, height);
-      linkSel
-        .attr('x1', d => toXY(d.source).x)
-        .attr('y1', d => toXY(d.source).y)
-        .attr('x2', d => toXY(d.target).x)
-        .attr('y2', d => toXY(d.target).y);
-      nodeCircleSel
-        .attr('cx', d => toXY(d).x)
-        .attr('cy', d => toXY(d).y)
-        .attr('r', d => getNodeRadius(d));
-      labelsSel
-        .attr('x', d => {
-          const p = toXY(d);
-          const offset = (p.x >= 0 ? 10 : -10);
-          return p.x + offset;
-        })
-        .attr('y', d => toXY(d).y)
-        .attr('text-anchor', d => {
-          const p = toXY(d);
-          return p.x >= 0 ? 'start' : 'end';
-        });
-      // 更新縮放的平移限制
-      zoom.translateExtent([[0, 0], [newWidth, height]]);
-    };
-    const onResize = () => window.requestAnimationFrame(handleResize);
-    window.addEventListener('resize', onResize);
-
-    return () => {
-      window.removeEventListener('resize', onResize);
-      tooltip.remove();
-    };
-  }, [hierarchyData, sourceToCount, height]);
-
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
-      <div style={{ position: 'absolute', top: 12, left: 12, zIndex: 2, display: 'flex', gap: 8 }}>
-        {/* 控制列可依需求擴充，如篩選/縮放按鈕 */}
+    <>
+      <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>壓力來源心智圖</h1>
+      {!username && (
+        <div style={{ 
+          textAlign: 'center', 
+          padding: '2rem', 
+          backgroundColor: '#fff3cd', 
+          borderRadius: '8px',
+          margin: '0 auto 2rem',
+          maxWidth: '600px',
+          color: '#856404'
+        }}>
+          請先登入以查看您的壓力來源分析
+        </div>
+      )}
+      <StressMapContent 
+        username={username}
+        userNickname={userNickname}
+        analysisData={analysisData}
+        isLoading={isLoading}
+        error={error}
+      />
+      {/* 分析按鈕和狀態顯示 */}
+      <div style={{ 
+        display: 'flex', 
+        justifyContent: 'center', 
+        gap: '16px', 
+        marginTop: '1rem',
+        flexWrap: 'wrap',
+        alignItems: 'center'
+      }}>
+        <button
+          onClick={handleAnalyzeStress}
+          disabled={isAnalyzing || !username}
+          style={{
+            padding: '12px 24px',
+            backgroundColor: isAnalyzing ? '#ccc' : '#FAEAD3',
+            color: '#6a6258',
+            border: 'none',
+            borderRadius: '8px',
+            cursor: isAnalyzing || !username ? 'not-allowed' : 'pointer',
+            fontSize: '16px',
+            fontWeight: '600',
+            boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
+            transition: 'all 0.2s',
+          }}
+          onMouseOver={(e) => {
+            if (!isAnalyzing && username) {
+              e.target.style.backgroundColor = 'rgba(255,255,255,0.5)';
+              e.target.style.transform = 'translateY(-1px)';
+              e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
+            }
+          }}
+          onMouseOut={(e) => {
+            if (!isAnalyzing && username) {
+              e.target.style.backgroundColor = '#FAEAD3';
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
+            }
+          }}
+        >
+          {isAnalyzing ? '🔄 分析中...' : '🔍 AI 壓力分析'}
+        </button>
+        
+        {isLoading && (
+          <div style={{ 
+            padding: '8px 16px', 
+            backgroundColor: 'rgba(33, 150, 243, 0.1)', 
+            borderRadius: '8px',
+            fontSize: '14px',
+            color: '#1976d2',
+            border: '1px solid rgba(33, 150, 243, 0.3)'
+          }}>
+            ⏳ 載入中...
+          </div>
+        )}
+        
+        {error && (
+          <div style={{ 
+            padding: '8px 16px', 
+            backgroundColor: 'rgba(244, 67, 54, 0.1)', 
+            borderRadius: '8px',
+            fontSize: '14px',
+            color: '#d32f2f',
+            maxWidth: '300px',
+            border: '1px solid rgba(244, 67, 54, 0.3)'
+          }}>
+            ❌ {error}
+          </div>
+        )}
+        
+        {analysisData.length > 0 && !isLoading && (
+          <div style={{ 
+            padding: '8px 16px', 
+            backgroundColor: '#faead3d7', 
+            borderRadius: '8px',
+            fontSize: '14px',
+            color: '#6a6258',
+            border: '1px solid #FAEAD3'
+          }}>
+            📊 共 {analysisData.length} 條記錄
+          </div>
+        )}
       </div>
-      <svg ref={svgRef} />
-    </div>
+
+      
+
+    </>
   );
 }
 
-
+export default StressMindMap;

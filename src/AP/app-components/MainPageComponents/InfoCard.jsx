@@ -1,5 +1,5 @@
 import React, { Suspense, useMemo, useEffect, useState } from 'react';
-import StressMindMap from '../StressMindMap';
+import StressMapContent from '../StressMapContent';
 
 // 卡片資料抽離成常數，避免每次 render 重新建立陣列
 const cardList = [
@@ -36,6 +36,11 @@ function Card({ item, setActivatePage }) {
     const [tipsLoading, setTipsLoading] = useState(false);
     const [tipsError, setTipsError] = useState(null);
 
+    // 壓力心智圖狀態
+    const [analysisData, setAnalysisData] = useState([]);
+    const [mindMapLoading, setMindMapLoading] = useState(false);
+    const [mindMapError, setMindMapError] = useState(null);
+
     // 從 localStorage 取得使用者 id（與 ChatPage 一致，預設 visitor）
     const username = useMemo(() => {
         try {
@@ -44,6 +49,17 @@ function Card({ item, setActivatePage }) {
             return (info && info.id) ? info.id : 'visitor';
         } catch {
             return 'visitor';
+        }
+    }, []);
+
+    // 從 localStorage 取得使用者 nickname
+    const userNickname = useMemo(() => {
+        try {
+            const saved = localStorage.getItem('leyaUserInfo');
+            const info = saved ? JSON.parse(saved) : null;
+            return (info && info.nickname) ? info.nickname : '使用者';
+        } catch {
+            return '使用者';
         }
     }, []);
 
@@ -104,6 +120,37 @@ function Card({ item, setActivatePage }) {
         if (!isRelaxTips) return;
         fetchRelaxTips();
     }, [isRelaxTips]);
+
+    // 載入壓力分析數據
+    useEffect(() => {
+        if (!isMindMap || !username) return;
+        let cancelled = false;
+        (async () => {
+            try {
+                setMindMapLoading(true);
+                setMindMapError(null);
+                const res = await fetch(`https://leya-backend-vercel.vercel.app/emotion-analysis?username=${encodeURIComponent(username)}`);
+                if (!res.ok) throw new Error('network');
+                const result = await res.json();
+                if (cancelled) return;
+                
+                if (result.success && result.records && result.records.length > 0) {
+                    setAnalysisData(result.records);
+                } else {
+                    setAnalysisData([]);
+                }
+            } catch (e) {
+                if (!cancelled) {
+                    setMindMapError('failed');
+                    setAnalysisData([]);
+                }
+            } finally {
+                if (!cancelled) setMindMapLoading(false);
+            }
+        })();
+        return () => { cancelled = true; };
+    }, [isMindMap, username]);
+
     const randomMood = useMemo(() => {
         if (!isMoodCard || !Array.isArray(MOODS) || MOODS.length === 0) return null;
         const idx = Math.floor(Math.random() * MOODS.length);
@@ -164,7 +211,15 @@ function Card({ item, setActivatePage }) {
                 {isMindMap && (
                     <div className="mindmap-wrapper" style={{ width: '100%', maxHeight: '25vh', marginTop: 8, cursor: 'pointer' }} onClick={() => setActivatePage('stress-mind-map')}>
                         <Suspense fallback={<div style={{ fontSize: 12, color: '#666' }}>載入中...</div>}>
-                            <StressMindMap height={220} maxDepth={1} />
+                            <StressMapContent 
+                                height={200} 
+                                maxDepth={1} 
+                                username={username}
+                                userNickname={userNickname}
+                                analysisData={analysisData}
+                                isLoading={mindMapLoading}
+                                error={mindMapError}
+                            />
                         </Suspense>
                     </div>
                 )}

@@ -72,15 +72,20 @@ body {
     width: 100%;
     box-sizing: border-box;
     margin: 0 auto;
+    height: 60px;
 }
 
 .ap-header-title {
+    position: absolute;
     text-align: center;
     flex: 1;
+    display: flex;
+    align-items: center;
     font-family: "LXGW WenKai TC", cursive;
     font-weight: 700;
     font-style: normal;
     font-size: 2em;
+    height: 60px;
 }
 
 .logo {
@@ -90,6 +95,8 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
+    position: absolute;
+    left: 1em;
 }
 
 .golden-sentence-container {
