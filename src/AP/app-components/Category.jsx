@@ -10,7 +10,7 @@ function CategoryPage({ activePage, setActivePage, handleNavigation  }) {
         <>
             <div id="category-page">
                 <div className="category-list">
-                    <div className="category-row">
+                    <div className="category-col">
                         <div className="category-item">
                             <div className="category-icon"
                                 onClick={() => setActivePage('mood-page')}
@@ -36,9 +36,17 @@ function CategoryPage({ activePage, setActivePage, handleNavigation  }) {
                             </div>
                             <div className="category-name">冥想</div>
                         </div>
+                        <div className="category-item"
+                        onClick={() => navigate('/')}
+                                style={{ cursor: "pointer" }}>
+                                <div className="category-icon" >
+                                    <FontAwesomeIcon icon={faEarthAmericas} />
+                                </div>
+                            <div className="category-name">樂壓Talks 介紹頁面</div>
+                        </div>
                     </div>
 
-                    <div className="category-row">
+                    {/* <div className="category-row">
                         <div className="category-item coming-soon">
                             <div className="category-icon">
                                 <FontAwesomeIcon icon={faClipboardCheck} />
@@ -57,9 +65,10 @@ function CategoryPage({ activePage, setActivePage, handleNavigation  }) {
                             </div>
                             <div className="category-name">即將新增</div>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className="category-row">
+                    {/* <div className="category-row">
+                        
                         <div className="category-item coming-soon">
                             <div className="category-icon">
                                 <FontAwesomeIcon icon={faClock} />
@@ -74,16 +83,7 @@ function CategoryPage({ activePage, setActivePage, handleNavigation  }) {
                             </div>
                             <div className="category-name">即將新增</div>
                         </div>
-                        <div className="category-item">
-                                <div className="category-icon" 
-                                onClick={() => navigate('/')}
-                                style={{ cursor: "pointer" }}
-                                >
-                                    <FontAwesomeIcon icon={faEarthAmericas} />
-                                </div>
-                            <div className="category-name">樂壓Talks<br />介紹頁面</div>
-                        </div>
-                    </div>
+                    </div> */}
                 </div>
             </div>
         </>

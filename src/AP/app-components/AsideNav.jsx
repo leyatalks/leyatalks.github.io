@@ -1,8 +1,10 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBook, faLeaf, faDiagramProject, faCommentDots, faCircleUser } from '@fortawesome/free-solid-svg-icons';
+import { faBook, faLeaf, faDiagramProject, faCommentDots, faCircleUser, faEarthAmericas } from '@fortawesome/free-solid-svg-icons';
 
 function AsideNav({ setActivePage, activePage, collapsed = false, onToggle }) {
+  const navigate = useNavigate();
   return (
     <aside className={`ap-aside ${collapsed ? 'collapsed' : ''}`}>
       <div className="ap-aside-inner">
@@ -26,6 +28,10 @@ function AsideNav({ setActivePage, activePage, collapsed = false, onToggle }) {
           <button className={`ap-aside-item ${activePage === 'chat-page' ? 'active' : ''}`} onClick={() => setActivePage('chat-page')}>
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faCommentDots} /></span>
             <span className="ap-aside-text">吐司聊天室</span>
+          </button>
+          <button className='ap-aside-item' onClick={() => navigate('/')}>
+            <span className="ap-aside-icon"><FontAwesomeIcon icon={faEarthAmericas} /></span>
+            <span className="ap-aside-text">樂壓Talks 介紹頁面</span>
           </button>
         </nav>
         <div className="ap-aside-footer">

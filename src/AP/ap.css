@@ -43,8 +43,8 @@ body {
     overflow-x: hidden;
     overflow-y: auto;
     box-sizing: border-box;
-    display:flex;
-    flex-direction:column;
+    display: flex;
+    flex-direction: column;
 }
 
 .ap-page-container {
@@ -54,8 +54,8 @@ body {
     width: 100%;
     justify-content: center;
     position: relative;
-    flex:1;
-    min-height:0;
+    flex: 1;
+    min-height: 0;
 }
 
 /* 头部样式 */
@@ -211,10 +211,10 @@ body {
     max-width: var(--app-max-width);
     margin-left: auto;
     margin-right: auto;
-    display:flex;
-    flex-direction:column;
-    min-height:0;
-    overflow:hidden;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
 }
 
 /* 聊天區域 */
@@ -225,10 +225,10 @@ body {
     position: relative;
     background-color: var(--primary-color);
     width: 100%;
-    flex:1;
-    display:flex;
-    flex-direction:column;
-    min-height:0;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
 }
 
 .chat-history {
@@ -238,16 +238,18 @@ body {
     padding: 0 10% var(--chat-input-offset) 10%;
     scroll-behavior: smooth;
     scrollbar-color: transparent transparent;
-    min-height:0;
+    min-height: 0;
 }
 
 /* 聊天訊息外層 */
 .chat-message {
     margin: 8px 0;
 }
+
 .chat-message-user {
     text-align: right;
 }
+
 .chat-message-bot {
     text-align: left;
 }
@@ -281,6 +283,7 @@ body {
     background: #dcebfe;
     /* background: #e0f7fa; */
 }
+
 .chat-bubble-bot {
     background: #fae8da;
     /* background: #f1f8e9; */
@@ -358,37 +361,56 @@ body {
     margin-bottom: 25px;
 }
 
-.category-item {
+.category-col {
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 40%;
+    gap: 2rem;
+    height: 100%;
+}
+
+.category-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    width: 60%;
+    height: 4rem;
     padding-left: 2rem;
     padding-right: 2rem;
+    background-color: var(--secondary-color);
+    gap: 2rem;
+    border-radius: 16px;
+    cursor: pointer;
 }
 
 .category-icon {
-    width: 60px;
-    height: 60px;
+    width: 80px;
+    height: 100%;
     background-color: var(--secondary-color);
-    border-radius: 50%;
+    /* border-radius: 50%; */
     display: flex;
     align-items: center;
     justify-content: center;
-    margin-bottom: 10px;
     color: white;
     font-size: 24px;
 }
 
-.category-icon:hover {
+.category-item:hover {
     background-color: var(--icon-color);
-    ;
+    color: white;
+    transition: 0.5s;
+}
+
+.category-item:hover .category-icon {
+    background-color: var(--icon-color);
     color: white;
     transition: 0.5s;
 }
 
 .category-name {
-    font-size: 14px;
+    display: block;
+    justify-self: center;
+    font-size: 20px;
     font-weight: 500;
     white-space: nowrap;
 }
@@ -511,19 +533,29 @@ body {
 }
 
 /* Aside（桌面） */
-.ap-app { display: flex; }
-.ap-page-container { display: flex; width: 100%; background-color: var(--primary-color); }
-.ap-aside {
-  position: fixed;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  width: 280px;
-  background: #E9D9C8;
-  border-right: 1px solid var(--border-color);
-  display: none; /* 手機預設隱藏 */
-  z-index: 20;
+.ap-app {
+    display: flex;
 }
+
+.ap-page-container {
+    display: flex;
+    width: 100%;
+    background-color: var(--primary-color);
+}
+
+.ap-aside {
+    position: fixed;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    width: 280px;
+    background: #E9D9C8;
+    border-right: 1px solid var(--border-color);
+    display: none;
+    /* 手機預設隱藏 */
+    z-index: 20;
+}
+
 .ap-aside-title {
     font-family: "LXGW WenKai TC", cursive;
     font-weight: 700;
@@ -532,17 +564,71 @@ body {
     text-align: center;
     color: var(--text-color);
 }
-.ap-aside-inner { position: sticky; top: 0; display: flex; flex-direction: column; height: 100%; padding: 24px 16px; gap: 20px; }
-.ap-aside-logo { display: flex; align-items: center; justify-content: center; }
-.ap-aside-logo img { width: 72px; height: 72px; object-fit: contain; }
-.ap-aside-nav { display: flex; flex-direction: column; gap: 16px; }
-.ap-aside-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; border: none; background: #F3E8DD; cursor: pointer; font-size: 16px; text-align: left; }
-.ap-aside-item:hover { background: #ead7c5; transition: .2s; }
-.ap-aside-item.active { box-shadow: 0 0 0 2px #d4bda8 inset; }
-.ap-aside-icon { width: 24px; display: inline-flex; align-items: center; justify-content: center; color: var(--third-color); }
-.ap-aside-text { color: #1b1b1b; font-weight: 600; }
 
-.ap-aside-footer{
+.ap-aside-inner {
+    position: sticky;
+    top: 0;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    padding: 24px 16px;
+    gap: 20px;
+}
+
+.ap-aside-logo {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.ap-aside-logo img {
+    width: 72px;
+    height: 72px;
+    object-fit: contain;
+}
+
+.ap-aside-nav {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.ap-aside-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 18px;
+    border-radius: 12px;
+    border: none;
+    background: #F3E8DD;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: left;
+}
+
+.ap-aside-item:hover {
+    background: #ead7c5;
+    transition: .2s;
+}
+
+.ap-aside-item.active {
+    box-shadow: 0 0 0 2px #d4bda8 inset;
+}
+
+.ap-aside-icon {
+    width: 24px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--third-color);
+}
+
+.ap-aside-text {
+    color: #1b1b1b;
+    font-weight: 600;
+}
+
+.ap-aside-footer {
     display: flex;
     flex-direction: row;
     justify-content: flex-start;
@@ -554,25 +640,48 @@ body {
 }
 
 /* 主內容容器：預留側欄寬度 */
-.ap-main { width: 100%; margin-left: 0; display: flex; flex-direction: column; background-color: var(--primary-color);}
+.ap-main {
+    width: 100%;
+    margin-left: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: var(--primary-color);
+}
 
 @media (min-width: 1024px) {
-  .ap-aside { display: block; }
-  .ap-main { width: calc(100% - 280px); margin-left: 280px; }
-  /* 讓桌面版鋪滿寬度但內容仍遵守側欄偏移 */
-  .ap-header, .content-area, .chat-input-container, .footer { max-width: none; width: 100%; margin: 0;  }
+    .ap-aside {
+        display: block;
+    }
+
+    .ap-main {
+        width: calc(100% - 280px);
+        margin-left: 280px;
+    }
+
+    /* 讓桌面版鋪滿寬度但內容仍遵守側欄偏移 */
+    .ap-header,
+    .content-area,
+    .chat-input-container,
+    .footer {
+        max-width: none;
+        width: 100%;
+        margin: 0;
+    }
 }
 
 /* 手機保留底部導覽（既有 footer），故隱藏 aside */
 @media (max-width: 1023px) {
-  .ap-aside { display: none; }
-  .logout-btn{
-    display: flex;
-    position: absolute;
-    right: 0;
-    font-size: 12px;
-    max-width: fit-content;
-  }
+    .ap-aside {
+        display: none;
+    }
+
+    .logout-btn {
+        display: flex;
+        position: absolute;
+        right: 0;
+        font-size: 12px;
+        max-width: fit-content;
+    }
 }
 
 /* RWD 設定 */
@@ -606,12 +715,12 @@ body {
 
     .category-icon {
         width: 50px;
-        height: 50px;
+        height: 100%;
         font-size: 20px;
     }
 
     .category-name {
-        font-size: 12px;
+        font-size: 14px;
     }
 
     .nav-item {
@@ -654,14 +763,27 @@ body {
 
 /* 新增：平板與桌面斷點，擴增內容寬度與欄數 */
 @media (min-width: 768px) {
-    :root { --app-max-width: 720px; }
-    .category-item { width: 30%; }
+    :root {
+        --app-max-width: 720px;
+    }
+
+    .category-item {
+        width: 60%;
+    }
 }
 
 @media (min-width: 1024px) {
-    :root { --app-max-width: 960px; }
-    .category-item { width: 22%; }
-    .post-images img { width: 12em; }
+    :root {
+        --app-max-width: 960px;
+    }
+
+    .category-item {
+        width: 60%;
+    }
+
+    .post-images img {
+        width: 12em;
+    }
 
     /* 桌面版全寬鋪滿（移除左右邊距與最大寬度限制） */
     #app,
@@ -677,57 +799,140 @@ body {
 }
 
 @media (min-width: 1280px) {
-    :root { --app-max-width: 1200px; }
+    :root {
+        --app-max-width: 1200px;
+    }
 }
 
 /* 移除桌面視圖多餘 padding 與左右內縮 */
 @media (min-width: 1024px) {
-  .post-list { padding-left: 0; padding-right: 0; }
-  .category-list { padding-left: 0; padding-right: 0; }
-  .chat-history { padding-left: 0; padding-right: 0; }
+    .post-list {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .category-list {
+        padding-left: 0;
+        padding-right: 0;
+    }
+
+    .chat-history {
+        padding-left: 0;
+        padding-right: 0;
+    }
 }
 
 /* Aside 收合樣式 */
-.ap-aside.collapsed { width: 88px; }
-.ap-aside.collapsed .ap-aside-title { display: none; }
-.ap-aside.collapsed .ap-aside-item { justify-content: center; }
-.ap-aside.collapsed .ap-aside-text { display: none; }
-.ap-aside.collapsed .ap-aside-inner { padding-left: 12px; padding-right: 12px; }
+.ap-aside.collapsed {
+    width: 88px;
+}
+
+.ap-aside.collapsed .ap-aside-title {
+    display: none;
+}
+
+.ap-aside.collapsed .ap-aside-item {
+    justify-content: center;
+}
+
+.ap-aside.collapsed .ap-aside-text {
+    display: none;
+}
+
+.ap-aside.collapsed .ap-aside-inner {
+    padding-left: 12px;
+    padding-right: 12px;
+}
 
 @media (min-width: 1024px) {
-  .ap-main { width: calc(100% - 280px); margin-left: 280px; }
-  .ap-main.aside-collapsed { width: calc(100% - 88px); margin-left: 88px;}
+    .ap-main {
+        width: calc(100% - 280px);
+        margin-left: 280px;
+    }
+
+    .ap-main.aside-collapsed {
+        width: calc(100% - 88px);
+        margin-left: 88px;
+    }
 }
 
 /* 桌面：右側內容加 5% padding，聊天輸入列對齊 */
 @media (min-width: 1024px) {
-  /* 右側主內容容器側邊留白 */
-  .ap-main { padding-left: 5%; padding-right: 5%; }
-  /* 依收合狀態提供 aside 寬度變數 */
-  .ap-main { --aside-width: 280px; }
-  .ap-main.aside-collapsed { --aside-width: 88px; }
 
-  /* 讓聊天輸入列貼齊右側主內容的 5% 內距並避開側欄 */
-  .ap-main .chat-input-container {
-    left: calc(var(--aside-width));
-    right: 5%;
-    max-width: calc(100% - 280px);
-    margin: 0;
-    bottom: 0;
-  }
+    /* 右側主內容容器側邊留白 */
+    .ap-main {
+        padding-left: 5%;
+        padding-right: 5%;
+    }
 
-  /* 聊天紀錄預留空間，避免被輸入列遮擋 */
-  .ap-main .chat-history { margin-bottom: 0; }
+    /* 依收合狀態提供 aside 寬度變數 */
+    .ap-main {
+        --aside-width: 280px;
+    }
+
+    .ap-main.aside-collapsed {
+        --aside-width: 88px;
+    }
+
+    /* 讓聊天輸入列貼齊右側主內容的 5% 內距並避開側欄 */
+    .ap-main .chat-input-container {
+        left: calc(var(--aside-width));
+        right: 5%;
+        max-width: calc(100% - 280px);
+        margin: 0;
+        bottom: 0;
+    }
+
+    /* 聊天紀錄預留空間，避免被輸入列遮擋 */
+    .ap-main .chat-history {
+        margin-bottom: 0;
+    }
 }
 
 /* ===== Chat layout fix start ===== */
-#app { display:flex; flex-direction:column; }
-.ap-page-container { flex:1; display:flex; flex-direction:column; min-height:0; }
-.ap-main { flex:1; display:flex; flex-direction:column; min-height:0; }
-.content-area { flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden; }
-.chat-container { flex:1; display:flex; flex-direction:column; min-height:0; }
-.chat-history { flex:1; min-height:0; overflow-y:auto; }
-/* 保持底部輸入列預留空間 */
-.chat-history { padding-bottom: var(--chat-input-offset); }
-/* ===== Chat layout fix end ===== */
+#app {
+    display: flex;
+    flex-direction: column;
+}
 
+.ap-page-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.ap-main {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.content-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.chat-container {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.chat-history {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* 保持底部輸入列預留空間 */
+.chat-history {
+    padding-bottom: var(--chat-input-offset);
+}
+
+/* ===== Chat layout fix end ===== */
