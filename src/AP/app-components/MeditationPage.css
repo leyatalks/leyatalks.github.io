@@ -69,7 +69,7 @@ input, button, select {
     border-radius: 25px;
     font-size: 1.1rem;
     cursor: pointer;
-    max-width: 80%;
+    /* max-width: 80%; */
 }
 
 button {

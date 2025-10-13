@@ -1,0 +1,178 @@
+/* 應用主頁全預設定 */
+.mainpage-container {
+    width: 100%;
+    height: 80%;
+    display: flex;
+    flex-direction: row;
+    gap: 1.5rem;
+}
+
+.flex-col {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    gap: 8px;
+}
+
+.flex-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    gap: 8px;
+}
+
+/* 廣告版位 */
+.ads-container {
+    width: 100%;
+    height: 10rem;
+    display: flex;
+    position: sticky;
+    top: 76px;
+    margin-top: 20px;
+    /* border: 1px solid #000; */
+    gap: 20px;
+    overflow-x: auto;
+    scrollbar-color: transparent transparent;
+    scroll-behavior: smooth;
+}
+
+.main-ad {
+    min-width: 16rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* padding: 1rem 2rem 1rem 2rem; */
+    /* border: 3px solid var(--secondary-color); */
+    /* background-color: #000; */
+    border-radius: 15px;
+}
+
+.main-ad img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border: 3px solid var(--secondary-color);
+    border-radius: 15px;
+    color: #fff;
+    font-size: 1.2rem;
+    cursor: pointer;
+}
+
+
+/* 角色版位 */
+
+.mainrole-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    align-self: center;
+    height: 80%;
+    width: 40%;
+    background-color: var(--secondary-color);
+    border-radius: 24px;
+    gap: 1rem;
+    /* Debug Using */
+    /* border: 1px solid blue; */
+}
+
+.encourageTitle {
+    font-family: 'Noto Sans TC';
+    font-size: 2vw;
+    font-weight: 700;
+    transition: all 0.5s ease;
+    max-width: 80%;
+    word-break: break-all;
+    line-break: break-word;
+}
+
+
+.roleImg {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    /* Debug Using */
+    /* border: 1px solid red; */
+}
+
+.roleImg>img {
+    max-height: 100%;
+}
+
+/* 資訊卡片版位（儀錶板） */
+.infocard-container {
+    align-self: center;
+    width: 60%;
+    height: 80%;
+    gap: 16px;
+    /* Debug Using */
+    /* border: 1px solid purple; */
+}
+
+.infocard {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    width: 100%;
+    height: 100%;
+    background-color: #f0f0f0;
+    border-radius: 16px;
+}
+
+.mindmap-wrapper {
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+}
+
+.mindmap-wrapper svg {
+    width: 100% !important;
+    height: 100% !important;
+}
+
+@media (max-width: 768px) {
+
+    .mainpage-container {
+        flex-direction: column;
+        align-items: center;
+        height: 100%;
+        position: relative;
+        overflow-y: scroll;
+        margin-bottom: 36px;
+    }
+
+    .ads-container {
+        top: 0;
+        padding-left: 1rem;
+        padding-right: 1rem;
+        margin-bottom: 1rem;
+    }
+
+    .mainrole-container,
+    .infocard-container {
+        width: 80%;
+        height: 15rem;
+
+    }
+
+    .encourageTitle {
+        font-size: 5vw;
+    }
+
+    .flex-row {
+        flex-direction: column;
+        height: fit-content;
+    }
+
+    .infocard {
+        min-width: 100%;
+        min-height: fit-content;
+    }
+
+    .roleImg {
+        max-height: 15vh;
+    }
+}

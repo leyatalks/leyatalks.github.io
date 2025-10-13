@@ -5,6 +5,7 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
     const [username, setUsername] = useState('');
     const [password, setPassword] = useState('');
     const [error, setError] = useState('');
+    const [loading, setLoading] = useState(false);
 
     function handle(page) {
         setActivePage(page);
@@ -13,7 +14,12 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
     const handleLogin = async (e) => {
         e.preventDefault();
         setError(''); // 清空之前的錯誤訊息
+        setLoading(true);
         try {
+            // 設定 10 秒逾時，避免後端因資料庫防火牆或網路卡住時一直等待
+            const controller = new AbortController();
+            const timeoutId = setTimeout(() => controller.abort(), 10000);
+
             const response = await fetch('https://leya-backend-vercel.vercel.app/login', {
                 method: 'POST',
                 headers: {
@@ -23,7 +29,9 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
                     usernameOrEmail: username,
                     password: password
                 }),
+                signal: controller.signal,
             });
+            clearTimeout(timeoutId);
 
             if (response.ok) {
                 const data = await response.json();
@@ -37,7 +45,14 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
             }
         } catch (err) {
             console.error('錯誤:', err);
-            setError(err.message);
+            if (err.name === 'AbortError') {
+                setError('伺服器回應逾時，可能是資料庫連線受防火牆限制，請稍後再試');
+            } else {
+                setError(err.message || '發生未知錯誤');
+            }
+        }
+        finally {
+            setLoading(false);
         }
     };
 
@@ -52,6 +67,7 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
                     placeholder="Email / 帳號"
                     value={username}
                     onChange={(e) => setUsername(e.target.value)}
+                    disabled={loading}
                     required
                 />
                 <input
@@ -60,11 +76,14 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
                     placeholder="密碼"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
+                    disabled={loading}
                     required
                 />
                 {error && <p style={{ color: 'red' }}>{error}</p>}
                 <div className="forgot">忘記密碼？</div>
-                <button className={`login ${activePage === 'home-page' ? 'active' : 'login-page'}`} type="submit">登入</button>
+                <button className={`login ${activePage === 'home-page' ? 'active' : 'login-page'}`} type="submit" disabled={loading}>
+                    {loading ? '登入中…' : '登入'}
+                </button>
             </form>
 
             {/* <div className="divider">── 或使用社群快速登入 ──</div>
@@ -80,8 +99,8 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
             <div className="login-donate">
                 <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/shu.png" alt="世新大學校徽" className='shu' />
                 <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/ics.png" alt="資傳系徽" className='ics' />
-                <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/donate_example_logo.png" alt="donate"  className='login-donate-logo' />
-                <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/donate_example_logo.png" alt="donate"  className='login-donate-logo' />
+                <img src="https://shoplineimg.com/5e8da4c99e08ce00119090ae/682c4043f1e727000d963bc5/1200x.webp?source_format=png" alt="donate"  className='login-donate-logo' />
+                <img src="https://cdn.store-assets.com/s/1359361/f/13666576.png" alt="donate"  className='login-donate-logo' />
             </div>
         </div>
     );

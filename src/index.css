@@ -62,3 +62,29 @@ button:focus-visible {
     background-color: #f9f9f9;
   }
 } */
+
+/* 全域 RWD 基線 */
+html { box-sizing: border-box; }
+*, *::before, *::after { box-sizing: inherit; }
+
+html, body, #root { height: 100%; width: 100%; margin: 0; padding: 0; }
+
+/* 讓圖片/影片預設為響應式 */
+img, video { max-width: 100%; height: auto; display: block; }
+
+/* 文字易讀性與系統字體 */
+:root { font-family: system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Noto Sans TC", "PingFang TC", "Microsoft JhengHei", sans-serif; line-height: 1.5; }
+
+/* 避免橫向滾動 */
+body { overflow-x: hidden; min-height: 100vh; }
+
+/* 可聚焦外框提升可近性 */
+:focus-visible { outline: 3px solid #8ab4f8; outline-offset: 2px; }
+
+/* 容器工具類，可在需要時套用 */
+.container { width: min(100% - 2rem, 1200px); margin-inline: auto; }
+
+/* 保留原檔尾註解 */
+/* 原始內容以下保留...
+...existing code...
+*/

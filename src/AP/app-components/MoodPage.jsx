@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react'
 
-function MoodPage() {
+function MoodPage(props) {
 	const imagesBase = '/mood/images'
 	const storeKey = 'moodJournal'
+	console.log('用戶資訊 props.userInfo', props?.userInfo);
 
 	const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
@@ -10,10 +11,17 @@ function MoodPage() {
 	const [modalMoodPath, setModalMoodPath] = useState('')
 	const [isModalOpen, setIsModalOpen] = useState(false)
 	const [noteText, setNoteText] = useState('')
+	// data 結構：{ [dateStr]: { text?: string, mood?: string, id?: number } }
+	// 僅保留已同步到資料庫的紀錄（有 id 才顯示）
 	const [data, setData] = useState(() => {
 		try {
 			const saved = localStorage.getItem(storeKey)
-			return saved ? JSON.parse(saved) : {}
+			const parsed = saved ? JSON.parse(saved) : {}
+			const filtered = {}
+			for (const k of Object.keys(parsed || {})) {
+				if (parsed[k] && parsed[k].id) filtered[k] = parsed[k]
+			}
+			return filtered
 		} catch (e) {
 			return {}
 		}
@@ -26,6 +34,44 @@ function MoodPage() {
 		{ key: '憤怒', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E6%86%A4%E6%80%92.PNG" },
 		{ key: '焦慮', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E7%84%A6%E6%85%AE.PNG" },
 	]
+
+	function moodKeyToSrc(key) {
+		if (!key) return ''
+		const found = MOODS.find(m => m.key === key)
+		return found ? found.src : ''
+	}
+
+	function dateStrFromCreatedAt(createdAt) {
+		if (!createdAt || typeof createdAt !== 'string') return ''
+		const m = createdAt.match(/^(\d{4}-\d{2}-\d{2})/)
+		return m ? m[1] : ''
+	}
+
+	function moodKeyToSrc(key) {
+		if (!key) return ''
+		const found = MOODS.find(m => m.key === key)
+		return found ? found.src : ''
+	}
+
+	function dateStrFromCreatedAt(createdAt) {
+		if (!createdAt || typeof createdAt !== 'string') return ''
+		// 避免時區影響，直接取 YYYY-MM-DD
+		const m = createdAt.match(/^(\d{4}-\d{2}-\d{2})/)
+		return m ? m[1] : ''
+	}
+
+	// 取得 username：優先用 props.userInfo.id；否則讀取 localStorage('userInfo') 的 JSON；最後回退 'demo-visitor'
+	const username = (() => {
+		if (props?.userInfo?.id) return String(props.userInfo.id)
+		try {
+			const raw = localStorage.getItem('userInfo')
+			if (raw) {
+				const parsed = JSON.parse(raw)
+				if (parsed?.id) return String(parsed.id)
+			}
+		} catch {}
+		return 'demo-visitor'
+	})();
 
 	function todayStr() {
 		const d = new Date()
@@ -81,25 +127,127 @@ function MoodPage() {
 		setNoteText(entry.text || '')
 	}
 
-	function saveEntry() {
+	// 從後端載入該使用者已存的心情日記，只用後端資料覆蓋本地，避免顯示暫存
+	useEffect(() => {
+		let cancelled = false
+		async function loadFromServer() {
+			if (!username) return
+			try {
+				const resp = await fetch(`https://leya-backend-vercel.vercel.app/mood-journal?username=${encodeURIComponent(username)}`)
+				const json = await resp.json()
+				if (cancelled) return
+				if (json?.success && Array.isArray(json.items)) {
+					const rebuilt = {}
+					for (const it of json.items) {
+						const dateStr = dateStrFromCreatedAt(it.created_at)
+						if (!dateStr) continue
+						const moodSrc = moodKeyToSrc(it.mood)
+						rebuilt[dateStr] = { id: it.id, text: typeof it.content === 'string' ? it.content : '', mood: moodSrc || '' }
+					}
+					setData(rebuilt)
+					try { localStorage.setItem(storeKey, JSON.stringify(rebuilt)) } catch {}
+				}
+			} catch (e) {
+				console.warn('載入雲端心情日記失敗', e)
+			}
+		}
+		loadFromServer()
+		return () => { cancelled = true }
+	}, [username])
+
+	// 從後端載入該使用者已存的心情日記，合併到本地資料
+	useEffect(() => {
+		let cancelled = false
+		async function loadFromServer() {
+			if (!username) return
+			try {
+				const resp = await fetch(`https://leya-backend-vercel.vercel.app/mood-journal?username=${encodeURIComponent(username)}`)
+				const json = await resp.json()
+				if (cancelled) return
+				if (json?.success && Array.isArray(json.items)) {
+					setData(prev => {
+						const next = { ...prev }
+						for (const it of json.items) {
+							const dateStr = dateStrFromCreatedAt(it.created_at)
+							if (!dateStr) continue
+							const moodSrc = moodKeyToSrc(it.mood)
+							next[dateStr] = {
+								...(next[dateStr] || {}),
+								id: it.id,
+								text: typeof it.content === 'string' ? it.content : (next[dateStr]?.text || ''),
+								mood: moodSrc || next[dateStr]?.mood || ''
+							}
+						}
+						try { localStorage.setItem(storeKey, JSON.stringify(next)) } catch {}
+						return next
+					})
+				}
+			} catch (e) {
+				// 保持靜默失敗：離線或網路錯誤時仍可用本地資料
+				console.warn('載入雲端心情日記失敗', e)
+			}
+		}
+		loadFromServer()
+		return () => { cancelled = true }
+	}, [username])
+
+	async function saveEntry() {
 		if (!selectedDate) return
 		const text = (noteText || '').trim()
-		const next = { ...data }
-		if (!next[selectedDate]) next[selectedDate] = {}
-		next[selectedDate].text = text
-		if (modalMoodPath) next[selectedDate].mood = modalMoodPath
-		setData(next)
-		try { localStorage.setItem(storeKey, JSON.stringify(next)) } catch (e) {}
+
+		// 後端同步：若已有 id -> 更新，否則建立（成功後才更新本地 / 顯示）
+		const moodKey = MOODS.find(m => m.src === modalMoodPath)?.key || ''
+		const payload = {
+			username,
+			content: text,
+			mood: moodKey,
+			created_at: `${selectedDate}T00:00:00.000Z`
+		}
+		try {
+			if (data[selectedDate]?.id) {
+				const resp = await fetch(`https://leya-backend-vercel.vercel.app/mood-journal/${data[selectedDate].id}`, {
+					method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+				})
+				const json = await resp.json()
+				if (json?.success && json.item?.id) {
+					const updated = { ...data, [selectedDate]: { id: json.item.id, text, mood: modalMoodPath || '' } }
+					setData(updated)
+					try { localStorage.setItem(storeKey, JSON.stringify(updated)) } catch {}
+				}
+			} else {
+				const resp = await fetch('https://leya-backend-vercel.vercel.app/mood-journal', {
+					method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
+				})
+				const json = await resp.json()
+				if (json?.success && json.item?.id) {
+					const created = { ...data, [selectedDate]: { id: json.item.id, text, mood: modalMoodPath || '' } }
+					setData(created)
+					try { localStorage.setItem(storeKey, JSON.stringify(created)) } catch {}
+				}
+			}
+		} catch (err) {
+			console.warn('同步心情日記至後端失敗', err)
+		}
 		closeModal()
 	}
 
-	function deleteEntry() {
+	async function deleteEntry() {
 		if (!selectedDate) return
 		if (!data[selectedDate]) return closeModal()
-		const next = { ...data }
-		delete next[selectedDate]
-		setData(next)
-		try { localStorage.setItem(storeKey, JSON.stringify(next)) } catch (e) {}
+		const id = data[selectedDate]?.id
+		// 僅刪除已存在於資料庫的紀錄
+		if (id) {
+			try {
+				const resp = await fetch(`https://leya-backend-vercel.vercel.app/mood-journal/${id}`, { method: 'DELETE' })
+				const json = await resp.json()
+				if (json?.success) {
+					const next = { ...data }
+					delete next[selectedDate]
+					setData(next)
+					try { localStorage.setItem(storeKey, JSON.stringify(next)) } catch (e) {}
+				}
+			} catch (e) { console.warn('刪除雲端日記失敗', e) }
+		}
 		closeModal()
 	}
 
@@ -133,8 +281,8 @@ function MoodPage() {
 				.emoji{margin-top:6px;display:flex;align-items:center;justify-content:center;min-height:28px;width:100%}
 				.emoji img{width:100%;object-fit:contain;display:block;margin:auto;filter:drop-shadow(0 2px 3px rgba(0,0,0,.08))}
 				.disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.15)}
-				.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:${isModalOpen ? 'block' : 'none'}}
-				.modal{position:fixed;inset:0;display:${isModalOpen ? 'grid' : 'none'};place-items:center;z-index:10}
+				.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:${isModalOpen ? 'block' : 'none'}; z-index: 21;}
+				.modal{position:fixed;inset:0;display:${isModalOpen ? 'grid' : 'none'};place-items:center;z-index:22}
 				.card{width:min(92vw,520px);background:#fff;border-radius:18px;box-shadow:var(--shadow);padding:22px 20px}
 				.card h3{margin:0 0 10px;font-size:20px;font-weight:800;letter-spacing:.3px;display:flex;align-items:center;gap:8px}
 				.meta-row{color:var(--muted);font-size:14px;margin:8px 0 12px}
@@ -187,7 +335,8 @@ function MoodPage() {
 					const d = idx + 1
 					const dateStr = `${currentYear}-${String(currentMonth + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`
 					const disabled = isFuture(dateStr)
-					const moodPath = data[dateStr]?.mood || ''
+					const entry = data[dateStr]
+					const moodPath = entry && entry.id ? (entry.mood || '') : ''
 					return (
 						<div key={dateStr} className={`day-cell${disabled ? ' disabled' : ''}`} onClick={() => !disabled && openModal(dateStr)}>
 							<div className="day-num">{d}</div>

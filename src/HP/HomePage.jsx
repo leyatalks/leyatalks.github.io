@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 import { faCircleRight } from '@fortawesome/free-solid-svg-icons';
 import './hp.css'
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import 'https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4';
 
 //首頁圖片
 const firstImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-first.webp";
@@ -158,6 +158,7 @@ function HomePage({ handleNavigation }) {
             });
         }
     };
+    const navigate = useNavigate();
 
     return (
         <div className='hp-global'>
@@ -175,28 +176,28 @@ function HomePage({ handleNavigation }) {
                 {/* 桌面版導航 */}
                 {!isMobile && (
                     <div className='hp-navbar-links' style={{ display: 'flex', flexDirection: 'row', position: 'static', transform: 'none', opacity: 1, background: 'transparent', boxShadow: 'none' }}>
-                        <a href="#" onClick={handleNavClick}>主頁</a>
+                        {/* <a href="#" onClick={handleNavClick}>主頁</a>
                         <a href="#concept" onClick={handleNavClick}>專題理念</a>
-                        <a href="#planning" onClick={handleNavClick}>專題企劃</a>
+                        <a href="#planning" onClick={handleNavClick}>專題企劃</a> */}
                         <a onClick={() => {
-                            handleNavigation("/LeyaTalks");
-                            handleNavClick();
+                            navigate('/leya')
                         }} className='hp-arrow-link'>
-                            <FontAwesomeIcon icon={faCircleRight} />
+                            登入 / 註冊
                         </a>
                     </div>
                 )}
                 {/* 移動版導航 */}
                 {isMobile && (
                     <div className={`hp-navbar-links ${isMenuOpen ? 'open' : ''}`}>
-                        <a href="#" onClick={handleNavClick}>主頁</a>
+                        {/* <a href="#" onClick={handleNavClick}>主頁</a>
                         <a href="#concept" onClick={handleNavClick}>專題理念</a>
-                        <a href="#planning" onClick={handleNavClick}>專題企劃</a>
+                        <a href="#planning" onClick={handleNavClick}>專題企劃</a> */}
                         <a onClick={() => {
-                            handleNavigation("/LeyaTalks");
-                            handleNavClick();
-                        }} className='hp-arrow-link'>
-                            <FontAwesomeIcon icon={faCircleRight} />
+                            navigate('/leya')
+                        }} className='hp-arrow-link'
+                            style={{ maxWidth: '80%' }}
+                        >
+                            登入 / 註冊
                         </a>
                     </div>
                 )}
@@ -219,7 +220,7 @@ function HomePage({ handleNavigation }) {
                 />
             )}
 
-            <IndexContainer isMobile={isMobile} />
+            <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} />
         </div>
     )
 }
@@ -231,10 +232,12 @@ function FakeNavbar() {
 }
 
 // 內容容器
-function IndexContainer({ isMobile }) {
+function IndexContainer({ isMobile, handleNavigation}) {
     return (
         <div className='hp-container'>
             <Slogan isMobile={isMobile} />
+            <ScrollBar id="scroll-bar" isMobile={isMobile} handleNavigation={handleNavigation}/>
+            {/* <Video id="video" isMobile={isMobile} /> */}
             <Content id="concept" isMobile={isMobile} />
             <Content_Reverse id="planning" isMobile={isMobile} />
             <Footer />
@@ -248,6 +251,7 @@ function Slogan({ isMobile }) {
             {!isMobile ? (
                 <>
                     樂壓Talks 溫暖你的心
+                    <p style={{ letterSpacing: '1.8rem', fontSize: '3rem', fontFamily: 'Dela Gothic One' }}>如果你需要，我隨時都在</p>
                 </>
             ) : (
                 <>
@@ -256,6 +260,27 @@ function Slogan({ isMobile }) {
                     溫暖你的心
                 </>
             )}
+        </div>
+    )
+}
+
+function ScrollBar({ id }) {
+    const navigate = useNavigate();
+    return (
+        <div className='hp-scroll-bar' id={id}>
+            <a onClick={() => {
+                navigate('/leya')
+            }} className='hp-sc-btn1'
+            >前往聊天</a>
+            <a href="#concept" className='hp-sc-btn2'>了解更多</a>
+        </div>
+    )
+}
+
+function Video({ id, isMobile }) {
+    return (
+        <div className='hp-video' id={id}>
+            16165416
         </div>
     )
 }
@@ -273,12 +298,14 @@ function Content({ id, isMobile }) {
                     </div>
                     <div className="hp-half-container">
                         <div className="hp-content">
-                            在快節奏的現代生活中，許多人外表看似正常，<br />
-                            內心卻早已身心俱疲，這正是韓國所稱的「Toast-out」狀態。<br />
-                            我們的專題網站樂壓Talk's，便以此為靈感出發，<br />
-                            致力於打造一個能隨時隨地提供心理支持的網站，<br />
-                            協助使用者識別壓力來源、釋放情緒，<br />
-                            讓心理健康成為日常生活的一部分。
+                            在快節奏的現代生活中<br />
+                            許多人外表看似正常<br />
+                            內心卻早已身心俱疲<br />
+                            這正是韓國所稱的「Toast-out」狀態<br />
+                            我們的專題網站樂壓Talk's，便以此為靈感出發<br />
+                            致力於打造一個能隨時隨地提供心理支持的網站<br />
+                            協助使用者識別壓力來源、釋放情緒<br />
+                            讓心理健康成為日常生活的一部分
                         </div>
                     </div>
                 </>

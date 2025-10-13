@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import DonatePost from './PostExample/DonatePost';
-import UserPost from './PostExample/UserPost';
+// import DonatePost from './PostExample/DonatePost';
+// import UserPost from './PostExample/UserPost';
 
 function Post() {
     const [posts, setPosts] = useState([]);
@@ -13,13 +13,14 @@ function Post() {
 
     return (
         <div className="content-area" id="home-page">
-            <div className="post-list">
+            {/* <div className="post-list">
                 {posts.map(post =>
                     post.user_id === 999
                         ? <DonatePost key={post.id} post={post} />
                         : <UserPost key={post.id} post={post} />
                 )}
-            </div>
+            </div> */}
+            Welcome Back
         </div>
     );
 }

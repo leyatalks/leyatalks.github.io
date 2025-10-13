@@ -47,7 +47,7 @@ function buildHierarchy(records) {
   return { root, sourceToCount };
 }
 
-export default function StressMindMap({ data = demoData, height = 600 }) {
+export default function StressMindMap({ data = demoData, height = 600, maxDepth }) {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
 
@@ -74,6 +74,14 @@ export default function StressMindMap({ data = demoData, height = 600 }) {
 
     // 建立階層與徑向 cluster 佈局
     const root = d3.hierarchy(hierarchyData);
+    // 若有設定最大層級，剪裁超出層級的子節點（root.depth=0）
+    if (Number.isFinite(maxDepth)) {
+      root.eachBefore((node) => {
+        if (node.depth >= maxDepth) {
+          node.children = null; // 刪除更深層
+        }
+      });
+    }
     const computeCluster = (w, h) => {
       const radius = Math.min(w, h) / 2 - 24; // 留白
       const cluster = d3.cluster().size([2 * Math.PI, radius]);
@@ -100,7 +108,7 @@ export default function StressMindMap({ data = demoData, height = 600 }) {
       return { x: Math.cos(angle) * d.y, y: Math.sin(angle) * d.y };
     };
 
-    const linksData = root.links();
+  const linksData = root.links();
     const linkSel = g.append('g')
       .attr('class', 'links')
       .selectAll('line')

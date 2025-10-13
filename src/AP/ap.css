@@ -4,13 +4,16 @@
 /* 全局样式 */
 :root {
     --primary-color: #FFF4EB;
-    --secondary-color: #D7BFB0;
+    --secondary-color: #e0bca6;
     --third-color: #9a9286;
     --text-color: #333333;
     --text-secondary-color: #D8CAAF;
     --icon-color: #BFB0A0;
     --active-color: #F1A66A;
     --border-color: #EEDFCE;
+    /* 新增：App 最大寬度（隨斷點調整） */
+    --app-max-width: 480px;
+    --chat-input-offset: 110px;
 }
 
 * {
@@ -34,12 +37,14 @@ body {
 #app {
     width: 100%;
     height: 100vh;
-    max-width: 480px;
+    max-width: var(--app-max-width);
     margin: 0 auto;
     position: relative;
     overflow-x: hidden;
     overflow-y: auto;
     box-sizing: border-box;
+    display:flex;
+    flex-direction:column;
 }
 
 .ap-page-container {
@@ -49,6 +54,8 @@ body {
     width: 100%;
     justify-content: center;
     position: relative;
+    flex:1;
+    min-height:0;
 }
 
 /* 头部样式 */
@@ -61,7 +68,7 @@ body {
     border-bottom: 1px solid var(--border-color);
     position: relative;
     z-index: 10;
-    max-width: 480px;
+    max-width: var(--app-max-width);
     width: 100%;
     box-sizing: border-box;
     margin: 0 auto;
@@ -186,102 +193,45 @@ body {
 /* 内容区域 */
 .content-area {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: hidden;
     padding: 10px 0;
     background-color: var(--primary-color);
     margin-bottom: 1em;
     display: flex;
     width: 100%;
-    /* align-items: center; */
     justify-content: center;
+    /* 新增：在桌面置中並限制最大寬度 */
+    max-width: var(--app-max-width);
+    margin-left: auto;
+    margin-right: auto;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
+    overflow:hidden;
 }
 
-/* 帖子列表样式 */
-.post-list {
-    padding: 0 15px;
-    width: 100%;
-}
-
-.post-item {
-    display: flex;
-    padding: 15px 0;
-    border-bottom: 1px solid var(--border-color);
-}
-
-.post-avatar {
-    width: 50px;
-    height: 50px;
-    margin-right: 12px;
-}
-
-.post-avatar img {
-    width: 100%;
-    height: 100%;
-    border-radius: 50%;
-    object-fit: cover;
-}
-
-.post-content {
-    flex: 1;
-}
-
-.post-header {
-    display: flex;
-    align-items: center;
-    margin-bottom: 8px;
-}
-
-.post-name {
-    font-weight: 600;
-    margin-right: 5px;
-    font-size: 1.2rem;
-}
-
-.post-username {
-    color: #999;
-    font-size: 0.9rem;
-}
-
-.post-text {
-    margin-bottom: 5px;
-    font-weight: 500;
-    font-size: 1rem;
-}
-
-.post-subtext {
-    color: #666;
-    font-size: 12px;
-    margin-bottom: 8px;
-}
-
-.post-images {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 5px;
-}
-
-.post-images img {
-    width: 10em;
-    max-width: 100%;
-    border-radius: 8px;
-    object-fit: cover;
-}
-
-/* 聊天页面样式 */
+/* 聊天區域 */
 .chat-container {
     display: flex;
     flex-direction: column;
-    height: 100%;
+    height: fit-content;
     position: relative;
     background-color: var(--primary-color);
     width: 100%;
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    min-height:0;
 }
 
 .chat-history {
     flex: 1;
-    max-height: 87%;
     overflow-y: auto;
-    margin-bottom: 1rem;
+    margin: 0;
+    padding: 0 10% var(--chat-input-offset) 10%;
+    scroll-behavior: smooth;
+    scrollbar-color: transparent transparent;
+    min-height:0;
 }
 
 /* 聊天訊息外層 */
@@ -319,15 +269,14 @@ body {
     /* background-color: #e0f7fa; */
     margin-left: auto;
 }
-.chat-avatar-bot {
-    /* background-color: #f1f8e9; */
-}
 
 .chat-bubble-user {
-    background: #e0f7fa;
+    background: #dcebfe;
+    /* background: #e0f7fa; */
 }
 .chat-bubble-bot {
-    background: #f1f8e9;
+    background: #fae8da;
+    /* background: #f1f8e9; */
 }
 
 /* bot 額外資訊 */
@@ -344,17 +293,19 @@ body {
 
 .chat-input-container {
     position: fixed;
-    bottom: 70px;
+    bottom: 60px;
     left: 0;
     right: 0;
     padding: 15px;
     display: flex;
     align-items: center;
+    justify-content: center;
     background-color: var(--primary-color);
     border-top: 1px solid var(--border-color);
-    max-width: 480px;
+    max-width: var(--app-max-width);
     margin: 0 auto;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    z-index: 50;
 }
 
 .chat-input {
@@ -457,7 +408,7 @@ body {
     left: 0;
     right: 0;
     z-index: 10;
-    max-width: 480px;
+    max-width: var(--app-max-width);
     width: 100%;
     margin: 0 auto;
     box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
@@ -498,13 +449,14 @@ body {
     border-radius: 12px;
     padding: 1em 2em;
     border: none;
-    background-color: var(--border-color);
+    color: #000;
+    background-color: #F3E8DD;
 }
 
 .logout-btn:hover {
     cursor: pointer;
-    background-color: var(--active-color);
-    transition: 0.3s;
+    background: #ead7c5;
+    transition: 0.2s;
 }
 
 .user-info {
@@ -549,6 +501,71 @@ body {
 .trash-icon:hover {
     color: red;
     transition: 0.7s;
+}
+
+/* Aside（桌面） */
+.ap-app { display: flex; }
+.ap-page-container { display: flex; width: 100%; background-color: var(--primary-color); }
+.ap-aside {
+  position: fixed;
+  top: 0;
+  left: 0;
+  bottom: 0;
+  width: 280px;
+  background: #E9D9C8;
+  border-right: 1px solid var(--border-color);
+  display: none; /* 手機預設隱藏 */
+  z-index: 20;
+}
+.ap-aside-title {
+    font-family: "LXGW WenKai TC", cursive;
+    font-weight: 700;
+    font-style: normal;
+    font-size: 2em;
+    text-align: center;
+    color: var(--text-color);
+}
+.ap-aside-inner { position: sticky; top: 0; display: flex; flex-direction: column; height: 100%; padding: 24px 16px; gap: 20px; }
+.ap-aside-logo { display: flex; align-items: center; justify-content: center; }
+.ap-aside-logo img { width: 72px; height: 72px; object-fit: contain; }
+.ap-aside-nav { display: flex; flex-direction: column; gap: 16px; }
+.ap-aside-item { display: flex; align-items: center; gap: 12px; padding: 14px 18px; border-radius: 12px; border: none; background: #F3E8DD; cursor: pointer; font-size: 16px; text-align: left; }
+.ap-aside-item:hover { background: #ead7c5; transition: .2s; }
+.ap-aside-item.active { box-shadow: 0 0 0 2px #d4bda8 inset; }
+.ap-aside-icon { width: 24px; display: inline-flex; align-items: center; justify-content: center; color: var(--third-color); }
+.ap-aside-text { color: #1b1b1b; font-weight: 600; }
+
+.ap-aside-footer{
+    display: flex;
+    flex-direction: row;
+    justify-content: flex-start;
+    align-items: flex-end;
+    width: 100%;
+    height: 100%;
+    position: sticky;
+    bottom: 0;
+}
+
+/* 主內容容器：預留側欄寬度 */
+.ap-main { width: 100%; margin-left: 0; display: flex; flex-direction: column; background-color: var(--primary-color);}
+
+@media (min-width: 1024px) {
+  .ap-aside { display: block; }
+  .ap-main { width: calc(100% - 280px); margin-left: 280px; }
+  /* 讓桌面版鋪滿寬度但內容仍遵守側欄偏移 */
+  .ap-header, .content-area, .chat-input-container, .footer { max-width: none; width: 100%; margin: 0;  }
+}
+
+/* 手機保留底部導覽（既有 footer），故隱藏 aside */
+@media (max-width: 1023px) {
+  .ap-aside { display: none; }
+  .logout-btn{
+    display: flex;
+    position: absolute;
+    right: 0;
+    font-size: 12px;
+    max-width: fit-content;
+  }
 }
 
 /* RWD 設定 */
@@ -627,4 +644,83 @@ body {
         font-size: 11px;
     }
 }
+
+/* 新增：平板與桌面斷點，擴增內容寬度與欄數 */
+@media (min-width: 768px) {
+    :root { --app-max-width: 720px; }
+    .category-item { width: 30%; }
+}
+
+@media (min-width: 1024px) {
+    :root { --app-max-width: 960px; }
+    .category-item { width: 22%; }
+    .post-images img { width: 12em; }
+
+    /* 桌面版全寬鋪滿（移除左右邊距與最大寬度限制） */
+    #app,
+    .ap-header,
+    .content-area,
+    .chat-input-container,
+    .footer {
+        max-width: none;
+        width: 100%;
+        margin-left: 0;
+        margin-right: 0;
+    }
+}
+
+@media (min-width: 1280px) {
+    :root { --app-max-width: 1200px; }
+}
+
+/* 移除桌面視圖多餘 padding 與左右內縮 */
+@media (min-width: 1024px) {
+  .post-list { padding-left: 0; padding-right: 0; }
+  .category-list { padding-left: 0; padding-right: 0; }
+  .chat-history { padding-left: 0; padding-right: 0; }
+}
+
+/* Aside 收合樣式 */
+.ap-aside.collapsed { width: 88px; }
+.ap-aside.collapsed .ap-aside-title { display: none; }
+.ap-aside.collapsed .ap-aside-item { justify-content: center; }
+.ap-aside.collapsed .ap-aside-text { display: none; }
+.ap-aside.collapsed .ap-aside-inner { padding-left: 12px; padding-right: 12px; }
+
+@media (min-width: 1024px) {
+  .ap-main { width: calc(100% - 280px); margin-left: 280px; }
+  .ap-main.aside-collapsed { width: calc(100% - 88px); margin-left: 88px;}
+}
+
+/* 桌面：右側內容加 5% padding，聊天輸入列對齊 */
+@media (min-width: 1024px) {
+  /* 右側主內容容器側邊留白 */
+  .ap-main { padding-left: 5%; padding-right: 5%; }
+  /* 依收合狀態提供 aside 寬度變數 */
+  .ap-main { --aside-width: 280px; }
+  .ap-main.aside-collapsed { --aside-width: 88px; }
+
+  /* 讓聊天輸入列貼齊右側主內容的 5% 內距並避開側欄 */
+  .ap-main .chat-input-container {
+    left: calc(var(--aside-width));
+    right: 5%;
+    max-width: calc(100% - 280px);
+    margin: 0;
+    bottom: 0;
+  }
+
+  /* 聊天紀錄預留空間，避免被輸入列遮擋 */
+  .ap-main .chat-history { margin-bottom: 0; }
+}
+
+/* ===== Chat layout fix start ===== */
+#app { display:flex; flex-direction:column; }
+.ap-page-container { flex:1; display:flex; flex-direction:column; min-height:0; }
+.ap-main { flex:1; display:flex; flex-direction:column; min-height:0; }
+.content-area { flex:1; display:flex; flex-direction:column; min-height:0; overflow:hidden; }
+.chat-container { flex:1; display:flex; flex-direction:column; min-height:0; }
+.chat-history { flex:1; min-height:0; overflow-y:auto; }
+/* 保持底部輸入列預留空間 */
+.chat-history { padding-bottom: var(--chat-input-offset); }
+/* ===== Chat layout fix end ===== */
 

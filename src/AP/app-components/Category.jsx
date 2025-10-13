@@ -1,9 +1,11 @@
 import React from 'react';
 import { faBrain, faCloudMoon, faClipboardCheck, faClock, faEarthAmericas, faHeart, faBook } from '@fortawesome/free-solid-svg-icons'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { useNavigate} from 'react-router-dom'
 
 
-function CategoryPage({ activePage, setActivePage, handleNavigation }) {
+function CategoryPage({ activePage, setActivePage, handleNavigation  }) {
+    const navigate = useNavigate();
     return (
         <>
             <div id="category-page">
@@ -74,7 +76,7 @@ function CategoryPage({ activePage, setActivePage, handleNavigation }) {
                         </div>
                         <div className="category-item">
                                 <div className="category-icon" 
-                                onClick={() => handleNavigation('home')}
+                                onClick={() => navigate('/')}
                                 style={{ cursor: "pointer" }}
                                 >
                                     <FontAwesomeIcon icon={faEarthAmericas} />

@@ -1,11 +1,17 @@
 .login-container {
+    /* 僅調整登入頁容器，避免影響其他頁 */
     display: flex;
     flex-direction: column;
     align-items: center;
-    height: 100%;
+    justify-content: center; /* 垂直置中 */
+    min-height: 100vh; /* 佔滿可視高度以利置中 */
     text-align: center;
-    margin: auto;
-    width: 100vw;
+    margin: 0 auto; /* 水平置中區塊 */
+    width: 100vw; /* 用 100% 取代 100vw，避免視窗捲軸造成偏移 */
+    box-sizing: border-box;
+    padding: 0 16px; /* 小幅留白，避免貼邊 */
+    position: absolute;
+    left: 0;
 }
 
 .login-logo {
@@ -146,7 +152,7 @@ button.login:hover {
 
     img {
         height: 64px;
-        max-width: 96px;
+        /* max-width: 96px; */
         max-height: 96px;
     }
 }

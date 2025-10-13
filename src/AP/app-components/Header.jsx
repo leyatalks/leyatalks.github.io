@@ -24,9 +24,12 @@ function Header({ setActivePage, userInfo }) {
                 <div className='ap-header-title'>
                     樂壓Talks
                 </div>
-                <div className="user-icon" onClick={handleUserIconClick}>
+                <button className='logout-btn' onClick={() => setActivePage('login-page')} style={{width: '100%'}}>
+                    登出
+                </button>
+                {/* <div className="user-icon" onClick={handleUserIconClick}>
                     <FontAwesomeIcon icon={faCircleUser} />
-                </div>
+                </div> */}
             </header>
         </>
     );

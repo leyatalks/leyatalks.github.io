@@ -17,7 +17,7 @@ export default defineConfig({
         theme_color: '#000000',
         background_color: '#ffffff',
         display: 'standalone',
-        start_url: 'leyatalks.com',
+        start_url: '/',
         icons: [
           {
             src: '/leyalogo.png',
@@ -33,5 +33,6 @@ export default defineConfig({
       }
     })
   ],
+  // 若日後需要部署到子路徑（如 /repo-name/），請改為 base: '/repo-name/'
   base: '/',
 })
