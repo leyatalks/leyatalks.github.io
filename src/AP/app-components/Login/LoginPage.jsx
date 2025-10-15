@@ -58,7 +58,9 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
 
     return (
         <div className="login-container">
-            <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png" alt="" className="login-logo" />
+            <a href="/">
+                <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png" alt="" className="login-logo" />
+            </a>
             <h2 className="login-title">樂壓Talks</h2>
             <form onSubmit={handleLogin} className="input-group">
                 <input
@@ -80,7 +82,9 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
                     required
                 />
                 {error && <p style={{ color: 'red' }}>{error}</p>}
-                <div className="forgot">忘記密碼？</div>
+                <div className="forgot" style={{ cursor: 'pointer' }} onClick={() => handle('forgot-password')}>
+                    忘記密碼？
+                </div>
                 <button className={`login ${activePage === 'home-page' ? 'active' : 'login-page'}`} type="submit" disabled={loading}>
                     {loading ? '登入中…' : '登入'}
                 </button>
@@ -95,12 +99,12 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
             <div className="signup">
                 還沒有帳號？<a href="#" className={`signup ${activePage === 'register' ? 'active' : ''}`} onClick={() => handle('register')}>註冊</a>
             </div>
-            
+
             <div className="login-donate">
                 <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/shu.png" alt="世新大學校徽" className='shu' />
                 <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/ics.png" alt="資傳系徽" className='ics' />
-                <img src="https://shoplineimg.com/5e8da4c99e08ce00119090ae/682c4043f1e727000d963bc5/1200x.webp?source_format=png" alt="donate"  className='login-donate-logo' />
-                <img src="https://cdn.store-assets.com/s/1359361/f/13666576.png" alt="donate"  className='login-donate-logo' />
+                <img src="https://shoplineimg.com/5e8da4c99e08ce00119090ae/682c4043f1e727000d963bc5/1200x.webp?source_format=png" alt="donate" className='login-donate-logo' />
+                <img src="https://cdn.store-assets.com/s/1359361/f/13666576.png" alt="donate" className='login-donate-logo' />
             </div>
         </div>
     );

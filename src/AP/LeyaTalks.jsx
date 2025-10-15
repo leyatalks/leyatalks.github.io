@@ -9,6 +9,8 @@ import ChatPage from './app-components/ChatPage'
 import UserPage from './app-components/UserPage'
 import LoginPage from './app-components/Login/LoginPage'
 import RegisterPage from './app-components/Login/Register'
+import ForgotPassword from './app-components/Login/ForgotPassword'
+import ResetPassword from './app-components/Login/ResetPassword'
 import Sercet from './app-components/Sand'
 import AdminPage from './app-components/AdminPage'
 import DonateManage from './app-components/Admin-Function/DonateManage'
@@ -142,6 +144,8 @@ function Application() {
         'donate-manage': '/leya/donate-manage',
         'login-page': '/leya/login',
         'register': '/leya/register',
+        'forgot-password': '/leya/forgot-password',
+        'reset-password': '/leya/reset-password',
         'secret': '/leya/secret',
         'mood-page': '/leya/mood',
         'stress-mind-map': '/leya/stress-mind-map',
@@ -149,13 +153,22 @@ function Application() {
     };
     const reverseMap = Object.fromEntries(Object.entries(routeMap).map(([k, v]) => [v, k]));
     const legacySetActivePage = (pageKey) => {
+        // 如果是登出（跳轉到登入頁面），清除 userInfo
+        if (pageKey === 'login-page') {
+            try {
+                localStorage.removeItem('leyaUserInfo');
+                setUserInfo({ nickname: '', id: '' });
+            } catch (err) {
+                console.error('清除使用者資料失敗:', err);
+            }
+        }
         const to = routeMap[pageKey] || '/leya/home';
         navigate(to);
     };
     const activePage = reverseMap[location.pathname] || 'home-page';
 
-    // login / register 隱藏 Header / Footer / Aside
-    const hideLayout = ['/leya/login', '/leya/register'].includes(location.pathname);
+    // login / register / forgot-password / reset-password 隱藏 Header / Footer / Aside
+    const hideLayout = ['/leya/login', '/leya/register', '/leya/forgot-password', '/leya/reset-password'].includes(location.pathname);
 
     return (
         <div id='app' className='ap-app'>
@@ -175,6 +188,8 @@ function Application() {
                             <Route index element={<DefaultRoute />} />
                             <Route path="login" element={<LoginPage activePage={activePage} setActivePage={legacySetActivePage} setUserInfo={setUserInfo} />} />
                             <Route path="register" element={<RegisterPage activePage={activePage} setActivePage={legacySetActivePage} />} />
+                            <Route path="forgot-password" element={<ForgotPassword setActivePage={legacySetActivePage} />} />
+                            <Route path="reset-password" element={<ResetPassword setActivePage={legacySetActivePage} />} />
                             <Route path="home" element={<MainPage activePage={activePage} setActivePage={legacySetActivePage} />} />
                             <Route path="category" element={<CategoryPage activePage={activePage} setActivePage={legacySetActivePage} />} />
                             <Route path="chat" element={<ChatPage userInfo={userInfo} />} />

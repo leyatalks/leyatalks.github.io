@@ -3,7 +3,7 @@ import { faCircleRight } from '@fortawesome/free-solid-svg-icons';
 import './hp.css'
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-
+import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 //首頁圖片
 const firstImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-first.webp";
 const secondImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-second.webp";
@@ -98,6 +98,27 @@ const enablePullToRefresh = (callback) => {
 function HomePage({ handleNavigation }) {
     const [isMenuOpen, setMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const navigate = useNavigate();
+
+    // 檢查用戶是否已登入並處理導航
+    const handleLoginNavigation = () => {
+        try {
+            const saved = localStorage.getItem('leyaUserInfo');
+            const userInfo = saved ? JSON.parse(saved) : null;
+            
+            // 如果有用戶資料且有 id，直接跳轉到主頁面
+            if (userInfo && userInfo.id) {
+                navigate('/leya');
+            } else {
+                // 沒有用戶資料，跳轉到登入頁面
+                navigate('/leya/login');
+            }
+        } catch (error) {
+            console.error('解析用戶資料失敗:', error);
+            // 發生錯誤時跳轉到登入頁面
+            navigate('/leya/login');
+        }
+    };
 
     // 監聽視窗大小變化和啟用下拉刷新
     useEffect(() => {
@@ -158,7 +179,6 @@ function HomePage({ handleNavigation }) {
             });
         }
     };
-    const navigate = useNavigate();
 
     return (
         <div className='hp-global'>
@@ -179,9 +199,7 @@ function HomePage({ handleNavigation }) {
                         {/* <a href="#" onClick={handleNavClick}>主頁</a>
                         <a href="#concept" onClick={handleNavClick}>專題理念</a>
                         <a href="#planning" onClick={handleNavClick}>專題企劃</a> */}
-                        <a onClick={() => {
-                            navigate('/leya')
-                        }} className='hp-arrow-link'>
+                        <a onClick={handleLoginNavigation} className='hp-arrow-link'>
                             登入 / 註冊
                         </a>
                     </div>
@@ -192,9 +210,7 @@ function HomePage({ handleNavigation }) {
                         {/* <a href="#" onClick={handleNavClick}>主頁</a>
                         <a href="#concept" onClick={handleNavClick}>專題理念</a>
                         <a href="#planning" onClick={handleNavClick}>專題企劃</a> */}
-                        <a onClick={() => {
-                            navigate('/leya')
-                        }} className='hp-arrow-link'
+                        <a onClick={handleLoginNavigation} className='hp-arrow-link'
                             style={{ maxWidth: '80%' }}
                         >
                             登入 / 註冊
@@ -220,7 +236,7 @@ function HomePage({ handleNavigation }) {
                 />
             )}
 
-            <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} />
+            <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
         </div>
     )
 }
@@ -232,11 +248,11 @@ function FakeNavbar() {
 }
 
 // 內容容器
-function IndexContainer({ isMobile, handleNavigation}) {
+function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation }) {
     return (
         <div className='hp-container'>
             <Slogan isMobile={isMobile} />
-            <ScrollBar id="scroll-bar" isMobile={isMobile} handleNavigation={handleNavigation}/>
+            <ScrollBar id="scroll-bar" isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
             {/* <Video id="video" isMobile={isMobile} /> */}
             <Content id="concept" isMobile={isMobile} />
             <Content_Reverse id="planning" isMobile={isMobile} />
@@ -264,13 +280,10 @@ function Slogan({ isMobile }) {
     )
 }
 
-function ScrollBar({ id }) {
-    const navigate = useNavigate();
+function ScrollBar({ id, handleLoginNavigation }) {
     return (
         <div className='hp-scroll-bar' id={id}>
-            <a onClick={() => {
-                navigate('/leya')
-            }} className='hp-sc-btn1'
+            <a onClick={handleLoginNavigation} className='hp-sc-btn1'
             >前往聊天</a>
             <a href="#concept" className='hp-sc-btn2'>了解更多</a>
         </div>
@@ -398,6 +411,7 @@ function Footer() {
                 <p>樂壓Talks聯絡資訊</p>
                 <p>專案經理：張騰利</p>
                 <p>聯絡信箱：<a href='mailto:leyatalks1010@gmail.com'>leyatalks1010@gmail.com</a></p>
+                <p><a href='https://www.instagram.com/le_ya.talks/' target='_blank'><FontAwesomeIcon icon={faInstagram} /><span style={{fontFamily: 'Noto Serif TC', marginLeft: '0.5rem', letterSpacing: '2px'}}>le_ya.talks</span></a></p>
             </div>
         </div>
     )
