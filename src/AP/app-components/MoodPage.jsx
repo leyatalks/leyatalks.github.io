@@ -251,6 +251,36 @@ function MoodPage(props) {
 		closeModal()
 	}
 
+	// 一鍵清除所有心情日記 (僅限 shuics)
+	async function clearAllMoodJournals() {
+		if (username !== 'shuics') {
+			alert('此功能僅限訪客模式使用');
+			return;
+		}
+
+		if (!confirm('確定要清除所有心情日記嗎？此操作無法復原！')) {
+			return;
+		}
+
+		try {
+			const response = await fetch(`https://leya-backend-vercel.vercel.app/mood-journal/clear-all?username=${username}`, {
+				method: 'DELETE'
+			});
+			const json = await response.json();
+			
+			if (json?.success) {
+				setData({});
+				try { localStorage.setItem(storeKey, JSON.stringify({})) } catch (e) {}
+				alert('已清除所有心情日記！');
+			} else {
+				alert('清除失敗，請稍後再試');
+			}
+		} catch (err) {
+			console.error('清除心情日記錯誤:', err);
+			alert('清除失敗，請檢查網路連線');
+		}
+	}
+
 	const monthNames = ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
 	const first = new Date(currentYear, currentMonth, 1)
 	const last = new Date(currentYear, currentMonth + 1, 0)
@@ -310,6 +340,42 @@ function MoodPage(props) {
 				<div className="title">📔 今天你的心情如何？</div>
 				<button className="nav-btn" onClick={() => changeMonth(1)}><span>→<br/>下一個月</span></button>
 			</div>
+
+			{/* 訪客模式清除按鈕 */}
+			{username === 'shuics' && (
+				<div style={{ 
+					display: 'flex', 
+					justifyContent: 'center', 
+					margin: '12px 0',
+					padding: '10px'
+				}}>
+					<button
+						onClick={clearAllMoodJournals}
+						style={{
+							background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
+							color: 'white',
+							border: 'none',
+							borderRadius: '20px',
+							padding: '10px 24px',
+							cursor: 'pointer',
+							fontWeight: 'bold',
+							fontSize: '14px',
+							boxShadow: '0 4px 12px rgba(238, 90, 111, 0.3)',
+							transition: 'all 0.3s ease'
+						}}
+						onMouseOver={(e) => {
+							e.target.style.transform = 'translateY(-2px)';
+							e.target.style.boxShadow = '0 6px 16px rgba(238, 90, 111, 0.4)';
+						}}
+						onMouseOut={(e) => {
+							e.target.style.transform = 'translateY(0)';
+							e.target.style.boxShadow = '0 4px 12px rgba(238, 90, 111, 0.3)';
+						}}
+					>
+						🗑️ 一鍵清除所有日記
+					</button>
+				</div>
+			)}
 
 			<div className="quick-moods" aria-label="快速選擇心情">
 				{MOODS.map(m => (

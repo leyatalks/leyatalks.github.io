@@ -153,12 +153,71 @@ function ChatPage({ userInfo }) {
         }, 1000);
     };
 
+    // 一鍵清除聊天紀錄 (僅限 shuics)
+    const handleClearAllChats = async () => {
+        if (username !== 'shuics') {
+            alert('此功能僅限訪客模式使用');
+            return;
+        }
+        
+        if (!confirm('確定要清除所有聊天紀錄嗎？此操作無法復原！')) {
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://leya-backend-vercel.vercel.app/chat-history/clear-all?username=${username}`, {
+                method: 'DELETE'
+            });
+            
+            if (response.ok) {
+                setMessages([]);
+                alert('已清除所有聊天紀錄！');
+            } else {
+                alert('清除失敗，請稍後再試');
+            }
+        } catch (err) {
+            console.error('清除聊天紀錄錯誤:', err);
+            alert('清除失敗，請檢查網路連線');
+        }
+    };
+
     const userAvatar = "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png";
     const botAvatar = "https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png";
 
     return (
         <>
             <div className="content-area" id="chat-page">
+                {/* 訪客模式清除按鈕 */}
+                {username === 'shuics' && (
+                    <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'flex-end', 
+                        padding: '10px 20px',
+                        background: '#fff3e6',
+                        borderRadius: '8px',
+                        marginBottom: '10px'
+                    }}>
+                        <button
+                            onClick={handleClearAllChats}
+                            style={{
+                                background: 'linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '20px',
+                                padding: '8px 20px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                fontSize: '14px',
+                                boxShadow: '0 2px 8px rgba(238, 90, 111, 0.3)',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+                            onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+                        >
+                            🗑️ 一鍵清除所有紀錄
+                        </button>
+                    </div>
+                )}
                 {/* <div className="golden-sentence-container">
                     <FontAwesomeIcon icon={faHandHoldingHeart} className="golden-sentence-icon" />
                     <div className="golden-sentence">
@@ -191,7 +250,7 @@ function ChatPage({ userInfo }) {
                                                     {msg.encouragement}
                                                 </div>
                                             )}
-                                            {/* {msg.emotion && <div>情緒：{msg.emotion}</div>} */}
+                                            {username === 'shuics' && msg.emotion && <div style={{marginTop: '0.5rem', color: 'blue', fontSize: '0.8rem', fontWeight: '500'}}>情緒:{msg.emotion}</div>}
                                         </div>
                                     )}
                                 </div>

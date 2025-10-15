@@ -11,14 +11,35 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
         setActivePage(page);
     }
 
-    const handleLogin = async (e) => {
+    // 訪客模式登入
+    const handleGuestLogin = async () => {
+        setError('');
+        setLoading(true);
+        try {
+            const data = { nickname: '訪客模式', id: 'shuics' };
+            setUserInfo(data);
+            setActivePage('home-page');
+        } catch (err) {
+            console.error('訪客模式登入錯誤:', err);
+            setError('訪客模式登入失敗');
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // 登入函數加上重試機制
+    const handleLogin = async (e, retryCount = 0) => {
         e.preventDefault();
         setError(''); // 清空之前的錯誤訊息
         setLoading(true);
+
+        const maxRetries = 2; // 最多重試2次
+        const timeout = 15000; // 15秒超時
+
         try {
-            // 設定 10 秒逾時，避免後端因資料庫防火牆或網路卡住時一直等待
+            // 設定超時控制
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 10000);
+            const timeoutId = setTimeout(() => controller.abort(), timeout);
 
             const response = await fetch('https://leya-backend-vercel.vercel.app/login', {
                 method: 'POST',
@@ -45,8 +66,21 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
             }
         } catch (err) {
             console.error('錯誤:', err);
+
+            // 如果是超時錯誤且還有重試次數
+            if (err.name === 'AbortError' && retryCount < maxRetries) {
+                setError(`連線超時，正在重試 (${retryCount + 1}/${maxRetries})...`);
+                setLoading(false);
+                // 等待1秒後重試
+                setTimeout(() => {
+                    handleLogin(e, retryCount + 1);
+                }, 1000);
+                return;
+            }
+
+            // 已達最大重試次數或其他錯誤
             if (err.name === 'AbortError') {
-                setError('伺服器回應逾時，可能是資料庫連線受防火牆限制，請稍後再試');
+                setError('伺服器回應逾時，請檢查網路連線或稍後再試。您也可以使用訪客模式體驗功能。');
             } else {
                 setError(err.message || '發生未知錯誤');
             }
@@ -87,6 +121,23 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
                 </div>
                 <button className={`login ${activePage === 'home-page' ? 'active' : 'login-page'}`} type="submit" disabled={loading}>
                     {loading ? '登入中…' : '登入'}
+                </button>
+                <button
+                    className="login guest-login"
+                    type="button"
+                    onClick={handleGuestLogin}
+                    disabled={loading}
+                    style={{
+                        border: '2px solid #ff8fa473',
+                        color: '#ff8fa4',
+                        backgroundColor: 'transparent',
+                        marginTop: '10px',
+                        transition: 'all 0.3s ease'
+                    }}
+                    onMouseOver={(e) => (e.target.style.backgroundColor = '#ff8fa4', e.target.style.color = '#fff')}
+                    onMouseOut={(e) => (e.target.style.backgroundColor = 'transparent', e.target.style.color = '#ff8fa4')}
+                >
+                    訪客模式 (快速體驗)
                 </button>
             </form>
 
