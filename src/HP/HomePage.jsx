@@ -1,9 +1,11 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { faCircleRight } from '@fortawesome/free-solid-svg-icons';
 import './hp.css'
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons';
+import Comic from './Comic';
+import Member from './Member';
 //首頁圖片
 const firstImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-first.webp";
 const secondImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-second.webp";
@@ -105,7 +107,7 @@ function HomePage({ handleNavigation }) {
         try {
             const saved = localStorage.getItem('leyaUserInfo');
             const userInfo = saved ? JSON.parse(saved) : null;
-            
+
             // 如果有用戶資料且有 id，直接跳轉到主頁面
             if (userInfo && userInfo.id) {
                 navigate('/leya');
@@ -253,9 +255,11 @@ function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation }) {
         <div className='hp-container'>
             <Slogan isMobile={isMobile} />
             <ScrollBar id="scroll-bar" isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
-            {/* <Video id="video" isMobile={isMobile} /> */}
             <Content id="concept" isMobile={isMobile} />
             <Content_Reverse id="planning" isMobile={isMobile} />
+            <Member id="member" isMobile={isMobile} />
+            <Comic id="comic" isMobile={isMobile} />
+            <Video id="video" isMobile={isMobile} />
             <Footer />
         </div>
     )
@@ -291,11 +295,106 @@ function ScrollBar({ id, handleLoginNavigation }) {
 }
 
 function Video({ id, isMobile }) {
+    const containerRef = useRef(null);
+    useEffect(() => {
+        const processEmbeds = () => {
+            if (window.instgrm && window.instgrm.Embeds && typeof window.instgrm.Embeds.process === 'function') {
+                try {
+                    // 優先僅處理此容器，避免影響其他區塊
+                    const el = containerRef.current;
+                    if (el) {
+                        // 某些版本支援傳入元素，若不支援則退回全域處理
+                        try { window.instgrm.Embeds.process(el); }
+                        catch { window.instgrm.Embeds.process(); }
+                    } else {
+                        window.instgrm.Embeds.process();
+                    }
+                } catch { }
+            }
+        };
+
+        const existing = document.getElementById('instagram-embed-js');
+        if (!existing) {
+            const script = document.createElement('script');
+            script.id = 'instagram-embed-js';
+            script.async = true;
+            script.src = 'https://www.instagram.com/embed.js';
+            script.onload = processEmbeds;
+            document.body.appendChild(script);
+        } else {
+            processEmbeds();
+        }
+    }, []);
+
     return (
-        <div className='hp-video' id={id}>
-            16165416
+        <div className='hp-video' id={id} ref={containerRef}>
+            <h3 className="hp-video-title">療心室</h3>
+            <div className='hp-video-content'>
+                <blockquote
+                    className="instagram-media"
+                    // data-instgrm-captioned
+                    data-instgrm-permalink="https://www.instagram.com/reel/DKJ5wBSJAuc/"
+                    data-instgrm-version="14"
+                    style={{
+                        background: '#FFF',
+                        border: 0,
+                        borderRadius: '3px',
+                        boxShadow: '0 0 1px 0 rgba(0,0,0,0.5), 0 1px 10px 0 rgba(0,0,0,0.15)',
+                        margin: '1px auto',
+                        maxWidth: 326,
+                        minWidth: 326,
+                        padding: 0,
+                        width: 'calc(100% - 2px)'
+                    }}
+                >
+                    <a
+                        href="https://www.instagram.com/reel/DKJ5wBSJAuc/"
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        style={{
+                            color: '#3897f0',
+                            fontFamily: 'Arial, sans-serif',
+                            fontSize: 14,
+                            textDecoration: 'none'
+                        }}
+                    >
+                        在 Instagram 查看這則貼文
+                    </a>
+                </blockquote>
+                <blockquote
+                    className="instagram-media"
+                    // data-instgrm-captioned
+                    data-instgrm-permalink="https://www.instagram.com/reel/DKZd5HkJYR9/"
+                    data-instgrm-version="14"
+                    style={{
+                        background: '#FFF',
+                        border: 0,
+                        borderRadius: '3px',
+                        boxShadow: '0 0 1px 0 rgba(0,0,0,0.5), 0 1px 10px 0 rgba(0,0,0,0.15)',
+                        margin: '1px auto',
+                        maxWidth: 326,
+                        minWidth: 326,
+                        padding: 0,
+                        width: 'calc(100% - 2px)'
+                    }}
+                >
+                    <a
+                        href="https://www.instagram.com/reel/DKZd5HkJYR9/"
+                        target="_blank"
+                        rel="noreferrer noopener"
+                        style={{
+                            color: '#3897f0',
+                            fontFamily: 'Arial, sans-serif',
+                            fontSize: 14,
+                            textDecoration: 'none'
+                        }}
+                    >
+                        在 Instagram 查看這則貼文
+                    </a>
+                </blockquote>
+            </div>
         </div>
-    )
+    );
 }
 
 function Content({ id, isMobile }) {
@@ -411,7 +510,7 @@ function Footer() {
                 <p>樂壓Talks聯絡資訊</p>
                 <p>專案經理：張騰利</p>
                 <p>聯絡信箱：<a href='mailto:leyatalks1010@gmail.com'>leyatalks1010@gmail.com</a></p>
-                <p><a href='https://www.instagram.com/le_ya.talks/' target='_blank'><FontAwesomeIcon icon={faInstagram} /><span style={{fontFamily: 'Noto Serif TC', marginLeft: '0.5rem', letterSpacing: '2px'}}>le_ya.talks</span></a></p>
+                <p><a href='https://www.instagram.com/le_ya.talks/' target='_blank'><FontAwesomeIcon icon={faInstagram} /><span style={{ fontFamily: 'Noto Serif TC', marginLeft: '0.5rem', letterSpacing: '2px' }}>le_ya.talks</span></a></p>
             </div>
         </div>
     )

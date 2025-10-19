@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Serif+TC:wght@200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+TC:wght@200..900&display=swap');
 
 .hp-global {
     font-family: 'Noto Sans TC', sans-serif;
@@ -121,7 +121,8 @@
     cursor: pointer;
     font-weight: 800;
 }
-.hp-sc-btn1:hover{
+
+.hp-sc-btn1:hover {
     color: #c49349;
     transition: 0.3s;
     border: 2px solid #c49349;
@@ -137,7 +138,8 @@
     font-weight: 800;
     text-decoration: none;
 }
-.hp-sc-btn2:hover{
+
+.hp-sc-btn2:hover {
     color: #f8eBD8;
     transition: 0.3s;
     border: 2px solid #c49349;
@@ -147,14 +149,31 @@
 .hp-video {
     width: 100%;
     height: 100%;
+    padding: 1rem 5rem;
     background-color: #F8EBD8;
     display: flex;
-    justify-content: center;
+    justify-content: space-around;
     align-items: center;
     font-size: 2rem;
     font-family: "Dela Gothic One", sans-serif;
     font-weight: 400;
     font-style: normal;
+}
+
+.hp-video-content {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2rem;
+}
+
+.hp-video-title {
+    font-family: 'dela gothic one', sans-serif;
+    font-weight: 500;
+    font-size: 70px;
+    letter-spacing: 50px;
+    -webkit-writing-mode: vertical-lr;
+    writing-mode: vertical-lr;
 }
 
 .hp-content-container {
@@ -301,12 +320,14 @@
 }
 
 .hp-hamburger {
-    display: none; /* 預設隱藏漢堡菜單 */
+    display: none;
+    /* 預設隱藏漢堡菜單 */
     font-size: 2rem;
     background: none;
     border: none;
     cursor: pointer;
-    z-index: 1001; /* 確保漢堡按鈕在最上層 */
+    z-index: 1001;
+    /* 確保漢堡按鈕在最上層 */
     transition: transform 0.3s ease;
     width: 40px;
     height: 40px;
@@ -316,6 +337,154 @@
 
 .hp-hamburger:hover {
     transform: scale(1.1);
+}
+
+/* 漫畫版面 */
+.hp-comic-container {
+    /* 疊放單張，容器不塌陷 */
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    position: relative;
+}
+
+
+.comic-content {
+    /* 疊在同一格，單張顯示 */
+    grid-area: 1 / 1;
+    opacity: 0;
+    transform: translateX(100%);
+    animation: carouselComic 18s linear infinite both;
+}
+
+.comic-content:nth-child(1) {
+    animation-delay: 0s;
+}
+
+.comic-content:nth-child(2) {
+    animation-delay: 6s;
+}
+
+.comic-content:nth-child(3) {
+    animation-delay: 12s;
+}
+
+@keyframes carouselComic {
+
+    /* 從右入場 → 停留 → 向左離場；每張的可見窗約佔 0%~33% 區段 */
+    0% {
+        opacity: 0;
+        transform: translateX(100%);
+    }
+
+    10% {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+
+    30% {
+        opacity: 1;
+        transform: translateX(0%);
+    }
+
+    40% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+
+    100% {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+}
+
+.hp-member-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 0 2rem;
+    height: 40rem;
+    max-height: 400px;
+    gap: 1rem;
+    overflow-x: auto;
+}
+
+.member-card {
+    width: 20%;
+    height: 100%;
+    perspective: 1000px;
+    /* 3D 透視 */
+}
+
+.member-card-inner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    transition: transform 0.6s ease;
+    transform-style: preserve-3d;
+    border-radius: 16px;
+}
+
+.member-card.is-flipped .member-card-inner {
+    transform: rotateY(-180deg);
+    /* 向左翻轉 */
+}
+
+.member-face {
+    position: absolute;
+    inset: 0;
+    background-color: var(--primary-color);
+    border-radius: 16px;
+    padding: 1rem 1rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    backface-visibility: hidden;
+}
+
+.member-front {
+    transform: rotateY(0deg);
+}
+
+.member-back {
+    transform: rotateY(180deg);
+}
+
+.member-photo {
+    max-height: 230px;
+    object-fit: contain;
+}
+
+.member-role {
+    font-family: 'Noto Sans TC', serif;
+    font-weight: 900;
+    font-size: 32px;
+    text-align: center;
+}
+
+.member-name {
+    font-family: 'Noto Sans TC', serif;
+    font-weight: 900;
+    letter-spacing: 3px;
+    font-size: 22px;
+    text-align: center;
+}
+
+.member-desc {
+    font-family: 'Noto Serif TC', serif;
+}
+
+/* 動畫減量：避免暈動不適 */
+@media (prefers-reduced-motion: reduce) {
+    .comic-content {
+        animation: none;
+        opacity: 1;
+        transform: none;
+    }
+
+    .comic-content:not(:first-child) {
+        display: none;
+    }
 }
 
 /* 大螢幕設備樣式 */
@@ -329,7 +498,8 @@
         min-height: 35rem;
     }
 
-    .hp-content, .hp-content-reverse {
+    .hp-content,
+    .hp-content-reverse {
         font-size: 1.2rem;
     }
 
@@ -403,6 +573,17 @@
     .hp-logo-container p[style*="font-size: '1.6rem'"] {
         font-size: 1.4rem !important;
     }
+
+    .hp-video {
+        flex-direction: column;
+    }
+
+    .hp-video-title {
+        writing-mode: horizontal-tb;
+        text-align: center;
+        letter-spacing: 2px;
+    }
+
 }
 
 /* 手機樣式 */
@@ -417,7 +598,7 @@
         right: 0;
         z-index: 1000;
         background-color: #FAEAD3;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         max-height: 4.8em;
         overflow-y: hidden;
     }
@@ -431,25 +612,31 @@
         flex-direction: column;
         width: 100%;
         background-color: rgba(250, 234, 211, 0.95);
-        position: fixed; /* 改為 fixed 定位 */
+        position: fixed;
+        /* 改為 fixed 定位 */
         top: 4em;
         left: 0;
-        right: 0; /* 確保寬度與視窗一致 */
+        right: 0;
+        /* 確保寬度與視窗一致 */
         padding: 1em 0;
         margin: 0;
         gap: 1.5em;
-        transform: translateY(-100%); /* 初始位置在視窗外 */
+        transform: translateY(-100%);
+        /* 初始位置在視窗外 */
         opacity: 0;
         transition: transform 0.3s ease, opacity 0.3s ease;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-        max-height: calc(100vh - 4em); /* 最大高度為視窗高度減去導航欄高度 */
-        overflow-y: auto; /* 如果內容過多，允許滾動 */
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        max-height: calc(100vh - 4em);
+        /* 最大高度為視窗高度減去導航欄高度 */
+        overflow-y: auto;
+        /* 如果內容過多，允許滾動 */
         z-index: 999;
     }
 
     .hp-navbar-links.open {
         display: flex;
-        transform: translateY(0); /* 顯示時移動到視窗內 */
+        transform: translateY(0);
+        /* 顯示時移動到視窗內 */
         opacity: 1;
         z-index: 1000;
     }
@@ -468,7 +655,8 @@
     }
 
     .hp-hamburger {
-        display: flex; /* 在移動設備上顯示漢堡選單 */
+        display: flex;
+        /* 在移動設備上顯示漢堡選單 */
     }
 
     .hp-slogan {
@@ -539,6 +727,27 @@
     .hp-footer-contact p {
         margin: 0.5rem;
     }
+
+    .hp-video {
+        flex-direction: column;
+    }
+
+    .hp-video-content{
+        flex-direction: column;
+    }
+
+    .hp-video-title {
+        writing-mode: horizontal-tb;
+        text-align: center;
+        letter-spacing: 2px;
+    }
+
+    .member-card {
+        min-width: 60%;
+    }
+
+    .hp-sc-btn1 {font-size: 2rem;}
+    .hp-sc-btn2 {font-size: 2rem;}
 }
 
 /* 小手機樣式 */
@@ -575,7 +784,8 @@
         align-items: center;
     }
 
-    .shu, .ics {
+    .shu,
+    .ics {
         margin-right: 0;
         margin-bottom: 0.5rem;
     }
@@ -587,4 +797,25 @@
     .hp-footer-contact {
         font-size: 0.9rem;
     }
+
+    .hp-video {
+        flex-direction: column;
+    }
+
+    .hp-video-content{
+        flex-direction: column;
+    }
+
+    .hp-video-title {
+        writing-mode: horizontal-tb;
+        text-align: center;
+        letter-spacing: 2px;
+    }
+
+    .member-card {
+        min-width: 60%;
+    }
+
+    .hp-sc-btn1 {font-size: 1.5rem;}
+    .hp-sc-btn2 {font-size: 1.5rem;}
 }
