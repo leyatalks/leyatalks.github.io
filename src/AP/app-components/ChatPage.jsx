@@ -10,12 +10,72 @@ function ChatPage({ userInfo }) {
     const [loading, setLoading] = useState(false);
     const [showModal, setShowModal] = useState(false);
     const [modalImg, setModalImg] = useState("");
+    // AI 分析視窗
+    const [showAnalysis, setShowAnalysis] = useState(false);
+    const [analysis, setAnalysis] = useState(null); // 保留但不顯示統計
+    const [selectedAnalysisImage, setSelectedAnalysisImage] = useState(null);
+    // 控制讀取歷史訊息前置條件（確保先清除再讀取）
+    const [readyToFetch, setReadyToFetch] = useState(false);
+
+    // TODO: 將下列五張圖片替換為你的最終人格測驗圖片網址
+    // 例如：
+    // const ANALYSIS_IMAGE_URLS = [
+    //   'https://your.cdn.com/p1.png',
+    //   'https://your.cdn.com/p2.png',
+    //   'https://your.cdn.com/p3.png',
+    //   'https://your.cdn.com/p4.png',
+    //   'https://your.cdn.com/p5.png'
+    // ];
+    const ANALYSIS_IMAGE_URLS = [
+        'https://raw.githubusercontent.com/ChenXi0731/leya_user_generated/main/user_generated_images/chat_image_user3_1751014206308.webp',
+        'https://raw.githubusercontent.com/ChenXi0731/leya_user_generated/main/user_generated_images/chat_image_user3_1751015075238.webp',
+        'https://raw.githubusercontent.com/ChenXi0731/leya_user_generated/main/user_generated_images/chat_image_user3_1751017645702.webp',
+        'https://raw.githubusercontent.com/ChenXi0731/leya_user_generated/main/user_generated_images/chat_image_admin_1751019466061.webp',
+        'https://raw.githubusercontent.com/ChenXi0731/leya_user_generated/main/user_generated_images/chat_image_admin_1758517024359.webp'
+    ];
 
     const chatHistoryRef = useRef(null);
 
-    // 只從後端讀取訊息
+    // 登入（或切換帳號）時的前置：展覽帳號與訪客帳號需先清除資料
     useEffect(() => {
-        if (!username) return; // 沒有 username 不 fetch
+        let isMounted = true;
+        async function clearIfNeeded() {
+            if (!username) {
+                setReadyToFetch(false);
+                return;
+            }
+            // 預設可讀取，除非是需要先清除的帳號
+            const needClear = username === 'leyatalks' || username === 'shuics';
+            if (!needClear) {
+                setReadyToFetch(true);
+                return;
+            }
+            setReadyToFetch(false);
+            try {
+                // 清除聊天紀錄（展覽與訪客）
+                await fetch(`https://leya-backend-vercel.vercel.app/chat-history/clear-all?username=${username}`, { method: 'DELETE' });
+                // 訪客模式：另外清除心情日記（請依實際 API 調整，錯誤時忽略）
+                if (username === 'shuics') {
+                    try {
+                        await fetch(`https://leya-backend-vercel.vercel.app/mood-diary/clear-all?username=${username}`, { method: 'DELETE' });
+                    } catch (_) { /* ignore */ }
+                }
+                if (isMounted) {
+                    setMessages([]);
+                }
+            } catch (err) {
+                console.error('清除使用者資料失敗:', err);
+            } finally {
+                if (isMounted) setReadyToFetch(true);
+            }
+        }
+        clearIfNeeded();
+        return () => { isMounted = false; };
+    }, [username]);
+
+    // 只從後端讀取訊息（會等 readyToFetch true）
+    useEffect(() => {
+        if (!username || !readyToFetch) return; // 沒有 username 或未準備好不 fetch
         async function fetchHistory() {
             const res = await fetch(`https://leya-backend-vercel.vercel.app/chat-history?username=${username}`);
             const history = await res.json();
@@ -35,7 +95,7 @@ function ChatPage({ userInfo }) {
             setMessages(msgs);
         }
         fetchHistory();
-    }, [username]);
+    }, [username, readyToFetch]);
 
     useEffect(() => {
         console.log('fetch username:', username);
@@ -140,17 +200,74 @@ function ChatPage({ userInfo }) {
             a.remove();
             window.URL.revokeObjectURL(url);
         } catch (e) {
-            alert('下載失敗');
+            // Fallback：直接開啟原圖連結，讓使用者自行另存
+            try {
+                const a = document.createElement('a');
+                a.href = imgUrl;
+                a.target = '_blank';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+            } catch (_) {}
+            alert('下載失敗，已嘗試以新分頁開啟原圖。');
         }
     };
 
-    // IG分享（複製網址並嘗試打開IG App的story camera）
-    const handleShareIG = (imgUrl) => {
-        navigator.clipboard.writeText(imgUrl);
-        window.location.href = 'instagram://story-camera';
-        setTimeout(() => {
-            alert('圖片網址已複製，請在 IG 貼上或選擇圖片！');
-        }, 1000);
+    // IG 分享（優先：複製圖片到剪貼簿；備援：Web Share API 分享檔案；最後：開IG相機並提示）
+    const handleShareIG = async (imgUrl) => {
+        try {
+            const resp = await fetch(imgUrl, { mode: 'cors' });
+            if (!resp.ok) throw new Error('fetch failed');
+            const blob = await resp.blob();
+            const type = blob.type || 'image/png';
+            const ext = type.split('/')[1] || 'png';
+
+            // 1) 嘗試複製圖片到剪貼簿
+            if (navigator.clipboard && window.ClipboardItem) {
+                try {
+                    const item = new ClipboardItem({ [type]: blob });
+                    await navigator.clipboard.write([item]);
+                    // 開啟 IG 限動相機，使用者可直接貼上
+                    window.location.href = 'instagram://story-camera';
+                    setTimeout(() => {
+                        alert('已將圖片複製到剪貼簿，開啟 IG 後直接貼上到限動即可！');
+                    }, 600);
+                    return;
+                } catch (e) {
+                    // 繼續走分享備援
+                }
+            }
+
+            // 2) 備援：Web Share API 分享檔案（行動裝置分享面板可能可直接選 IG）
+            const file = new File([blob], `leya-share.${ext}`, { type });
+            if (navigator.canShare && navigator.canShare({ files: [file] })) {
+                try {
+                    await navigator.share({ files: [file], title: '分享至 IG', text: '分享這張圖片' });
+                    return;
+                } catch (e) {
+                    // 使用者取消或不支援，繼續下一步
+                }
+            }
+
+            // 3) 最後備援：開 IG 相機與開新分頁讓使用者手動另存
+            try { window.location.href = 'instagram://story-camera'; } catch (_) {}
+            const a = document.createElement('a');
+            a.href = imgUrl; a.target = '_blank';
+            document.body.appendChild(a); a.click(); a.remove();
+            alert('已開啟 IG 相機並在新分頁開啟圖片，請儲存後再於 IG 限動選取或貼上。');
+        } catch (err) {
+            console.warn('IG 分享失敗，改複製網址備援:', err);
+            try { await navigator.clipboard.writeText(imgUrl); } catch (_) {}
+            try { window.location.href = 'instagram://story-camera'; } catch (_) {}
+            alert('暫時無法直接複製圖片，已複製圖片網址到剪貼簿，請在 IG 貼上或自行選擇圖片。');
+        }
+    };
+
+    // 產生 QR code 連結（無需額外套件）
+    // 將 QR 指向 save-image.html，手機掃碼後可一鍵加入相簿
+    const getQrUrl = (imageUrl) => {
+        const page = `${window.location.origin}/save-image.html?url=${encodeURIComponent(imageUrl)}`;
+        return `https://api.qrserver.com/v1/create-qr-code/?size=240x240&data=${encodeURIComponent(page)}`;
     };
 
     // 一鍵清除聊天紀錄 (僅限 shuics)
@@ -181,13 +298,46 @@ function ChatPage({ userInfo }) {
         }
     };
 
+    // AI 分析（本地端簡易統計）：僅供展覽帳號使用
+    const handleOpenAnalysis = () => {
+        // 簡易 AI 選圖：依據對話中 bot 的情緒占比作為人格圖建議
+        const botMsgs = messages.filter(m => m.role === 'bot');
+        const emotionDist = botMsgs.reduce((acc, m) => {
+            const emo = (m.emotion || '').trim();
+            if (!emo) return acc;
+            acc[emo] = (acc[emo] || 0) + 1;
+            return acc;
+        }, {});
+        const ordered = Object.entries(emotionDist).sort((a, b) => b[1] - a[1]);
+        const topEmotion = ordered.length ? ordered[0][0] : (botMsgs[botMsgs.length - 1]?.emotion || '');
+
+        // 映射：依你的圖片語意自行調整
+        const emotionToIndex = {
+            '平靜': 0,
+            '焦慮': 1,
+            '開心': 2,
+            '傷心': 3,
+            '憤怒': 4
+        };
+        let idx = 0;
+        if (topEmotion && emotionToIndex.hasOwnProperty(topEmotion)) {
+            idx = emotionToIndex[topEmotion];
+        } else if (botMsgs.length) {
+            // 若沒有標準情緒，依使用者名稱或訊息數做一個穩定 fallback
+            idx = Math.abs((username || '').split('').reduce((h, c) => h + c.charCodeAt(0), 0)) % ANALYSIS_IMAGE_URLS.length;
+        }
+        const url = ANALYSIS_IMAGE_URLS[idx] || ANALYSIS_IMAGE_URLS[0];
+        setSelectedAnalysisImage(url);
+        setShowAnalysis(true);
+    };
+
     const userAvatar = "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png";
     const botAvatar = "https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png";
 
     return (
         <>
             <div className="content-area" id="chat-page">
-                {/* 訪客模式清除按鈕 */}
+                {/* 頂部操作區域：訪客(shuics) 顯示清除；展覽(leyatalks) 顯示 AI 分析 */}
                 {username === 'shuics' && (
                     <div style={{ 
                         display: 'flex', 
@@ -215,6 +365,36 @@ function ChatPage({ userInfo }) {
                             onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
                         >
                             🗑️ 一鍵清除所有紀錄
+                        </button>
+                    </div>
+                )}
+                {username === 'leyatalks' && (
+                    <div style={{ 
+                        display: 'flex', 
+                        justifyContent: 'flex-end', 
+                        padding: '10px 20px',
+                        background: '#e6f7ff',
+                        borderRadius: '8px',
+                        marginBottom: '10px'
+                    }}>
+                        <button
+                            onClick={handleOpenAnalysis}
+                            style={{
+                                background: 'linear-gradient(135deg, #36d1dc 0%, #5b86e5 100%)',
+                                color: 'white',
+                                border: 'none',
+                                borderRadius: '20px',
+                                padding: '8px 20px',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                fontSize: '14px',
+                                boxShadow: '0 2px 8px rgba(91, 134, 229, 0.3)',
+                                transition: 'all 0.3s ease'
+                            }}
+                            onMouseOver={(e) => e.target.style.transform = 'translateY(-2px)'}
+                            onMouseOut={(e) => e.target.style.transform = 'translateY(0)'}
+                        >
+                            🤖 AI 分析
                         </button>
                     </div>
                 )}
@@ -274,6 +454,78 @@ function ChatPage({ userInfo }) {
                     </div>
                 </div>
             </div>
+            {/* AI 分析視窗（展覽帳號） */}
+            {showAnalysis && (
+                <div
+                    style={{
+                        position: 'fixed',
+                        top: 0, left: 0, right: 0, bottom: 0,
+                        background: 'rgba(0,0,0,0.7)',
+                        display: 'flex', alignItems: 'center', justifyContent: 'center',
+                        zIndex: 9999
+                    }}
+                    onClick={() => setShowAnalysis(false)}
+                >
+                    <div
+                        style={{
+                            background: '#fff', color: '#333', borderRadius: 12,
+                            width: 'min(92vw, 560px)', maxHeight: '90vh', overflowY: 'auto',
+                            boxShadow: '0 0 24px rgba(0,0,0,0.25)', padding: 20, position: 'relative'
+                        }}
+                        onClick={e => e.stopPropagation()}
+                    >
+                        <div style={{ position: 'absolute', top: 10, right: 12, cursor: 'pointer' }} onClick={() => setShowAnalysis(false)}>✕</div>
+                        <h3 style={{ marginTop: 0 }}>AI 推薦的人格圖片</h3>
+                        <div style={{ display: 'flex', gap: 16, alignItems: 'stretch', flexWrap: 'wrap' }}>
+                            <div style={{ flex: '1 1 260px', minWidth: 240 }}>
+                                {selectedAnalysisImage ? (
+                                    <img src={selectedAnalysisImage} alt="ai-selection" style={{ width: '100%', maxHeight: 420, objectFit: 'contain', borderRadius: 8, border: '1px solid #eee' }} />
+                                ) : (
+                                    <div style={{ height: 260, border: '1px dashed #bbb', borderRadius: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
+                                        尚未選出圖片
+                                    </div>
+                                )}
+                                <div style={{ display: 'flex', gap: 8, marginTop: 8, flexWrap: 'wrap' }}>
+                                    <button
+                                        style={{ background: '#fff', borderRadius: 6, padding: '6px 12px', border: '1px solid #ddd', cursor: 'pointer' }}
+                                        onClick={() => selectedAnalysisImage && handleDownload(selectedAnalysisImage)}
+                                        disabled={!selectedAnalysisImage}
+                                    >
+                                        下載圖片（電腦）
+                                    </button>
+                                    <button
+                                        style={{ background: '#fff', borderRadius: 6, padding: '6px 12px', border: '1px solid #ddd', cursor: 'pointer', color: '#E1306C', fontWeight: 600 }}
+                                        onClick={() => selectedAnalysisImage && handleShareIG(selectedAnalysisImage)}
+                                        disabled={!selectedAnalysisImage}
+                                    >
+                                        分享 IG 限動
+                                    </button>
+                                    <a
+                                        href={selectedAnalysisImage || '#'}
+                                        target="_blank"
+                                        rel="noreferrer"
+                                        style={{ background: '#fff', borderRadius: 6, padding: '6px 12px', border: '1px solid #ddd', textDecoration: 'none', color: '#333' }}
+                                        onClick={(e) => { if (!selectedAnalysisImage) e.preventDefault(); }}
+                                    >
+                                        新分頁開啟
+                                    </a>
+                                </div>
+                            </div>
+                            <div style={{ width: 240, minWidth: 200, textAlign: 'center' }}>
+                                <div style={{ fontWeight: 600, marginBottom: 6 }}>手機掃描 QRcode 儲存</div>
+                                {selectedAnalysisImage ? (
+                                    <img src={getQrUrl(selectedAnalysisImage)} alt="qr" style={{ width: 200, height: 200, borderRadius: 8, border: '1px solid #eee', background: '#fff' }} />
+                                ) : (
+                                    <div style={{ width: 200, height: 200, border: '1px dashed #bbb', borderRadius: 8, display: 'inline-flex', alignItems: 'center', justifyContent: 'center', color: '#888' }}>
+                                        無網址
+                                    </div>
+                                )}
+                                <div style={{ fontSize: 12, color: '#666', marginTop: 6 }}>提示：手機掃碼開啟圖片後長按即可儲存至相簿</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            )}
             {showModal && (
                 <div
                     style={{
