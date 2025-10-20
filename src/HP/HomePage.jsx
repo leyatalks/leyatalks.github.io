@@ -410,11 +410,9 @@ function Content({ id, isMobile }) {
                     </div>
                     <div className="hp-half-container">
                         <div className="hp-content">
-                            在快節奏的現代生活中<br />
-                            許多人外表看似正常<br />
-                            內心卻早已身心俱疲<br />
-                            這正是韓國所稱的「Toast-out」狀態<br />
-                            我們的專題網站樂壓Talk's，便以此為靈感出發<br />
+                            在快節奏的現代生活中許多人外表看似正常<br/>
+                            內心卻早已身心俱疲，這正是韓國所稱的「Toast-out」狀態<br />
+                            我們的專題網站樂壓Talk's便以此為靈感出發<br />
                             致力於打造一個能隨時隨地提供心理支持的網站<br />
                             協助使用者識別壓力來源、釋放情緒<br />
                             讓心理健康成為日常生活的一部分
@@ -430,10 +428,8 @@ function Content({ id, isMobile }) {
                     </div>
                     <div className="hp-half-container">
                         <div className="hp-content">
-                            在快節奏的現代生活中<br />
-                            許多人外表看似正常<br />
-                            內心卻早已身心俱疲<br />
-                            這正是韓國所稱的「Toast-out」狀態<br />
+                            在快節奏的現代生活中許多人外表看似正常<br/>
+                            內心卻早已身心俱疲，這正是韓國所稱的「Toast-out」狀態<br />
                             我們的專題網站樂壓Talk's便以此為靈感出發<br />
                             致力於打造一個能隨時隨地提供心理支持的網站<br />
                             協助使用者識別壓力來源、釋放情緒<br />

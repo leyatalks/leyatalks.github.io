@@ -214,11 +214,13 @@
     align-items: center;
     height: 100%;
     padding-left: 2rem;
-    padding-right: 40%;
-    padding-bottom: 7rem;
+    padding-right: 10%;
+    padding-bottom: 5rem;
     text-align: justify;
     line-height: 1.6;
     letter-spacing: 0.2rem;
+    line-break: auto;
+    font-size: 1.1rem;
 }
 
 .hp-content-reverse {
@@ -227,11 +229,13 @@
     justify-content: end;
     height: 100%;
     padding-right: 2rem;
-    padding-left: 40%;
-    padding-bottom: 7rem;
+    padding-left: 10%;
+    padding-bottom: 5rem;
     text-align: right;
     line-height: 1.6;
     letter-spacing: 0.2rem;
+    line-break: auto;
+    font-size: 1.1rem;
 }
 
 .hp-footer {
@@ -402,11 +406,12 @@
     display: flex;
     flex-direction: row;
     align-items: center;
-    padding: 0 2rem;
+    padding: 20px 2rem;
     height: 40rem;
     max-height: 400px;
     gap: 1rem;
     overflow-x: auto;
+    overflow-y: hidden;
 }
 
 .member-card {
