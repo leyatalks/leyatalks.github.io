@@ -10,11 +10,11 @@ const cardList = [
 ];
 
 const MOODS = [
-		{ alt: '開心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E9%96%8B%E5%BF%83.PNG" },
-		{ alt: '平靜', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%B9%B3%E9%9D%9C.PNG" },
-		{ alt: '傷心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%82%B7%E5%BF%83.PNG" },
-		{ alt: '憤怒', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E6%86%A4%E6%80%92.PNG" },
-		{ alt: '焦慮', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E7%84%A6%E6%85%AE.PNG" },
+		{ alt: '開心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E9%96%8B%E5%BF%83.png" },
+		{ alt: '平靜', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%B9%B3%E9%9D%9C.png" },
+		{ alt: '傷心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%82%B7%E5%BF%83.png" },
+		{ alt: '憤怒', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E6%86%A4%E6%80%92.png" },
+		{ alt: '焦慮', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E7%84%A6%E6%85%AE.png" },
 	]
 
 // 單一卡片元件：接收 item 物件
@@ -198,13 +198,13 @@ function Card({ item, setActivatePage }) {
                 )}
                 {isMoodCard && randomMood && (
                     <div className="infocard-media"
-                        style={{ cursor: 'pointer', marginTop: 8, width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
+                        style={{ cursor: 'pointer', marginTop: '10%', width: '100%', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                         onClick={() => setActivatePage('mood-page')}>
                         <img
                             src={randomMood.src}
                             alt={randomMood.alt}
                             loading="lazy"
-                            style={{ alignSelf: 'center', width: '60%', height: 'auto', display: 'block', borderRadius: 8, objectFit: 'cover' }}
+                            style={{ alignSelf: 'center', width: '40%', maxWidth: '20vw', height: '40%', display: 'block', borderRadius: 8, objectFit: 'cover'}}
                         />
                     </div>
                 )}

@@ -17,25 +17,27 @@ function AsideNav({ setActivePage, activePage, collapsed = false, onToggle }) {
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faBook} /></span>
             <span className="ap-aside-text">心情日記</span>
           </button>
-          <button className={`ap-aside-item ${activePage === 'meditation-page' ? 'active' : ''}`} onClick={() => setActivePage('meditation-page')}>
-            <span className="ap-aside-icon"><FontAwesomeIcon icon={faLeaf} /></span>
-            <span className="ap-aside-text">正念冥想</span>
+          <button className={`ap-aside-item ${activePage === 'chat-page' ? 'active' : ''}`} onClick={() => setActivePage('chat-page')}>
+            <span className="ap-aside-icon"><FontAwesomeIcon icon={faCommentDots} /></span>
+            <span className="ap-aside-text">吐司聊天室</span>
           </button>
           <button className={`ap-aside-item ${activePage === 'stress-mind-map' ? 'active' : ''}`} onClick={() => setActivePage('stress-mind-map')}>
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faDiagramProject} /></span>
             <span className="ap-aside-text">壓力來源圖</span>
           </button>
-          <button className={`ap-aside-item ${activePage === 'chat-page' ? 'active' : ''}`} onClick={() => setActivePage('chat-page')}>
-            <span className="ap-aside-icon"><FontAwesomeIcon icon={faCommentDots} /></span>
-            <span className="ap-aside-text">吐司聊天室</span>
+          <button className={`ap-aside-item ${activePage === 'meditation-page' ? 'active' : ''}`} onClick={() => setActivePage('meditation-page')}>
+            <span className="ap-aside-icon"><FontAwesomeIcon icon={faLeaf} /></span>
+            <span className="ap-aside-text">冥想</span>
           </button>
-          <button className='ap-aside-item' onClick={() => navigate('/')}>
-            <span className="ap-aside-icon"><FontAwesomeIcon icon={faEarthAmericas} /></span>
-            <span className="ap-aside-text">樂壓Talks 介紹頁面</span>
-          </button>
+
         </nav>
         <div className="ap-aside-footer">
-          <button className='logout-btn' onClick={() => setActivePage('login-page')} style={{width: '100%'}}>
+          {/* 內嵌顯示介紹頁（右側容器切到 /leya/intro）*/}
+          <button className='ap-aside-item' onClick={() => setActivePage('intro-page')}>
+            <span className="ap-aside-icon"><FontAwesomeIcon icon={faEarthAmericas} /></span>
+            <span className="ap-aside-text">樂壓Talk's專題介紹</span>
+          </button>
+          <button className='logout-btn' onClick={() => setActivePage('login-page')}>
             登出
           </button>
           {/* <div className="user-icon" onClick={() => setActivePage('user-page')} style={{flex: 1}}>

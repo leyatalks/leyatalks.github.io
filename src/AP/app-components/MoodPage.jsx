@@ -28,11 +28,11 @@ function MoodPage(props) {
 	})
 
 	const MOODS = [
-		{ key: '開心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E9%96%8B%E5%BF%83.PNG" },
-		{ key: '平靜', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%B9%B3%E9%9D%9C.PNG" },
-		{ key: '傷心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%82%B7%E5%BF%83.PNG" },
-		{ key: '憤怒', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E6%86%A4%E6%80%92.PNG" },
-		{ key: '焦慮', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E7%84%A6%E6%85%AE.PNG" },
+		{ key: '開心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E9%96%8B%E5%BF%83.png" },
+		{ key: '平靜', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%B9%B3%E9%9D%9C.png" },
+		{ key: '傷心', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E5%82%B7%E5%BF%83.png" },
+		{ key: '憤怒', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E6%86%A4%E6%80%92.png" },
+		{ key: '焦慮', src: "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/moodPNG/%E7%84%A6%E6%85%AE.png" },
 	]
 
 	function moodKeyToSrc(key) {
@@ -288,18 +288,19 @@ function MoodPage(props) {
 	const offset = first.getDay()
 
 	return (
-		<div className="container">
+		<div className="mood-container">
 			<style>{`
 				:root{--bg:#fffaf5;--tile:#ffe4c4;--tile-hover:#ffd2a6;--weekday:#ffcf99;--accent:#ff8a65;--accent-hover:#ff7043;--text:#333;--muted:#777;--shadow:0 8px 20px rgba(0,0,0,.08);--radius:14px}
 				body{margin:0;font-family:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",Arial,"Helvetica Neue",Helvetica,"PingFang TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--text)}
-				.container{max-width:880px;margin:22px auto 40px;padding:0 16px}
+				.mood-container{max-width:880px;margin:22px auto 40px;padding:0 16px}
+				
 				.title-bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
 				.title{font-size:24px;font-weight:800;letter-spacing:.5px;display:flex;align-items:center;gap:8px}
 				.nav-btn{background:var(--accent);color:#fff;border:none;border-radius:12px;padding:8px 10px;width:80px;font-size:12px;cursor:pointer;box-shadow:var(--shadow)}
 				.nav-btn:hover{background:var(--accent-hover)}
 				.quick-moods{margin:14px 0 6px;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
 				.mood-btn{background:transparent;border:none;padding:4px;cursor:pointer;transition:transform .12s ease}
-				.mood-btn img{width:70px;height:70px;object-fit:contain;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.06))}
+				.mood-btn img{width:40px;object-fit:contain;display:block;filter:drop-shadow(0 2px 3px rgba(0,0,0,.06))}
 				.mood-btn:hover{transform:translateY(-2px)}
 				.month-label{font-weight:700;font-size:18px;text-align:center;margin-top:8px}
 				.weekday-row{display:grid;grid-template-columns:repeat(7,1fr);gap:8px;margin-top:16px}
@@ -328,11 +329,12 @@ function MoodPage(props) {
 				textarea::placeholder{color:#b57d5b}
 				.actions{display:flex;justify-content:flex-end;gap:10px;margin-top:14px}
 				.btn{border:none;border-radius:999px;padding:10px 16px;cursor:pointer;font-weight:700}
-				.btn-primary{background:var(--accent);color:#fff}
+				.btn-primary{background:var(--accent);color:#fff; white-space: nowrap;}
 				.btn-primary:hover{background:var(--accent-hover)}
-				.btn-ghost{background:#ececec;color:#444}
+				.btn-ghost{background:#ececec;color:#444; white-space: nowrap;}
 				.btn-ghost:hover{background:#ddd}
 				@media (max-width:480px){.day-cell{min-height:74px}.emoji img{width:26px;height:26px}}
+				@media (max-width:784px){.mood-container{margin: 10px auto 5px; padding:0; max-height: 100%; overflow-y: auto;} .weekday-row{padding: 0 10px;} .calendar{padding: 0 10px;} .actions{width: 100%; flex-direction: row; justify-content: center;} .btn{width: 100%;}
 			`}</style>
 
 			<div className="title-bar">

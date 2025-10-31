@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import "./login.css";
+import { gray } from 'd3';
 
 function LoginPage({ activePage, setActivePage, setUserInfo }) {
     const [username, setUsername] = useState('');
@@ -122,7 +123,7 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
                 <button className={`login ${activePage === 'home-page' ? 'active' : 'login-page'}`} type="submit" disabled={loading}>
                     {loading ? '登入中…' : '登入'}
                 </button>
-                <button
+                {/* <button
                     className="login guest-login"
                     type="button"
                     onClick={handleGuestLogin}
@@ -138,8 +139,10 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
                     onMouseOut={(e) => (e.target.style.backgroundColor = 'transparent', e.target.style.color = '#ff8fa4')}
                 >
                     訪客模式 (快速體驗)
-                </button>
+                </button> */}
             </form>
+            <p style={{cursor: 'not-allowed', marginTop: '10px', color: 'gray'}}>訪客模式目前維護中</p>
+
 
             {/* <div className="divider">── 或使用社群快速登入 ──</div>
             <div className="socials">

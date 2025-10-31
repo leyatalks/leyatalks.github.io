@@ -18,6 +18,7 @@ import MoodPage from './app-components/MoodPage'
 import StressMindMap from './app-components/StressMindMap'
 import MeditationPage from './app-components/MeditationPage'
 import AsideNav from './app-components/AsideNav'
+import HomePage from '../HP/HomePage'
 
 
 const DefaultRoute = () => {
@@ -150,6 +151,8 @@ function Application() {
         'mood-page': '/leya/mood',
         'stress-mind-map': '/leya/stress-mind-map',
         'meditation-page': '/leya/meditation',
+        // 新增：AP 右側容器內嵌的介紹頁面
+        'intro-page': '/leya/intro',
     };
     const reverseMap = Object.fromEntries(Object.entries(routeMap).map(([k, v]) => [v, k]));
     const legacySetActivePage = (pageKey) => {
@@ -200,6 +203,8 @@ function Application() {
                             <Route path="mood" element={<MoodPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="stress-mind-map" element={<StressMindMap activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="meditation" element={<MeditationPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
+                            {/* 介紹頁面內嵌顯示於 AP 右側容器（去除 HomePage Navbar）*/}
+                            <Route path="intro" element={<HomePage embedded />} />
                             <Route path="*" element={<Navigate to="login" replace />} />
                         </Routes>
                     </div>

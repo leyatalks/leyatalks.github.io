@@ -13,7 +13,7 @@
     --border-color: #EEDFCE;
     /* 新增：App 最大寬度（隨斷點調整） */
     --app-max-width: 480px;
-    --chat-input-offset: 110px;
+    --chat-input-offset: 85px;
 }
 
 * {
@@ -65,7 +65,7 @@ body {
     align-items: center;
     padding: 15px;
     background-color: var(--primary-color);
-    border-bottom: 1px solid var(--border-color);
+    /* border-bottom: 1px solid var(--border-color); */
     position: relative;
     z-index: 10;
     max-width: var(--app-max-width);
@@ -201,7 +201,7 @@ body {
 .content-area {
     flex: 1;
     overflow-y: hidden;
-    padding: 10px 0;
+    /* padding: 10px 0; */
     background-color: var(--primary-color);
     margin-bottom: 1em;
     display: flex;
@@ -229,6 +229,8 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 0;
+    padding-left: 2%;
+    padding-right: 2%;
 }
 
 .chat-history {
@@ -303,18 +305,19 @@ body {
 
 .chat-input-container {
     position: fixed;
-    bottom: 60px;
+    bottom: 100px;
     left: 0;
     right: 0;
-    padding: 15px;
+    padding: 13px;
     display: flex;
     align-items: center;
     justify-content: center;
-    background-color: var(--primary-color);
-    border-top: 1px solid var(--border-color);
+    background-color: transparent;
+    background: var(--primary-color);
+    /* border-top: 1px solid var(--border-color); */
     max-width: var(--app-max-width);
     margin: 0 auto;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    box-shadow: 0 -10px 20px rgba(255, 244, 235, 0.95);
     z-index: 50;
 }
 
@@ -373,6 +376,7 @@ body {
     display: flex;
     flex-direction: row;
     align-items: center;
+    justify-content: flex-start;
     width: 60%;
     height: 4rem;
     padding-left: 2rem;
@@ -429,8 +433,8 @@ body {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    height: 60px;
-    background-color: #fff;
+    height: 100px;
+    background-color: var(--primary-color);
     border-top: 1px solid var(--border-color);
     position: fixed;
     bottom: 0;
@@ -440,7 +444,7 @@ body {
     max-width: var(--app-max-width);
     width: 100%;
     margin: 0 auto;
-    box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05);
+    /* box-shadow: 0 -2px 10px rgba(0, 0, 0, 0.05); */
     box-sizing: border-box;
 }
 
@@ -476,10 +480,16 @@ body {
 
 .logout-btn {
     border-radius: 12px;
-    padding: 1em 2em;
+    padding: 14px 18px;
     border: none;
     color: #000;
     background-color: #F3E8DD;
+
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    font-size: 16px;
+    text-align: left;
 }
 
 .logout-btn:hover {
@@ -530,6 +540,16 @@ body {
 .trash-icon:hover {
     color: red;
     transition: 0.7s;
+}
+
+.stress-container {
+    position: relative;
+    width: 100%;
+}
+
+.stress-title {
+    text-align: center;
+    margin-bottom: 2rem;
 }
 
 /* Aside（桌面） */
@@ -630,13 +650,9 @@ body {
 
 .ap-aside-footer {
     display: flex;
-    flex-direction: row;
-    justify-content: flex-start;
-    align-items: flex-end;
-    width: 100%;
+    flex-direction: column;
+    justify-content: flex-end;
     height: 100%;
-    position: sticky;
-    bottom: 0;
 }
 
 /* 主內容容器：預留側欄寬度 */
@@ -686,6 +702,16 @@ body {
 
 /* RWD 設定 */
 @media (max-width: 480px) {
+
+    html,
+    body {
+        overscroll-behavior: none;
+    }
+
+    .content-area {
+        margin-bottom: 100px;
+    }
+
     .ap-header-title {
         font-size: 1.6em;
     }
@@ -723,10 +749,10 @@ body {
         font-size: 14px;
     }
 
-    .nav-item {
-        font-size: 20px;
-        padding: 8px;
+    .stress-container {
+        max-height: 70%;
     }
+
 }
 
 @media (max-width: 360px) {
@@ -861,8 +887,8 @@ body {
 
     /* 右側主內容容器側邊留白 */
     .ap-main {
-        padding-left: 5%;
-        padding-right: 5%;
+        /* padding-left: 5%;
+        padding-right: 5%; */
     }
 
     /* 依收合狀態提供 aside 寬度變數 */
@@ -922,6 +948,84 @@ body {
     display: flex;
     flex-direction: column;
     min-height: 0;
+}
+
+.disclaimer-label {
+    position: sticky;
+    width: 100%;
+    max-width: 100%;
+    min-height: fit-content;
+    padding: 0.5em 2.5em 0.5em 1em; /* 右側為關閉按鈕預留空間 */
+    color: var(--text-color);
+    font-size: 18px;
+    top: 0;
+    left: 0;
+    z-index: 1;
+    text-align: center;
+    font-weight: bold;
+    opacity: 0.8;
+    white-space: nowrap;
+    background: var(--primary-color);
+    overflow: hidden; /* 讓文字移動時，底色固定不位移 */
+    will-change: transform;
+    user-select: none;
+}
+
+/* 僅讓內層文字跑馬燈移動，外層保持固定底色 */
+.disclaimer-track {
+    display: inline-block;
+    padding: 0.25em 0;
+    animation: disclaimer 15s linear infinite;
+    opacity: 0.6;
+}
+
+/* 關閉免責聲明按鈕 */
+.disclaimer-close {
+    position: absolute;
+    right: 8px;
+    top: 6px;
+    transform: translateY(-50%);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: red;
+    font-size: 16px;
+    line-height: 28px;
+    cursor: pointer;
+    opacity: 0.5;
+}
+
+.disclaimer-close:hover {
+    background: none;
+}
+
+
+@keyframes disclaimer {
+    0% {
+        transform: translateX(120%);
+    }
+
+    100% {
+        transform: translateX(-120%);
+    }
+}
+
+@media (max-width: 768px) {
+    .disclaimer-track {
+        animation: disclaimer 15s linear infinite;
+    }
+
+    @keyframes disclaimer {
+    0% {
+        transform: translateX(100%);
+    }
+
+    100% {
+        transform: translateX(-100%);
+    }
+}
 }
 
 .chat-history {

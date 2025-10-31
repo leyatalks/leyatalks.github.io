@@ -97,9 +97,10 @@ const enablePullToRefresh = (callback) => {
     }, { passive: true });
 };
 
-function HomePage({ handleNavigation }) {
+function HomePage({ handleNavigation, embedded = false }) {
     const [isMenuOpen, setMenuOpen] = useState(false);
     const [isMobile, setIsMobile] = useState(window.innerWidth <= 768);
+    const [isLoggedIn, setIsLoggedIn] = useState(false);
     const navigate = useNavigate();
 
     // 檢查用戶是否已登入並處理導航
@@ -121,6 +122,27 @@ function HomePage({ handleNavigation }) {
             navigate('/leya/login');
         }
     };
+
+    // 初始化登入狀態
+    useEffect(() => {
+        try {
+            const saved = localStorage.getItem('leyaUserInfo');
+            const info = saved ? JSON.parse(saved) : null;
+            setIsLoggedIn(!!(info && info.id));
+        } catch {}
+        // 監聽跨分頁 storage 變更（例如登出）
+        const onStorage = (e) => {
+            if (e.key === 'leyaUserInfo') {
+                try {
+                    const saved = e.newValue;
+                    const info = saved ? JSON.parse(saved) : null;
+                    setIsLoggedIn(!!(info && info.id));
+                } catch {}
+            }
+        };
+        window.addEventListener('storage', onStorage);
+        return () => window.removeEventListener('storage', onStorage);
+    }, []);
 
     // 監聽視窗大小變化和啟用下拉刷新
     useEffect(() => {
@@ -182,6 +204,22 @@ function HomePage({ handleNavigation }) {
         }
     };
 
+    if (embedded) {
+        // 內嵌模式：只顯示內容容器（不要 Navbar/FakeNavbar/遮罩）
+        return (
+            <div className='hp-global'>
+                <button style={{
+                    position: 'fixed',
+                    left: 'auto',
+                    top: 0,
+                    right: 0
+                }} onClick={() => navigate('/')}>前往專題介紹頁</button>
+                <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
+            </div>
+        );
+    }
+
+    // 預設：完整首頁（含 Navbar）
     return (
         <div className='hp-global'>
             <FakeNavbar />
@@ -202,7 +240,7 @@ function HomePage({ handleNavigation }) {
                         <a href="#concept" onClick={handleNavClick}>專題理念</a>
                         <a href="#planning" onClick={handleNavClick}>專題企劃</a> */}
                         <a onClick={handleLoginNavigation} className='hp-arrow-link'>
-                            登入 / 註冊
+                            {isLoggedIn ? '回到應用' : '登入 / 註冊'}
                         </a>
                     </div>
                 )}
@@ -215,7 +253,7 @@ function HomePage({ handleNavigation }) {
                         <a onClick={handleLoginNavigation} className='hp-arrow-link'
                             style={{ maxWidth: '80%' }}
                         >
-                            登入 / 註冊
+                            {isLoggedIn ? '回到應用' : '登入 / 註冊'}
                         </a>
                     </div>
                 )}

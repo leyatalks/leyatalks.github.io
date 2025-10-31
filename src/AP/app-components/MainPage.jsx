@@ -6,7 +6,7 @@ import InfoCard from './MainPageComponents/InfoCard';
 
 function MainPage({ setActivePage }) {
     return (
-        <>
+        <div className='mp-container'>
             <ADs />
 
                 <div className="mainpage-container">
@@ -14,7 +14,7 @@ function MainPage({ setActivePage }) {
                     <InfoCard setActivatePage={setActivePage}/>
                 </div>
 
-        </>
+        </div>
     );
 
 

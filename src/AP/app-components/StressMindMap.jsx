@@ -93,7 +93,7 @@ function StressMindMap({ userInfo }) {
 
   return (
     <>
-      <h1 style={{ textAlign: 'center', marginBottom: '2rem' }}>壓力來源心智圖</h1>
+      <h1 className='stress-title'>壓力來源心智圖</h1>
       {!username && (
         <div style={{ 
           textAlign: 'center', 

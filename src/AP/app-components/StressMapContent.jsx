@@ -51,14 +51,20 @@ export default function StressMindMap({ data = demoData, height = 600, maxDepth,
     svgEl.selectAll('*').remove();
 
     const width = container?.clientWidth ?? 960;
-    const svg = svgEl.attr('width', width).attr('height', height);
+  // 手機寬度(<=768px)時，將高度限制到最多 300px
+  const computeTargetHeight = () => (typeof window !== 'undefined' && window.innerWidth <= 768 ? Math.min(height, 300) : height);
+    let targetHeight = computeTargetHeight();
+      const svg = svgEl.attr('width', width).attr('height', targetHeight);
 
     const containerG = svg.append('g');
-    const g = containerG.append('g').attr('transform', `translate(${width / 2}, ${height / 2})`);
+      const initialScale = (typeof window !== 'undefined' && window.innerWidth <= 768) ? 0.8 : 1;
+      const g = containerG
+        .append('g')
+        .attr('transform', `translate(${width / 2}, ${targetHeight / 2}) scale(${initialScale})`);
 
     const zoom = d3.zoom()
       .scaleExtent([0.5, 2.5])
-      .translateExtent([[0, 0], [width, height]])
+  .translateExtent([[0, 0], [width, targetHeight]])
       .on('zoom', (event) => containerG.attr('transform', event.transform));
     svg.call(zoom);
     svg.on('dblclick.zoom', null);
@@ -79,7 +85,7 @@ export default function StressMindMap({ data = demoData, height = 600, maxDepth,
       const cluster = d3.cluster().size([2 * Math.PI, radius]);
       cluster(root);
     };
-    computeCluster(width, height);
+  computeCluster(width, targetHeight);
 
     // 來源細項大小依頻率（放大點尺寸）
     const sourceCounts = Array.from(sourceToCount.values());
@@ -192,9 +198,14 @@ export default function StressMindMap({ data = demoData, height = 600, maxDepth,
 
     const handleResize = () => {
       const newWidth = container?.clientWidth ?? width;
-      svg.attr('width', newWidth).attr('height', height);
+      const newHeight = computeTargetHeight();
+      targetHeight = newHeight;
+      svg.attr('width', newWidth).attr('height', newHeight);
       // 重新計算 cluster 佈局與更新座標（保留邊距空間讓文字不出框）
-      computeCluster(newWidth, height);
+      computeCluster(newWidth, newHeight);
+      // 重新置中群組
+        const newScale = (typeof window !== 'undefined' && window.innerWidth <= 768) ? 1 : 1;
+        g.attr('transform', `translate(${newWidth / 2}, ${newHeight / 2}) scale(${newScale})`);
       linkSel
         .attr('x1', d => toXY(d.source).x)
         .attr('y1', d => toXY(d.source).y)
@@ -216,7 +227,7 @@ export default function StressMindMap({ data = demoData, height = 600, maxDepth,
           return p.x >= 0 ? 'start' : 'end';
         });
       // 更新縮放的平移限制
-      zoom.translateExtent([[0, 0], [newWidth, height]]);
+      zoom.translateExtent([[0, 0], [newWidth, newHeight]]);
     };
     const onResize = () => window.requestAnimationFrame(handleResize);
     window.addEventListener('resize', onResize);
@@ -228,7 +239,7 @@ export default function StressMindMap({ data = demoData, height = 600, maxDepth,
   }, [hierarchyData, sourceToCount, height]);
 
   return (
-    <div ref={containerRef} style={{ position: 'relative', width: '100%' }}>
+    <div ref={containerRef} className='stress-container'>
       <svg ref={svgRef} />
     </div>
   );

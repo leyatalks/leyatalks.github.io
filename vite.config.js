@@ -9,11 +9,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['leyalogo.png', 'vite.svg', 'save-image.html'],
-      workbox: {
-        // 讓直接造訪 /save-image.html 不被當成 SPA 導向 index.html
-        navigateFallbackDenylist: [/^\/save-image\.html$/],
-      },
+      includeAssets: ['leyalogo.png', 'vite.svg'],
       manifest: {
         name: '樂壓Talks',
         short_name: '樂壓Talks',
