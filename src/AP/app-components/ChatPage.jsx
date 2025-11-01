@@ -8,12 +8,14 @@ function ChatPage({ userInfo }) {
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
     const [loading, setLoading] = useState(false);
+    const [typingInterval, setTypingInterval] = useState(20); // 每個字顯示間隔（ms），預設 200ms
     const [showModal, setShowModal] = useState(false);
     const [showDisclaimer, setShowDisclaimer] = useState(true);
     const [modalImg, setModalImg] = useState("");
 
     const chatHistoryRef = useRef(null);
     const streamingRef = useRef({}); // 用來追蹤目前的打字動畫
+    const sseControllerRef = useRef({ queue: [], timer: null, botIndex: null, closed: false, finalReply: null });
 
     // 只從後端讀取訊息
     useEffect(() => {
@@ -73,7 +75,7 @@ function ChatPage({ userInfo }) {
     };
 
     // 以「打字機」方式即時渲染訊息內容（前端模擬 streaming）
-    const streamTextIntoMessage = (index, fullText, speed = 20) => {
+    const streamTextIntoMessage = (index, fullText, speed = typingInterval) => {
         return new Promise((resolve) => {
             let i = 0;
             // 若有既有的動畫在同一 index，先取消（透過旗標中斷）
@@ -118,60 +120,221 @@ function ChatPage({ userInfo }) {
         setInput("");
         setLoading(true);
         try {
-            // 1. 先呼叫 /chat 拿到 bot 回覆
-            const res = await fetch("https://leya-backend-vercel.vercel.app/chat", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ message: userMessage, userId: username })
-            });
-            const data = await res.json();
-            // 依序「串流」渲染 bot 回覆內容
-            await streamTextIntoMessage(botIndex, data.reply || '');
-            // 完成後再補上額外欄位（鼓勵語、情緒）
-            setMessages(prev => {
-                if (!prev[botIndex]) return prev;
-                const next = [...prev];
-                next[botIndex] = {
-                    ...next[botIndex],
-                    encouragement: data.encouragement,
-                    emotion: data.emotion
-                };
-                return next;
-            });
+            // 改為一次性 API（不使用 SSE 串流）
+            const useStreaming = false;
+            if (useStreaming && typeof EventSource !== 'undefined') {
+                const url = `https://leya-backend-vercel.vercel.app/chat/stream?userId=${encodeURIComponent(username)}&message=${encodeURIComponent(userMessage)}`;
+                await new Promise((resolve, reject) => {
+                    const es = new EventSource(url);
+                    let finalPayload = null;
 
-            // 2. 呼叫 /chat-history 儲存這一組訊息
-            await fetch("https://leya-backend-vercel.vercel.app/chat-history", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    username: username,
-                    user_message: userMessage,
-                    bot_message: data.reply,
-                    encourage_text: data.encouragement,
-                    emotion: data.emotion
-                })
-            });
+                    // 初始化打字緩衝控制器
+                    sseControllerRef.current = { queue: [], timer: null, botIndex, closed: false, finalReply: null };
 
-            // 3. 啟動輪詢，直到最新一筆 bot 訊息有 image_url
-            const pollForImage = () => {
-                const interval = setInterval(async () => {
-                    const res = await fetch(`https://leya-backend-vercel.vercel.app/chat-history?username=${username}`);
-                    const history = await res.json();
-                    // 找到最後一筆有 bot_message 的訊息
-                    for (let i = history.length - 1; i >= 0; i--) {
-                        const item = history[i];
-                        if (item.bot_message) {
-                            if (item.image_url) {
-                                setModalImg(item.image_url);
-                                setShowModal(true);
+                    const ensureDrain = () => {
+                        const ctrl = sseControllerRef.current;
+                        if (ctrl.timer) return;
+                        ctrl.timer = setInterval(() => {
+                            const c = sseControllerRef.current;
+                            // 直接嘗試從隊列取字並寫入，內層 setMessages 會自行保護索引不存在的情況
+                            if (c.queue.length > 0) {
+                                const ch = c.queue.shift();
+                                setMessages(prev => {
+                                    if (!prev[ctrl.botIndex]) return prev;
+                                    const next = [...prev];
+                                    next[ctrl.botIndex] = { ...next[ctrl.botIndex], text: (next[ctrl.botIndex].text || '') + ch };
+                                    return next;
+                                });
+                                return;
+                            }
+                            // 若隊列空且已關閉，收尾
+                            if (c.closed) {
+                                if (typeof c.finalReply === 'string') {
+                                    setMessages(prev => {
+                                        if (!prev[ctrl.botIndex]) return prev;
+                                        const next = [...prev];
+                                        // 確保最終文字與伺服器 final 一致
+                                        next[ctrl.botIndex] = { ...next[ctrl.botIndex], text: c.finalReply };
+                                        return next;
+                                    });
+                                }
+                                clearInterval(c.timer);
+                                c.timer = null;
+                                resolve();
+                            }
+                        }, typingInterval);
+                    };
+
+                    es.addEventListener('chunk', (e) => {
+                        try {
+                            const { delta } = JSON.parse(e.data || '{}');
+                            if (!delta) return;
+                            const ctrl = sseControllerRef.current;
+                            // 將收到的片段拆成字元，放入緩衝佇列
+                            for (const ch of String(delta)) ctrl.queue.push(ch);
+                            ensureDrain();
+                        } catch {}
+                    });
+
+                    es.addEventListener('final', async (e) => {
+                        try {
+                            finalPayload = JSON.parse(e.data || '{}');
+                        } catch {
+                            finalPayload = { reply: '', encouragement: '', emotion: '平靜' };
+                        }
+                        // 標記已關閉，並記錄最終 reply 以確保同步
+                        const ctrl = sseControllerRef.current;
+                        ctrl.closed = true;
+                        ctrl.finalReply = finalPayload.reply || '';
+
+                        // 若未收到 chunk（或前面字數不足），以 final 文本補齊待打字的佇列，並啟動打字器
+                        try {
+                            setMessages(prev => {
+                                const curr = prev[botIndex]?.text || '';
+                                const full = finalPayload.reply || '';
+                                if (full.length > curr.length) {
+                                    const rest = full.slice(curr.length);
+                                    for (const ch of rest) sseControllerRef.current.queue.push(ch);
+                                }
+                                return prev;
+                            });
+                            // 確保定時器已啟動（即使沒有任何 chunk 也能收尾或逐字補齊）
+                            ensureDrain();
+                        } catch {}
+
+                        // 填補鼓勵語與情緒
+                        setMessages(prev => {
+                            if (!prev[botIndex]) return prev;
+                            const next = [...prev];
+                            next[botIndex] = {
+                                ...next[botIndex],
+                                encouragement: finalPayload.encouragement,
+                                emotion: finalPayload.emotion
+                            };
+                            return next;
+                        });
+                        // 儲存聊天記錄
+                        try {
+                            await fetch("https://leya-backend-vercel.vercel.app/chat-history", {
+                                method: "POST",
+                                headers: { "Content-Type": "application/json" },
+                                body: JSON.stringify({
+                                    username: username,
+                                    user_message: userMessage,
+                                    bot_message: finalPayload.reply || '',
+                                    encourage_text: finalPayload.encouragement || '',
+                                    emotion: finalPayload.emotion || ''
+                                })
+                            });
+                        } catch {}
+                        // 輪詢圖片：只更新訊息的 image_url，不自動彈窗
+                        const pollForImage = () => {
+                            const interval = setInterval(async () => {
+                                try {
+                                    const res = await fetch(`https://leya-backend-vercel.vercel.app/chat-history?username=${username}`);
+                                    const history = await res.json();
+                                    // 從最新往回找此輪對話對應的圖片（找到就把當前 bot 訊息加上 image_url）
+                                    let foundUrl = null;
+                                    for (let i = history.length - 1; i >= 0; i--) {
+                                        const item = history[i];
+                                        if (item.bot_message && item.image_url) {
+                                            foundUrl = item.image_url;
+                                            break;
+                                        }
+                                    }
+                                    if (foundUrl) {
+                                        setMessages(prev => {
+                                            if (!prev[botIndex]) return prev;
+                                            const next = [...prev];
+                                            next[botIndex] = { ...next[botIndex], image_url: foundUrl };
+                                            return next;
+                                        });
+                                        clearInterval(interval);
+                                    }
+                                } catch (e) {
+                                    // 忽略暫時性錯誤，等待下次輪詢
+                                }
+                            }, 3000);
+                        };
+                        pollForImage();
+                        es.close();
+                        // 這裡不直接 resolve，等待緩衝器收尾（ensureDrain 會 resolve）
+                    });
+
+                    es.addEventListener('error', () => {
+                        const ctrl = sseControllerRef.current;
+                        // 若我們已經收到 final 並進入收尾，就忽略之後的 error 事件（某些瀏覽器在正常關閉時也會觸發）
+                        if (ctrl && ctrl.closed) {
+                            if (ctrl.timer) {
+                                clearInterval(ctrl.timer);
+                                ctrl.timer = null;
+                            }
+                            es.close();
+                            return;
+                        }
+                        if (ctrl && ctrl.timer) {
+                            clearInterval(ctrl.timer);
+                            ctrl.timer = null;
+                        }
+                        es.close();
+                        reject(new Error('SSE error'));
+                    });
+                });
+            } else {
+                // 一次性 API + 前端打字效果
+                const res = await fetch("https://leya-backend-vercel.vercel.app/chat", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ message: userMessage, userId: username })
+                });
+                const data = await res.json();
+                await streamTextIntoMessage(botIndex, data.reply || '', typingInterval);
+                setMessages(prev => {
+                    if (!prev[botIndex]) return prev;
+                    const next = [...prev];
+                    next[botIndex] = { ...next[botIndex], encouragement: data.encouragement, emotion: data.emotion };
+                    return next;
+                });
+                await fetch("https://leya-backend-vercel.vercel.app/chat-history", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        username: username,
+                        user_message: userMessage,
+                        bot_message: data.reply,
+                        encourage_text: data.encouragement,
+                        emotion: data.emotion
+                    })
+                });
+                const pollForImage = () => {
+                    const interval = setInterval(async () => {
+                        try {
+                            const res = await fetch(`https://leya-backend-vercel.vercel.app/chat-history?username=${username}`);
+                            const history = await res.json();
+                            let foundUrl = null;
+                            for (let i = history.length - 1; i >= 0; i--) {
+                                const item = history[i];
+                                if (item.bot_message && item.image_url) {
+                                    foundUrl = item.image_url;
+                                    break;
+                                }
+                            }
+                            if (foundUrl) {
+                                setMessages(prev => {
+                                    if (!prev[botIndex]) return prev;
+                                    const next = [...prev];
+                                    next[botIndex] = { ...next[botIndex], image_url: foundUrl };
+                                    return next;
+                                });
                                 clearInterval(interval);
                             }
-                            break;
+                        } catch (e) {
+                            // 忽略暫時性錯誤，等待下次輪詢
                         }
-                    }
-                }, 3000); // 每 3 秒查一次
-            };
-            pollForImage();
+                    }, 3000);
+                };
+                pollForImage();
+            }
         } catch (err) {
             // 若先前已經建立占位 bot 訊息，更新其內容；否則補一則錯誤訊息
             if (botIndex !== null) {
@@ -346,6 +509,21 @@ function ChatPage({ userInfo }) {
                         {loading && <div className="chat-loading">回覆中...</div>}
                     </div>
                     <div className="chat-input-container">
+                        {/* 字速選擇器 */}
+                        {/* <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 8 }}>
+                            <label htmlFor="typingSpeed" style={{ fontSize: 12, color: '#555' }}>字速</label>
+                            <select
+                                id="typingSpeed"
+                                value={typingInterval}
+                                onChange={(e) => setTypingInterval(Number(e.target.value))}
+                                disabled={loading}
+                                style={{ padding: '4px 8px', borderRadius: 6, border: '1px solid #ddd', fontSize: 12 }}
+                            >
+                                <option value={120}>快</option>
+                                <option value={200}>中</option>
+                                <option value={320}>慢</option>
+                            </select>
+                        </div> */}
                         <input
                             type="text"
                             className="chat-input"
