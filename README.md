@@ -1,12 +1,29 @@
-# React + Vite
+# 樂壓Talk's
+我們是 世新大學資訊傳播學系111級 畢業專題 【樂壓Talk's】
+本網站使用React作為前端框架建構
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 專題主旨
+本專題旨在透過數位科技方式，結合部分心理知識，並以社群宣傳為媒介，提升社會大眾與用戶對於心理衛教知識認識以及自我壓力源覺察，並提供即時人工智能陪伴與紓壓功能，以幫助用戶得將心中的話與放不下的壓力，有一個能夠釋放的空間。
 
-Currently, two official plugins are available:
+## 網站建構說明
+網站主要分為兩項
+- 專題介紹
+- 應用功能
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 成員介紹
+以下成員皆為世新資傳111級甲班學生
+- 專案經理：張騰利
+- 社群行銷：詹采璇
+- 美術設計：黎潁霖
+- 後端工程：黃芊瑜
+- 全端工程：林辰禧
 
-## Expanding the ESLint configuration
+## 相關連結
+樂壓Talk's：https://leyatalks.com
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+Instagram：https://www.instagram.com/le_ya.talks
+
+合作邀約：leyatalks1010@gmail.com
+
+## 免責聲明
+本網站提供心情陪伴聊天功能與壓力來源心智圖等心理相關資源皆僅供參考使用，如有需要，請尋求合格心理健康人士協助。
