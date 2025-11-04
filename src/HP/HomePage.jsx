@@ -129,7 +129,7 @@ function HomePage({ handleNavigation, embedded = false }) {
             const saved = localStorage.getItem('leyaUserInfo');
             const info = saved ? JSON.parse(saved) : null;
             setIsLoggedIn(!!(info && info.id));
-        } catch {}
+        } catch { }
         // 監聽跨分頁 storage 變更（例如登出）
         const onStorage = (e) => {
             if (e.key === 'leyaUserInfo') {
@@ -137,7 +137,7 @@ function HomePage({ handleNavigation, embedded = false }) {
                     const saved = e.newValue;
                     const info = saved ? JSON.parse(saved) : null;
                     setIsLoggedIn(!!(info && info.id));
-                } catch {}
+                } catch { }
             }
         };
         window.addEventListener('storage', onStorage);
@@ -212,8 +212,13 @@ function HomePage({ handleNavigation, embedded = false }) {
                     position: 'fixed',
                     left: 'auto',
                     top: 0,
-                    right: 0
-                }} onClick={() => navigate('/')}>前往專題介紹頁</button>
+                    right: 0,
+                    border: '1px solid var(--text-color)',
+                    fontWeight: 'bold',
+                    zIndex: 1,
+                }} onClick={() => navigate('/')}
+                onMouseEnter={e => e.currentTarget.style.backgroundColor = '#ffe3d0ff'}
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = ''}>前往專題介紹頁</button>
                 <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
             </div>
         );
@@ -298,6 +303,7 @@ function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation }) {
             <Member id="member" isMobile={isMobile} />
             <Comic id="comic" isMobile={isMobile} />
             <Video id="video" isMobile={isMobile} />
+            <QRcode />
             <Footer />
         </div>
     )
@@ -448,7 +454,7 @@ function Content({ id, isMobile }) {
                     </div>
                     <div className="hp-half-container">
                         <div className="hp-content">
-                            在快節奏的現代生活中許多人外表看似正常<br/>
+                            在快節奏的現代生活中許多人外表看似正常<br />
                             內心卻早已身心俱疲，這正是韓國所稱的「Toast-out」狀態<br />
                             我們的專題網站樂壓Talk's便以此為靈感出發<br />
                             致力於打造一個能隨時隨地提供心理支持的網站<br />
@@ -466,7 +472,7 @@ function Content({ id, isMobile }) {
                     </div>
                     <div className="hp-half-container">
                         <div className="hp-content">
-                            在快節奏的現代生活中許多人外表看似正常<br/>
+                            在快節奏的現代生活中許多人外表看似正常<br />
                             內心卻早已身心俱疲，這正是韓國所稱的「Toast-out」狀態<br />
                             我們的專題網站樂壓Talk's便以此為靈感出發<br />
                             致力於打造一個能隨時隨地提供心理支持的網站<br />
@@ -519,6 +525,28 @@ function Content_Reverse({ id, isMobile }) {
                     </div>
                 </>
             )}
+        </div>
+    )
+}
+
+function QRcode() {
+    return (
+        <div style={{ margin: '48px 0' }}>
+            <p className="qrcode-title">立即掃描QRcode追蹤我們</p>
+            <div className='qrcode-container'>
+                <a href="https://www.instagram.com/le_ya.talks/" target="_blank">
+                    <p className='qrcode-subtitle'>Instagram</p>
+                    <img className='qrcode' src="https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/instagram_qrcode.svg" alt="Instagram_QRcode" />
+                </a>
+                <a href="https://leyatalks.com" target="_blank">
+                    <p className="qrcode-subtitle">專題網站</p>
+                    <img className='qrcode' src="https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/website_qrcode.svg" alt="網站_QRcode" />
+                </a>
+                <a href="mailto:leyatalks1010@gmail.com">
+                    <p className="qrcode-subtitle">聯絡信箱</p>
+                    <img className='qrcode' src="https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/mail_qrcode.svg" alt="信箱_QRcode" />
+                </a>
+            </div>
         </div>
     )
 }

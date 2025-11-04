@@ -14,6 +14,8 @@ function ChatPage({ userInfo }) {
     const [modalImg, setModalImg] = useState("");
 
     const chatHistoryRef = useRef(null);
+    const bottomRef = useRef(null); // 聊天底部錨點
+    const prevMetadataRef = useRef({ length: 0, lastText: '' }); // 用於判斷是新增訊息還是持續打字
     const streamingRef = useRef({}); // 用來追蹤目前的打字動畫
     const sseControllerRef = useRef({ queue: [], timer: null, botIndex: null, closed: false, finalReply: null });
 
@@ -46,9 +48,33 @@ function ChatPage({ userInfo }) {
     }, [username]);
 
     useEffect(() => {
-        if (chatHistoryRef.current) {
-            chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
+        // 依據變化型態決定捲動行為：
+        // - 新增/刪除訊息：平滑捲動
+        // - 同筆訊息文字更新（打字機/串流）：即時捲動（auto），避免多次平滑造成卡頓
+        const last = messages[messages.length - 1];
+        const prev = prevMetadataRef.current;
+        const isNewItem = messages.length !== prev.length;
+        const isTypingUpdate = !isNewItem && (last?.text || '') !== (prev.lastText || '');
+
+        const behavior = isNewItem ? 'smooth' : 'auto';
+
+        // 使用底部錨點確保滾動到容器內部底部而非整頁
+        if (bottomRef.current) {
+            try {
+                bottomRef.current.scrollIntoView({ behavior, block: 'end' });
+            } catch (e) {
+                // 兼容舊瀏覽器：退回到直接操作 scrollTop
+                if (chatHistoryRef.current) {
+                    chatHistoryRef.current.scrollTop = chatHistoryRef.current.scrollHeight;
+                }
+            }
         }
+
+        // 更新前一次的快照
+        prevMetadataRef.current = {
+            length: messages.length,
+            lastText: last?.text || ''
+        };
     }, [messages]);
 
     // 讀取免責聲明是否已被關閉
@@ -173,7 +199,7 @@ function ChatPage({ userInfo }) {
                             // 將收到的片段拆成字元，放入緩衝佇列
                             for (const ch of String(delta)) ctrl.queue.push(ch);
                             ensureDrain();
-                        } catch {}
+                        } catch { }
                     });
 
                     es.addEventListener('final', async (e) => {
@@ -200,7 +226,7 @@ function ChatPage({ userInfo }) {
                             });
                             // 確保定時器已啟動（即使沒有任何 chunk 也能收尾或逐字補齊）
                             ensureDrain();
-                        } catch {}
+                        } catch { }
 
                         // 填補鼓勵語與情緒
                         setMessages(prev => {
@@ -226,7 +252,7 @@ function ChatPage({ userInfo }) {
                                     emotion: finalPayload.emotion || ''
                                 })
                             });
-                        } catch {}
+                        } catch { }
                         // 輪詢圖片：只更新訊息的 image_url，不自動彈窗
                         const pollForImage = () => {
                             const interval = setInterval(async () => {
@@ -420,7 +446,7 @@ function ChatPage({ userInfo }) {
         }
     };
 
-    const userAvatar = "https://www.iconpacks.net/icons/2/free-user-icon-3296-thumb.png";
+    const userAvatar = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/usericon.svg";
     const botAvatar = "https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png";
 
     return (
@@ -507,7 +533,10 @@ function ChatPage({ userInfo }) {
                             </div>
                         ))}
                         {loading && <div className="chat-loading">回覆中...</div>}
+
                     </div>
+                    {/* 底部錨點：確保每次更新都能正確滾到最底 */}
+                    <div ref={bottomRef} />
                     <div className="chat-input-container">
                         {/* 字速選擇器 */}
                         {/* <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginRight: 8 }}>
@@ -584,7 +613,9 @@ function ChatPage({ userInfo }) {
                                     color: '#333',
                                     fontWeight: 'bold',
                                     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    maxHeight: 'fit-content'
                                 }}
                                 onClick={e => {
                                     e.stopPropagation();
@@ -603,7 +634,9 @@ function ChatPage({ userInfo }) {
                                     color: '#E1306C',
                                     fontWeight: 'bold',
                                     boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
-                                    cursor: 'pointer'
+                                    cursor: 'pointer',
+                                    whiteSpace: 'nowrap',
+                                    maxHeight: 'fit-content'
                                 }}
                                 onClick={e => {
                                     e.stopPropagation();

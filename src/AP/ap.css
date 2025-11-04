@@ -552,6 +552,41 @@ body {
     margin-bottom: 2rem;
 }
 
+.application-link-button {
+    color: #595959;
+    background-color: transparent;
+    border: 2px solid #595959;
+    font-weight: bold;
+    padding: 8px 16px;
+}
+.application-link-button:hover {
+    background-color: var(--secondary-color);
+    color: #fff;
+    transition: 0.3s;
+}
+
+.diary-select-button{
+    /* 桌面版 */
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+@media (max-width: 768px) {
+    .diary-select-button{
+        /* 手機版 */
+        position: fixed;
+        top: auto;
+        bottom: 13%;
+        right: 10%;
+        left: 10%;
+    }
+}
+
+
 /* Aside（桌面） */
 .ap-app {
     display: flex;
@@ -569,8 +604,9 @@ body {
     left: 0;
     bottom: 0;
     width: 280px;
-    background: #E9D9C8;
-    border-right: 1px solid var(--border-color);
+    /* background: #E9D9C8; */
+    background: #FAEAD3;
+    /* border-right: 1px solid var(--border-color); */
     display: none;
     /* 手機預設隱藏 */
     z-index: 20;
@@ -886,10 +922,10 @@ body {
 @media (min-width: 1024px) {
 
     /* 右側主內容容器側邊留白 */
-    .ap-main {
-        /* padding-left: 5%;
-        padding-right: 5%; */
-    }
+    /* .ap-main {
+        padding-left: 5%;
+        padding-right: 5%;
+    } */
 
     /* 依收合狀態提供 aside 寬度變數 */
     .ap-main {
@@ -955,7 +991,8 @@ body {
     width: 100%;
     max-width: 100%;
     min-height: fit-content;
-    padding: 0.5em 2.5em 0.5em 1em; /* 右側為關閉按鈕預留空間 */
+    padding: 0.5em 2.5em 0.5em 1em;
+    /* 右側為關閉按鈕預留空間 */
     color: var(--text-color);
     font-size: 18px;
     top: 0;
@@ -966,7 +1003,8 @@ body {
     opacity: 0.8;
     white-space: nowrap;
     background: var(--primary-color);
-    overflow: hidden; /* 讓文字移動時，底色固定不位移 */
+    overflow: hidden;
+    /* 讓文字移動時，底色固定不位移 */
     will-change: transform;
     user-select: none;
 }
@@ -1018,14 +1056,16 @@ body {
     }
 
     @keyframes disclaimer {
-    0% {
-        transform: translateX(100%);
+        0% {
+            transform: translateX(100%);
+        }
+
+        100% {
+            transform: translateX(-100%);
+        }
     }
 
-    100% {
-        transform: translateX(-100%);
-    }
-}
+    .chat-input{font-size: 16px;}
 }
 
 .chat-history {

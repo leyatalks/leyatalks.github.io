@@ -1,4 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+TC:wght@200..900&display=swap');
+html, body {
+    background-color: #FAEAD3;
+    scrollbar-color: transparent transparent;;
+    scrollbar-width: none;
+}
+
 
 .hp-global {
     font-family: 'Noto Sans TC', sans-serif;
@@ -493,6 +499,40 @@
     }
 }
 
+/* QRcode樣式 */
+.qrcode-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: row;
+    margin: 24px 0;
+    gap: 20%;    
+}
+.qrcode-container a{
+    text-decoration: none;
+}
+
+.qrcode-title{
+    font-family: "Dela Gothic One", sans-serif;
+    text-align: center;
+    font-size: 36px;
+    white-space: nowrap;
+}
+
+.qrcode-subtitle{
+    font-family: 'Dela Gothic One', sans-serif;
+    text-align: center;
+    font-size: 24px;
+    margin-bottom: 16px;
+    color: var(--text-color);
+}
+
+.qrcode {
+    width: 200px;
+    height: 200px;
+    object-fit: contain;
+}
+
 /* 大螢幕設備樣式 */
 @media (min-width: 1441px) {
     .hp-slogan {
@@ -754,6 +794,21 @@
 
     .hp-sc-btn1 {font-size: 2rem;}
     .hp-sc-btn2 {font-size: 2rem;}
+
+    .qrcode-container {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    .qrcode-title{
+        font-size: 28px;
+    }
+    .qrcode-subtitle{
+        font-size: 24px;
+    }
+    .qrcode {
+        width: 150px;
+        height: 150px;
+    }
 }
 
 /* 小手機樣式 */
