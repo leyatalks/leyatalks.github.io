@@ -64,7 +64,7 @@ function Member() {
     return (
         <>
             <p
-                style={{ fontSize: '4rem', textAlign: 'center', marginTop: '20px', marginBottom: '20px', fontFamily: 'Dela Gothic One' }}
+                style={{ fontSize: '4rem', textAlign: 'center', marginTop: '20px', marginBottom: '20px', fontFamily: 'Dela Gothic One'}}
             >
                 成員介紹
             </p>

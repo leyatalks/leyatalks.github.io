@@ -56,9 +56,14 @@ function LoginPage({ activePage, setActivePage, setUserInfo }) {
             clearTimeout(timeoutId);
 
             if (response.ok) {
-                const data = await response.json();
-                console.log('登入成功:', data);
-                setUserInfo({ nickname: data.nickname, id: data.id });
+                const raw = await response.json();
+                // 後端回傳結構可能不同，這裡做彈性對應
+                const data = raw?.data && (typeof raw.data === 'object') ? raw.data : raw;
+                const nickname = data?.nickname ?? data?.nickName ?? data?.username ?? data?.userName ?? data?.name ?? (data?.email ? data.email.split('@')[0] : '');
+                const id = data?.id ?? data?.userId ?? data?._id ?? data?.username ?? data?.email ?? '';
+                const info = { nickname, id };
+                console.log('登入成功，解析後的使用者資料:', info, '原始:', raw);
+                setUserInfo(info);
                 setActivePage('home-page');
             } else {
                 // 當登入失敗時，設置錯誤訊息

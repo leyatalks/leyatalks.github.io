@@ -115,7 +115,7 @@ function Application() {
         }
     })
 
-    const [asideCollapsed, setAsideCollapsed] = useState(false);
+    const [asideCollapsed, setAsideCollapsed] = useState(true);
     const [isDesktop, setIsDesktop] = useState(() => typeof window !== 'undefined' ? window.innerWidth >= 1024 : true);
 
     useEffect(() => {
@@ -171,7 +171,8 @@ function Application() {
     const activePage = reverseMap[location.pathname] || 'home-page';
 
     // login / register / forgot-password / reset-password 隱藏 Header / Footer / Aside
-    const hideLayout = ['/leya/login', '/leya/register', '/leya/forgot-password', '/leya/reset-password'].includes(location.pathname);
+    // const hideLayout = ['/leya/login', '/leya/register', '/leya/forgot-password', '/leya/reset-password'].includes(location.pathname);
+    const hideLayout = [].includes(location.pathname);
 
     return (
         <div id='app' className='ap-app'>
@@ -180,6 +181,7 @@ function Application() {
                     <AsideNav
                         setActivePage={legacySetActivePage}
                         activePage={activePage}
+                        userInfo={userInfo}
                         collapsed={asideCollapsed}
                         onToggle={() => setAsideCollapsed(!asideCollapsed)}
                     />
@@ -189,14 +191,14 @@ function Application() {
                     <div className="content-area">
                         <Routes>
                             <Route index element={<DefaultRoute />} />
-                            <Route path="login" element={<LoginPage activePage={activePage} setActivePage={legacySetActivePage} setUserInfo={setUserInfo} />} />
+                            <Route path="login" element={<LoginPage activePage={activePage} setActivePage={legacySetActivePage} setUserInfo={setUserInfo}/>} />
                             <Route path="register" element={<RegisterPage activePage={activePage} setActivePage={legacySetActivePage} />} />
                             <Route path="forgot-password" element={<ForgotPassword setActivePage={legacySetActivePage} />} />
                             <Route path="reset-password" element={<ResetPassword setActivePage={legacySetActivePage} />} />
-                            <Route path="home" element={<MainPage activePage={activePage} setActivePage={legacySetActivePage} />} />
+                            <Route path="user" element={<MainPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="category" element={<CategoryPage activePage={activePage} setActivePage={legacySetActivePage} />} />
                             <Route path="chat" element={<ChatPage userInfo={userInfo} />} />
-                            <Route path="user" element={<UserPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
+                            <Route path="user-page" element={<UserPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="admin" element={<AdminPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="donate-manage" element={<DonateManage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="secret" element={<Sercet activePage={activePage} setActivePage={legacySetActivePage} />} />
@@ -204,7 +206,7 @@ function Application() {
                             <Route path="stress-mind-map" element={<StressMindMap activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="meditation" element={<MeditationPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             {/* 介紹頁面內嵌顯示於 AP 右側容器（去除 HomePage Navbar）*/}
-                            <Route path="intro" element={<HomePage embedded />} />
+                            <Route path="home" element={<HomePage embedded />} />
                             <Route path="*" element={<Navigate to="login" replace />} />
                         </Routes>
                     </div>

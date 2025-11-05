@@ -7,11 +7,11 @@
     min-height: 100vh; /* 佔滿可視高度以利置中 */
     text-align: center;
     margin: 0 auto; /* 水平置中區塊 */
-    width: 100vw; /* 用 100% 取代 100vw，避免視窗捲軸造成偏移 */
+    width: 100%; /* 用 100% 取代 100vw，避免視窗捲軸造成偏移 */
     box-sizing: border-box;
-    padding: 0 16px; /* 小幅留白，避免貼邊 */
-    position: absolute;
-    left: 0;
+    /* padding: 0 16px; 小幅留白，避免貼邊 */
+    position: relative;
+    /* left: 0; */
 }
 
 .login-logo {

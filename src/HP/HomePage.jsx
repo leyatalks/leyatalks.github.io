@@ -208,7 +208,7 @@ function HomePage({ handleNavigation, embedded = false }) {
         // 內嵌模式：只顯示內容容器（不要 Navbar/FakeNavbar/遮罩）
         return (
             <div className='hp-global'>
-                <button style={{
+                {/* <button style={{
                     position: 'fixed',
                     left: 'auto',
                     top: 0,
@@ -218,7 +218,7 @@ function HomePage({ handleNavigation, embedded = false }) {
                     zIndex: 1,
                 }} onClick={() => navigate('/')}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#ffe3d0ff'}
-                onMouseLeave={e => e.currentTarget.style.backgroundColor = ''}>前往專題介紹頁</button>
+                onMouseLeave={e => e.currentTarget.style.backgroundColor = ''}>前往專題介紹頁</button> */}
                 <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
             </div>
         );

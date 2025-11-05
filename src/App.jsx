@@ -14,9 +14,9 @@ function App() {
     }}>
       <BrowserRouter>
         <Routes>
-          <Route path="/" element={<HomePage />} />
+          <Route path="/" element={<Navigate to="/leya/home" replace />} />
           <Route path="/leya/*" element={<LeyaTalks />} />
-          <Route path="*" element={<Navigate to="/" replace />} />
+          <Route path="*" element={<Navigate to="/leya/home" replace />} />
         </Routes>
       </BrowserRouter>
     </div>

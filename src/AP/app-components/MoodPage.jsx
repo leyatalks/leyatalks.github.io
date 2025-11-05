@@ -5,6 +5,7 @@ function MoodPage(props) {
 	const storeKey = 'moodJournal'
 	console.log('用戶資訊 props.userInfo', props?.userInfo);
 
+	const isLoggedIn = !!props.userInfo;
 	const [currentYear, setCurrentYear] = useState(new Date().getFullYear())
 	const [currentMonth, setCurrentMonth] = useState(new Date().getMonth())
 	const [selectedDate, setSelectedDate] = useState('')
@@ -292,7 +293,7 @@ function MoodPage(props) {
 			<style>{`
 				:root{--bg:#fffaf5;--tile:#ffe4c4;--tile-hover:#ffd2a6;--weekday:#ffcf99;--accent:#ff8a65;--accent-hover:#ff7043;--text:#333;--muted:#777;--shadow:0 8px 20px rgba(0,0,0,.08);--radius:14px}
 				body{margin:0;font-family:"Noto Sans TC",system-ui,-apple-system,"Segoe UI",Arial,"Helvetica Neue",Helvetica,"PingFang TC","Microsoft JhengHei",sans-serif;background:var(--bg);color:var(--text)}
-				.mood-container{max-width:880px;margin:22px auto 40px;padding:0 16px}
+				.mood-container{width: 90%;margin:22px auto 40px;padding:0 16px; overflow-y: auto;}
 				
 				.title-bar{display:flex;align-items:center;justify-content:space-between;gap:10px}
 				.title{font-size:24px;font-weight:800;letter-spacing:.5px;display:flex;align-items:center;gap:8px}

@@ -38,7 +38,7 @@ function buildHierarchy(records, userNickname = '使用者') {
   return { root, sourceToCount };
 }
 
-export default function StressMindMap({ data = demoData, height = 600, maxDepth, username, analysisData: externalAnalysisData, isLoading, error, userNickname }) {
+export default function StressMindMap({ data = demoData, height = 450, maxDepth, username, analysisData: externalAnalysisData, isLoading, error, userNickname }) {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const analysisData = externalAnalysisData || data;

@@ -27,12 +27,12 @@ function UserPage({ activePage, setActivePage, userInfo }) {
                         </button>
                     </div>
                 </div>
-                <div className="user-quote">
+                {/* <div className="user-quote">
                     <h3>分享給大家的金句</h3>
                     <div className="quote-list">
                         <UserPostSimple />
                     </div>
-                </div>
+                </div> */}
             </div>
         </>
     );
