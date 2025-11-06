@@ -1,0 +1,9 @@
+/* 角色養成頁面主容器 */
+.character-main-container {
+  /* Debug Using */
+  /* border: 1px solid red; */
+  
+  /* 長寬設定滿容器 */
+  height: 100%;
+  width: 100%;
+}

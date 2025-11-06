@@ -452,7 +452,7 @@ function ChatPage({ userInfo }) {
     return (
         <>
 
-            <div id="chat-page" style={{ overflowY: 'auto' }}>
+            <div id="chat-page" style={{ overflowY: 'auto', height: '100%'}}>
                 {showDisclaimer && (
                     <div className="disclaimer-label">
                         <div className="disclaimer-track">

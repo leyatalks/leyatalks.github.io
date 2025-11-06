@@ -29,13 +29,18 @@ function AuthCheck({ count = 0, min = MIN_REQUIRED_COUNT }) {
       padding: '1.5rem',
       backgroundColor: '#fff3cd',
       borderRadius: '8px',
-      margin: '0 auto 2rem',
+      margin: '0 auto 7rem',
       maxWidth: '90vw',
       color: '#856404',
-      border: '1px solid rgba(133,100,4,0.25)'
+      border: '1px solid rgba(133,100,4,0.25)',
+      height: '50%',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
     }}>
-      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>資料不足，暫時無法使用壓力心智圖</div>
+      <div style={{ fontSize: 18, fontWeight: 700, marginBottom: 8 }}>該時間區間資料不足，無法使用壓力心智圖</div>
       <div style={{ marginBottom: 8 }}>目前資料筆數：{count} / {min}</div>
+      <div>您可以重新選擇時間區間</div>
       <div>請前往「心情日記」或「吐司聊天室」新增更多互動，讓 AI 更了解你的壓力來源喔！</div>
       <div style={{ marginTop: '24px' }}>
         <button className="application-link-button"
@@ -63,6 +68,8 @@ function StressMindMap({ userInfo }) {
   const [isCountLoading, setIsCountLoading] = useState(false);
   const [countError, setCountError] = useState(null);
   const [totalCount, setTotalCount] = useState(0);
+  // 原始資料載入狀態（用於區間筆數顯示與門檻判斷）
+  const [isRawLoading, setIsRawLoading] = useState(true);
   // 日期區間/原始資料
   const [chatItems, setChatItems] = useState([]);
   const [moodItems, setMoodItems] = useState([]);
@@ -148,6 +155,7 @@ function StressMindMap({ userInfo }) {
   useEffect(() => {
     const fetchRaw = async () => {
       if (!username) return;
+      setIsRawLoading(true);
       try {
         const [chatRes, moodRes] = await Promise.all([
           fetch(`${API_BASE_URL}/chat-history?username=${encodeURIComponent(username)}`),
@@ -161,6 +169,8 @@ function StressMindMap({ userInfo }) {
         console.error('取得原始資料失敗:', e);
         setChatItems([]);
         setMoodItems([]);
+      } finally {
+        setIsRawLoading(false);
       }
     };
     fetchRaw();
@@ -222,6 +232,9 @@ function StressMindMap({ userInfo }) {
     }
     return total;
   }
+
+  // 目前選擇區間的資料總筆數（依據 chatItems/moodItems 與 dateRange 計算）
+  const filteredTotalCount = useMemo(() => getFilteredTotalCount(), [dateRange, chatItems, moodItems]);
 
   // 取得目前 temp 選擇的每日筆數（僅顯示 >0）
   function getTempDailyList() {
@@ -333,7 +346,7 @@ function StressMindMap({ userInfo }) {
   };
 
   return (
-    <div style={{height: '100%', overflowY: 'auto'}}>
+    <div style={{height: '100%', overflowY: 'auto', marginTop: 'calc(1.1rem + 16px)'}}>
       <h1 className='stress-title'>壓力來源心智圖</h1>
       {!username && (
         <div style={{
@@ -365,8 +378,7 @@ function StressMindMap({ userInfo }) {
             color: '#6a6258',
             fontSize: 14
           }}>
-            資料筆數：{isCountLoading ? '計算中…' : `${totalCount}`}
-            {countError ? `（${countError}）` : ''}
+            區間資料筆數：{isRawLoading ? '計算中…' : `${filteredTotalCount}`}
           </div>
           <div style={{
             padding: '6px 12px',
@@ -401,11 +413,11 @@ function StressMindMap({ userInfo }) {
         </div>
       )}
 
-      {username && !isCountLoading && totalCount < MIN_REQUIRED_COUNT && (
-        <AuthCheck count={totalCount} min={MIN_REQUIRED_COUNT} />
+      {username && !isRawLoading && filteredTotalCount < MIN_REQUIRED_COUNT && (
+        <AuthCheck count={filteredTotalCount} min={MIN_REQUIRED_COUNT} />
       )}
 
-      {username && totalCount >= MIN_REQUIRED_COUNT && (
+      {username && !isRawLoading && filteredTotalCount >= MIN_REQUIRED_COUNT && (
         <>
           <StressMapContent
             username={username}
@@ -426,28 +438,28 @@ function StressMindMap({ userInfo }) {
           }}>
             <button
               onClick={handleAnalyzeStress}
-              disabled={isAnalyzing || !username || totalCount < MIN_REQUIRED_COUNT}
+              disabled={isAnalyzing || !username || filteredTotalCount < MIN_REQUIRED_COUNT}
               style={{
                 padding: '12px 24px',
-                backgroundColor: isAnalyzing || totalCount < MIN_REQUIRED_COUNT ? '#ccc' : '#FAEAD3',
+                backgroundColor: isAnalyzing || filteredTotalCount < MIN_REQUIRED_COUNT ? '#ccc' : '#FAEAD3',
                 color: '#6a6258',
                 border: 'none',
                 borderRadius: '8px',
-                cursor: isAnalyzing || !username || totalCount < MIN_REQUIRED_COUNT ? 'not-allowed' : 'pointer',
+                cursor: isAnalyzing || !username || filteredTotalCount < MIN_REQUIRED_COUNT ? 'not-allowed' : 'pointer',
                 fontSize: '16px',
                 fontWeight: '600',
                 boxShadow: '0 2px 8px rgba(0,0,0,0.15)',
                 transition: 'all 0.2s',
               }}
               onMouseOver={(e) => {
-                if (!isAnalyzing && username && totalCount >= MIN_REQUIRED_COUNT) {
+                if (!isAnalyzing && username && filteredTotalCount >= MIN_REQUIRED_COUNT) {
                   e.target.style.backgroundColor = 'rgba(255,255,255,0.5)';
                   e.target.style.transform = 'translateY(-1px)';
                   e.target.style.boxShadow = '0 4px 12px rgba(0,0,0,0.2)';
                 }
               }}
               onMouseOut={(e) => {
-                if (!isAnalyzing && username && totalCount >= MIN_REQUIRED_COUNT) {
+                if (!isAnalyzing && username && filteredTotalCount >= MIN_REQUIRED_COUNT) {
                   e.target.style.backgroundColor = '#FAEAD3';
                   e.target.style.transform = 'translateY(0)';
                   e.target.style.boxShadow = '0 2px 8px rgba(0,0,0,0.15)';
