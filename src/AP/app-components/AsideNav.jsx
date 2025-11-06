@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBook, faLeaf, faDiagramProject, faCommentDots, faUser } from '@fortawesome/free-solid-svg-icons';
+import { faBook, faDiagramProject, faCommentDots, faUser, faBrain } from '@fortawesome/free-solid-svg-icons';
 
 function AsideNav({ setActivePage, activePage, userInfo, collapsed }) {
   const navigate = useNavigate();
@@ -15,28 +15,30 @@ function AsideNav({ setActivePage, activePage, userInfo, collapsed }) {
           {/* <span className="ap-aside-title" onClick={(e) => { e.stopPropagation(); setActivePage('home-page'); }}>樂壓Talks</span> */}
         </div>
         <nav className="ap-aside-nav">
+          <button className={`ap-aside-item ${activePage === 'meditation-page' ? 'active' : ''}`} 
+          onClick={() => setActivePage('meditation-page')}
+          balloon-data="冥想">
+            <span className="ap-aside-icon"><FontAwesomeIcon icon={faBrain} /></span>
+            <span className="ap-aside-text">冥想</span>
+          </button>
           <button className={`ap-aside-item ${activePage === 'mood-page' ? 'active' : ''}`} 
           onClick={(e) => { if (isLoggedIn) { setActivePage('mood-page') } else { e.stopPropagation(); document.getElementById('login-hint-modal').style.display = 'flex' } }}
-          >
+          balloon-data="心情日記">
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faBook} /></span>
             <span className="ap-aside-text">心情日記</span>
           </button>
           <button className={`ap-aside-item ${activePage === 'chat-page' ? 'active' : ''}`} 
-          onClick={(e) => { if (isLoggedIn) { setActivePage('chat-page') } else { e.stopPropagation(); document.getElementById('login-hint-modal').style.display = 'flex' } }}>
+          onClick={(e) => { if (isLoggedIn) { setActivePage('chat-page') } else { e.stopPropagation(); document.getElementById('login-hint-modal').style.display = 'flex' } }}
+          balloon-data="吐司聊天室">
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faCommentDots} /></span>
             <span className="ap-aside-text">吐司聊天室</span>
           </button>
           <button className={`ap-aside-item ${activePage === 'stress-mind-map' ? 'active' : ''}`} 
-          onClick={(e) => { if (isLoggedIn) { setActivePage('stress-mind-map') } else { e.stopPropagation(); document.getElementById('login-hint-modal').style.display = 'flex' } }}>
+          onClick={(e) => { if (isLoggedIn) { setActivePage('stress-mind-map') } else { e.stopPropagation(); document.getElementById('login-hint-modal').style.display = 'flex' } }}
+          balloon-data="壓力來源心智圖">
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faDiagramProject} /></span>
-            <span className="ap-aside-text">壓力來源圖</span>
+            <span className="ap-aside-text">壓力來源心智圖</span>
           </button>
-          <button className={`ap-aside-item ${activePage === 'meditation-page' ? 'active' : ''}`} 
-          onClick={() => setActivePage('meditation-page')}>
-            <span className="ap-aside-icon"><FontAwesomeIcon icon={faLeaf} /></span>
-            <span className="ap-aside-text">冥想</span>
-          </button>
-
         </nav>
         <div className="ap-aside-footer">
           {/* 內嵌顯示介紹頁（右側容器切到 /leya/intro）*/}
@@ -44,7 +46,9 @@ function AsideNav({ setActivePage, activePage, userInfo, collapsed }) {
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faEarthAmericas} /></span>
             <span className="ap-aside-text">樂壓Talk's專題介紹</span>
           </button> */}
-          <button className='ap-aside-item' onClick={() => { if (isLoggedIn) { navigate('/leya/user') } else { navigate('/leya/login') } }}>
+          <button className='ap-aside-item' 
+          onClick={() => { if (isLoggedIn) { navigate('/leya/user') } else { navigate('/leya/login') } }}
+          balloon-data="用戶中心">
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faUser} /></span>
           </button>
           {/* <div className="user-icon" onClick={() => setActivePage('user-page')} style={{flex: 1}}>

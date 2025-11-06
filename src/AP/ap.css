@@ -68,13 +68,18 @@ body {
     padding: 15px;
     background-color: var(--primary-color);
     /* border-bottom: 1px solid var(--border-color); */
-    position: relative;
+    position: fixed;
     z-index: 10;
     max-width: var(--app-max-width);
     width: 100%;
     box-sizing: border-box;
     margin: 0 auto;
     height: 60px;
+}
+
+/* 開啟漢堡選單時，讓 Header 更「亮」並置於最上層 */
+.ap-header.menu-open {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .ap-header-title {
@@ -90,6 +95,15 @@ body {
     height: 60px;
 }
 
+.hd-user {
+
+    font-size: 30px;
+    color: var(--secondary-color);
+    margin-left: 18px;
+    margin-right: auto;
+    cursor: pointer;
+}
+
 .logo {
     width: 40px;
     height: 40px;
@@ -97,8 +111,7 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    position: absolute;
-    left: 1em;
+    position: relative;
 }
 
 .golden-sentence-container {
@@ -202,21 +215,18 @@ body {
 /* 内容区域 */
 .content-area {
     flex: 1;
-    overflow-y: hidden;
-    /* padding: 10px 0; */
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+    width: 100%;
     background-color: var(--primary-color);
     margin-bottom: 1em;
-    display: flex;
-    width: 100%;
     justify-content: center;
     /* 新增：在桌面置中並限制最大寬度 */
     max-width: var(--app-max-width);
     margin-left: auto;
     margin-right: auto;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
 }
 
 /* 聊天區域 */
@@ -552,6 +562,7 @@ body {
 
 .stress-title {
     text-align: center;
+    margin-top: auto;
     margin-bottom: 2rem;
 }
 
@@ -562,13 +573,14 @@ body {
     font-weight: bold;
     padding: 8px 16px;
 }
+
 .application-link-button:hover {
     background-color: var(--secondary-color);
     color: #fff;
     transition: 0.3s;
 }
 
-.diary-select-button{
+.diary-select-button {
     /* 桌面版 */
     padding: 8px 12px;
     display: flex;
@@ -578,14 +590,11 @@ body {
     top: 0;
     right: 0;
 }
+
 @media (max-width: 768px) {
-    .diary-select-button{
+    .diary-select-button {
         /* 手機版 */
-        position: fixed;
-        top: auto;
-        bottom: 13%;
-        right: 10%;
-        left: 10%;
+        position: relative;
     }
 }
 
@@ -665,11 +674,38 @@ body {
     cursor: pointer;
     font-size: 16px;
     text-align: left;
+    position: relative;
+    /* 使 tooltip 以按鈕為定位基準 */
 }
 
 .ap-aside-item:hover {
     background: #ead7c5;
     transition: .2s;
+}
+
+.ap-aside-item:after {
+    background-color: rgba(192, 192, 192, 0.3);
+    border-radius: 4px;
+    color: var(--text-color);
+    font-weight: bold;
+    content: attr(balloon-data);
+    /* margin-bottom: 12px; */
+    padding: 10px;
+    white-space: nowrap;
+    bottom: 0;
+    left: 110%;
+    /* transform: translate(50%, 0); */
+    position: absolute;
+    z-index: 10;
+    /* transition: all 0.02s ease-out 0.02s; */
+    opacity: 0;
+    pointer-events: none;
+    /* 避免遮擋按鈕點擊 */
+}
+
+.ap-aside-item:hover:before,
+.ap-aside-item:hover:after {
+    opacity: 1;
 }
 
 .ap-aside-item.active {
@@ -696,7 +732,7 @@ body {
     height: 100%;
 }
 
-.login-hint-modal{
+.login-hint-modal {
     display: none;
     /* display: flex; */
     flex-direction: column;
@@ -705,19 +741,21 @@ body {
     left: 25%;
     min-width: 50vw;
     min-height: 50vh;
-    background: rgba(0,0,0,0.6);
+    background: rgba(0, 0, 0, 0.6);
     border-radius: 24px;
     align-items: center;
     justify-content: center;
 }
-.login-hint{
+
+.login-hint {
     display: inline-block;
     color: rgb(255, 230, 0);
     font-size: 24px;
     font-weight: bold;
     text-align: center;
 }
-.login-hint-button{
+
+.login-hint-button {
     display: inline-block;
     padding: 10px 24px;
     color: #fff;
@@ -729,7 +767,8 @@ body {
     margin-top: 20%;
     cursor: pointer;
 }
-.login-hint-button:hover{
+
+.login-hint-button:hover {
     background: #fff;
     color: #333;
     transition: 0.3s;
@@ -788,9 +827,6 @@ body {
         overscroll-behavior: none;
     }
 
-    .content-area {
-        margin-bottom: 100px;
-    }
 
     .ap-header-title {
         font-size: 1.6em;
@@ -876,6 +912,7 @@ body {
     .category-item {
         width: 60%;
     }
+
 }
 
 @media (min-width: 1024px) {
@@ -1016,14 +1053,6 @@ body {
     min-height: 0;
 }
 
-.content-area {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    min-height: 0;
-    overflow: hidden;
-    width: 100%;
-}
 
 .chat-container {
     flex: 1;
@@ -1111,7 +1140,56 @@ body {
         }
     }
 
-    .chat-input{font-size: 16px;}
+    .chat-input {
+        font-size: 16px;
+    }
+
+    .content-area {
+        min-height: 100%;
+        margin-bottom: 0;
+        margin-top: 60px;
+    }
+
+    .ap-main {
+        overflow-y: hidden;
+    }
+
+    .logout-btn {
+        position: relative;
+        right: auto;
+    }
+
+    .category-list {
+        width: 80%;
+    }
+
+    .category-col {
+        width: 100%;
+    }
+
+    .category-item {
+        width: 100%;
+    }
+
+    .chat-input-container {
+        bottom: 0;
+    }
+
+    .stress-title {
+        margin-top: 20%;
+    }
+
+    .login-hint-modal {
+        top: 25%;
+        left: auto;
+        width: 80%;
+        min-height: 40%;
+        z-index: 12;
+    }
+
+    .login-hint-button {
+        margin-top: 10%;
+    }
 }
 
 .chat-history {

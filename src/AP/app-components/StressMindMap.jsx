@@ -333,7 +333,7 @@ function StressMindMap({ userInfo }) {
   };
 
   return (
-    <>
+    <div style={{height: '100%', overflowY: 'auto'}}>
       <h1 className='stress-title'>壓力來源心智圖</h1>
       {!username && (
         <div style={{
@@ -420,6 +420,7 @@ function StressMindMap({ userInfo }) {
             justifyContent: 'center',
             gap: '16px',
             marginTop: '1rem',
+            marginBottom: 'auto',
             flexWrap: 'wrap',
             alignItems: 'center'
           }}>
@@ -568,7 +569,7 @@ function StressMindMap({ userInfo }) {
         </div>
       )}
 
-    </>
+    </div>
   );
 }
 

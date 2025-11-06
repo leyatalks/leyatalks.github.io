@@ -210,9 +210,9 @@ function Application() {
                             <Route path="*" element={<Navigate to="login" replace />} />
                         </Routes>
                     </div>
-                    {!hideLayout && !isDesktop && (
+                    {/* {!hideLayout && !isDesktop && (
                         <Footer activePage={activePage} setActivePage={legacySetActivePage} />
-                    )}
+                    )} */}
                 </div>
             </div>
         </div>
