@@ -63,28 +63,30 @@ function ADcontent({ ad }) {
         <p id='ad-title' style={{ fontSize: 24, fontWeight: 700, marginBottom: 12 }}>
           {ad?.title || ''}
         </p>
-        <p id='ad-content' style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 16, whiteSpace: 'pre-line' }}>
-          {contentText}
-        </p>
         <img
           id='ad-image'
           src={imgSrc}
           alt={ad?.title || ''}
           onError={(e) => { e.currentTarget.src = fallback; }}
-          style={{ display: 'block', alignSelf: 'center', maxWidth: '70%', maxHeight: '50vh', objectFit: 'contain', borderRadius: 8, marginBottom: 16 }}
+          style={{ display: 'block', alignSelf: 'center', maxWidth: '70%', maxHeight: '50vh', objectFit: 'contain', borderRadius: 8, marginBottom: 16, boxShadow: '0 4px 20px rgba(0,0,0,0.2)' }}
         />
+        <p id='ad-content' style={{ fontSize: 16, lineHeight: 1.6, marginBottom: 16, whiteSpace: 'pre-line', textWrap: 'pretty',  textAlign: 'left' }}>
+          {contentText}
+        </p>
         <div>
           <button
             id='ad-url'
             onClick={() => { if (ad?.url) { window.open(ad.url, '_blank', 'noopener,noreferrer'); } }}
+            onMouseEnter={(e)=>{ e.currentTarget.style.color = '#7e2f59ff'; e.currentTarget.style.transition = 'color 0.3s'; }}
+            onMouseLeave={(e)=>{ e.currentTarget.style.color = ad?.url ? 'var(--text-color)' : '#f2f2f2'; }}
             disabled={!ad?.url}
             style={{
               minWidth: 'fit-content', padding: '10px 16px', borderRadius: 8, border: 'none', cursor: ad?.url ? 'pointer' : 'not-allowed',
-              background: ad?.url ? 'var(--secondary-color)' : 'rgba(255,255,255,0.4)', color: ad?.url ? 'var(--primary-color)' : '#f2f2f2',
+              background: ad?.url ? 'var(--secondary-color)' : 'rgba(255,255,255,0.4)', color: ad?.url ? 'var(--text-color)' : '#f2f2f2',
               fontWeight: 600
             }}
           >
-            {ad?.url ? '前往連結' : '沒有連結'}
+            {ad?.url ? `瞭解更多關於 ${ad.title}` : '沒有連結'}
           </button>
         </div>
       </div>
@@ -163,6 +165,11 @@ function Ads() {
 
   return (
     <>
+      <p
+        style={{ fontSize: '4rem', textAlign: 'center', marginTop: '20px', marginBottom: '20px', fontFamily: 'Dela Gothic One' }}
+      >
+        贊助商介紹
+      </p>
       <div
         id='ad-container'
         className='ads-container'

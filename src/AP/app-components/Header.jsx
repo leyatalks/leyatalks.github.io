@@ -48,7 +48,7 @@ function Header({ setActivePage, userInfo }) {
                     <div className="logo">
                         <img src="https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png" alt="樂壓Logo" className="logo-img" />
                     </div>
-                    樂壓Talks
+                    樂壓Talk's
                 </div>
                 <div className="hp-menu" style={{ position: 'relative' }}>
                     <button

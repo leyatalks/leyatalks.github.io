@@ -6,6 +6,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 import Comic from './Comic';
 import Member from './Member';
+import ADs from '../AP/app-components/MainPageComponents/ADs';
 //首頁圖片
 const firstImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-first.webp";
 const secondImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-second.webp";
@@ -96,6 +97,24 @@ const enablePullToRefresh = (callback) => {
         }
     }, { passive: true });
 };
+
+// 內容容器
+function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation }) {
+    return (
+        <div className='hp-container'>
+            <Slogan isMobile={isMobile} />
+            <ScrollBar id="scroll-bar" isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
+            <Content id="concept" isMobile={isMobile} />
+            <Content_Reverse id="planning" isMobile={isMobile} />
+            <Member id="member" isMobile={isMobile} />
+            <Comic id="comic" isMobile={isMobile} />
+            <Video id="video" isMobile={isMobile} />
+            <ADs />
+            <QRcode />
+            <Footer />
+        </div>
+    )
+}
 
 function HomePage({ handleNavigation, embedded = false }) {
     const [isMenuOpen, setMenuOpen] = useState(false);
@@ -292,34 +311,17 @@ function FakeNavbar() {
     )
 }
 
-// 內容容器
-function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation }) {
-    return (
-        <div className='hp-container'>
-            <Slogan isMobile={isMobile} />
-            <ScrollBar id="scroll-bar" isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
-            <Content id="concept" isMobile={isMobile} />
-            <Content_Reverse id="planning" isMobile={isMobile} />
-            <Member id="member" isMobile={isMobile} />
-            <Comic id="comic" isMobile={isMobile} />
-            <Video id="video" isMobile={isMobile} />
-            <QRcode />
-            <Footer />
-        </div>
-    )
-}
-
 function Slogan({ isMobile }) {
     return (
         <div className='hp-slogan'>
             {!isMobile ? (
                 <>
-                    樂壓Talks 溫暖你的心
+                    樂壓Talk's 溫暖你的心
                     <p style={{ letterSpacing: '1.8rem', fontSize: '3rem', fontFamily: 'Dela Gothic One' }}>如果你需要，我隨時都在</p>
                 </>
             ) : (
                 <>
-                    樂壓Talks
+                    樂壓Talk's
                     <br />
                     溫暖你的心
                 </>
@@ -565,11 +567,11 @@ function Footer() {
                 </div>
             </div>
             <div className='hp-copyright'>
-                <p>版權所有©2025樂壓Talks</p>
-                <p style={{ fontSize: '1rem' }}>Copyright©2025 Reserved by LeyaTalks</p>
+                <p>版權所有©2025樂壓Talk's</p>
+                <p style={{ fontSize: '1rem' }}>Copyright©2025 Reserved by LeyaTalk's</p>
             </div>
             <div className='hp-footer-contact'>
-                <p>樂壓Talks聯絡資訊</p>
+                <p>樂壓Talk's聯絡資訊</p>
                 <p>專案經理：張騰利</p>
                 <p>聯絡信箱：<a href='mailto:leyatalks1010@gmail.com'>leyatalks1010@gmail.com</a></p>
                 <p><a href='https://www.instagram.com/le_ya.talks/' target='_blank'><FontAwesomeIcon icon={faInstagram} /><span style={{ fontFamily: 'Noto Serif TC', marginLeft: '0.5rem', letterSpacing: '2px' }}>le_ya.talks</span></a></p>

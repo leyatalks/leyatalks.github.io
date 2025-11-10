@@ -311,7 +311,7 @@ function MoodPage(props) {
 				.day-cell:hover{background:var(--tile-hover)}
 				.day-num{font-weight:700;opacity:.9}
 				.emoji{margin-top:6px;display:flex;align-items:center;justify-content:center;min-height:28px;width:100%}
-				.emoji img{width:100%;object-fit:contain;display:block;margin:auto;filter:drop-shadow(0 2px 3px rgba(0,0,0,.08))}
+				.emoji img{width:30%;object-fit:contain;display:block;margin:auto;filter:drop-shadow(0 2px 3px rgba(0,0,0,.08))}
 				.disabled{opacity:.45;cursor:not-allowed;filter:grayscale(.15)}
 				.overlay{position:fixed;inset:0;background:rgba(0,0,0,.45);display:${isModalOpen ? 'block' : 'none'}; z-index: 21;}
 				.modal{position:fixed;inset:0;display:${isModalOpen ? 'grid' : 'none'};place-items:center;z-index:22}
