@@ -1,0 +1,223 @@
+.pageContainer {
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 2rem 1.5rem 4rem;
+  max-width: 1600px;
+  margin: 0 auto;
+}
+
+/* RWD：手機垂直堆疊 */
+@media (max-width: 768px) {
+  .pageContainer {
+    flex-direction: column;
+    padding: 1rem 1rem 3rem;
+  }
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 24px;
+  box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+  padding: 1.5rem 1.75rem 2rem;
+  flex: 1 1 0;
+  min-width: 260px;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+/* 區塊標題 */
+.sectionTitle {
+  font-size: 1.6rem;
+  font-weight: 700;
+  text-align: center;
+  margin: 0 0 1.25rem;
+  letter-spacing: 1px;
+}
+
+/* DailyTasks */
+.taskList {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: .75rem;
+}
+
+.taskItem label {
+  display: flex;
+  align-items: center;
+  gap: .6rem;
+  font-size: .95rem;
+  cursor: pointer;
+  user-select: none;
+}
+
+.taskItem input[type='checkbox'] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.completed {
+  text-decoration: line-through;
+  opacity: 0.7;
+}
+
+.expTag {
+  margin-left: auto;
+  background: #eaf9e2;
+  color: #2d7d29;
+  font-size: .7rem;
+  font-weight: 600;
+  padding: .25rem .5rem;
+  border-radius: 12px;
+}
+
+/* Character Panel */
+.characterContainer {
+  position: relative;
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto 1.25rem;
+  aspect-ratio: 1 / 1; /* 正方形便於置中 */
+}
+
+.wreathImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 4px 8px rgba(0,0,0,0.15));
+}
+
+.characterImage {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 65%;
+  height: auto;
+  object-fit: contain;
+}
+
+.levelRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: .9rem;
+  margin-bottom: .6rem;
+  padding: 0 .25rem;
+  font-weight: 600;
+}
+
+.level { color: #3e3e3e; }
+.nextLevel { color: #6a6a6a; font-weight: 500; }
+
+.expBarWrapper { margin-bottom: 1.1rem; }
+
+.expBarTrack {
+  background: #f1efe9;
+  border-radius: 10px;
+  height: 14px;
+  width: 100%;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid #d3cbb9;
+}
+
+.expBarFill {
+  background: linear-gradient(90deg,#7fbf55,#5fa73e);
+  height: 100%;
+  transition: width .35s ease;
+}
+
+.interactionButtons {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.interactionBtn {
+  background: #f8f4ef;
+  border: 2px solid #d8cdbb;
+  border-radius: 50%;
+  width: 86px;
+  height: 86px;
+  font-size: .9rem;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  position: relative;
+  transition: background .2s, transform .2s;
+}
+
+.interactionBtn:hover:not(:disabled) {
+  background: #fffdf9;
+  transform: translateY(-3px);
+}
+
+.interactionBtn:disabled {
+  opacity: .55;
+  cursor: not-allowed;
+}
+
+.btnSub {
+  font-size: .65rem;
+  font-weight: 500;
+  margin-top: .15rem;
+  color: #6c6c6c;
+}
+
+/* Achievements */
+.achievementsGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: .75rem;
+  margin-top: .25rem;
+}
+
+.achievementCell {
+  border: 2px solid #b89e75;
+  border-radius: 6px;
+  padding: .65rem .4rem .55rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 90px;
+  background: #fdfbf7;
+  text-align: center;
+}
+
+.achievementIcon { font-size: 1.6rem; line-height: 1; }
+.achievementName { font-size: .7rem; margin-top: .35rem; font-weight: 600; }
+
+.locked {
+  opacity: .5;
+  color: grey;
+}
+
+.unlocked {
+  opacity: 1;
+  color: #3b362e;
+}
+
+/* 卡片額外微調 (可依需求調整) */
+.tasksCard { max-width: 380px; }
+.characterCard { max-width: 420px; align-items: center; }
+.achievementsCard { max-width: 380px; }
+
+@media (max-width: 768px) {
+  .tasksCard, .characterCard, .achievementsCard {
+    max-width: 100%;
+  }
+  .characterContainer { max-width: 360px; }
+}
