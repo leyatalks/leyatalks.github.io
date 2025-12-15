@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Fireworks Relax 🎆</title>
+<style>
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{
+    height:100vh;width:100vw;overflow:hidden;
+    background: radial-gradient(circle at 50% 20%, #0b122b 0%, #000 80%);
+    user-select:none;touch-action:manipulation;
+    font-family:"PingFang TC","Noto Sans TC",sans-serif;
+  }
+
+  /* 星空背景：微亮點 */
+  #sky{
+    position:relative;width:100%;height:100%;
+    background-image:
+      radial-gradient(white 1px, transparent 1px),
+      radial-gradient(white 1px, transparent 1px);
+    background-size: 120px 120px, 80px 80px;
+    background-position: 0 0, 40px 60px;
+    animation: twinkle 8s linear infinite;
+  }
+  @keyframes twinkle{
+    0%,100%{opacity:1;}
+    50%{opacity:0.7;}
+  }
+
+  .particle{
+    position:absolute;
+    width:6px;height:6px;border-radius:50%;
+    opacity:1;pointer-events:none;
+    transform:translate(0,0) scale(1);
+    transition:transform 1.8s ease-out,opacity 1.8s ease-out;
+  }
+
+  .flash{
+    position:absolute;
+    border-radius:50%;
+    background:radial-gradient(circle,rgba(255,255,255,0.9)0%,rgba(255,255,255,0)70%);
+    pointer-events:none;
+    animation:flashExpand 0.6s ease-out forwards;
+  }
+  @keyframes flashExpand{
+    0%{transform:scale(0);opacity:0.9;}
+    100%{transform:scale(6);opacity:0;}
+  }
+
+  .hint{
+    position:absolute;bottom:14px;width:100%;text-align:center;
+    color:rgba(255,255,255,0.7);font-size:14px;letter-spacing:0.5px;
+  }
+</style>
+</head>
+<body>
+  <div id="sky">
+    <div class="hint">✨ 點擊夜空，放出美麗的煙火 ✨</div>
+  </div>
+
+  <!-- 柔和背景音樂 -->
+  <audio id="bgm" src="https://cdn.pixabay.com/download/audio/2022/03/09/audio_24d7fdbbd1.mp3?filename=ambient-piano-11027.mp3" loop preload="auto"></audio>
+
+  <!-- 煙火音效 -->
+  <audio id="pop" src="fireworks-12-419031.mp3" preload="auto"></audio>
+
+<script>
+const sky = document.getElementById('sky');
+const bgm = document.getElementById('bgm');
+const pop = document.getElementById('pop');
+let musicStarted = false;
+
+// 建立煙火
+function createFirework(x, y){
+  // 爆炸閃光
+  const flash = document.createElement('div');
+  flash.className = 'flash';
+  flash.style.width = flash.style.height = '20px';
+  flash.style.left = (x - 10) + 'px';
+  flash.style.top  = (y - 10) + 'px';
+  sky.appendChild(flash);
+  flash.addEventListener('animationend',()=>flash.remove());
+
+  // 彩色火花粒子
+  const count = 30 + Math.floor(Math.random()*20);
+  const color = `hsl(${Math.random()*360}, 100%, 60%)`;
+  for(let i=0;i<count;i++){
+    const p = document.createElement('div');
+    p.className = 'particle';
+    p.style.left = x + 'px';
+    p.style.top  = y + 'px';
+    p.style.background = color;
+    sky.appendChild(p);
+
+    // 隨機飛散方向與距離
+    const angle = Math.random()*2*Math.PI;
+    const distance = 80 + Math.random()*200;
+    const dx = Math.cos(angle)*distance;
+    const dy = Math.sin(angle)*distance;
+    const scale = 0.6 + Math.random()*1.2;
+    const fade = 0.4 + Math.random()*0.6;
+    requestAnimationFrame(()=>{
+      p.style.transform = `translate(${dx}px, ${dy}px) scale(${scale})`;
+      p.style.opacity = fade;
+    });
+    setTimeout(()=>p.remove(),1200);
+  }
+}
+
+sky.addEventListener('pointerdown', e=>{
+  const rect = sky.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  createFirework(x,y);
+
+  // 音樂控制
+  if(!musicStarted){
+    bgm.volume = 0.35;
+    bgm.play().catch(()=>{});
+    musicStarted = true;
+  }
+
+  try{
+    pop.currentTime=0;
+    pop.volume=0.6;
+    pop.play();
+  }catch(e){}
+
+  if(navigator.vibrate) navigator.vibrate(20);
+});
+</script>
+</body>
+</html>

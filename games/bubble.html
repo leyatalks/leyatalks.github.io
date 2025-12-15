@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>舒壓泡泡紙</title>
+<style>
+  :root{
+    --bubble-size: 54px;     /* 基本泡泡直徑（實際會±隨機） */
+    --max-bubbles: 50;       /* 同時存在的最大泡泡數 */
+    --spawn-interval: 1600;  /* 生成間隔（毫秒） */
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0; height:100vh; display:flex; align-items:center; justify-content:center;
+    background:#FFE5B4;
+    font-family: system-ui, -apple-system, "Segoe UI", Arial, "PingFang TC","Noto Sans TC", sans-serif;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* 遊戲容器：淡淡塑膠紋理 + 內陰影 */
+  #game{
+    position:relative;
+    width: min(94vw, 1100px);
+    height: min(94vh, 680px);
+    border: 2px solid #FFA07A;
+    border-radius: 18px;
+    overflow: hidden;
+    background:
+      radial-gradient(140% 100% at 50% 0%, rgba(255,255,255,.5) 0%, rgba(255,255,255,0) 55%),
+      repeating-linear-gradient(135deg, rgba(255,255,255,.06) 0 14px, rgba(0,0,0,.035) 14px 28px),
+      linear-gradient(145deg, #FFD8A8, #FFE5B4);
+    box-shadow: inset 0 10px 28px rgba(0,0,0,.12);
+    user-select:none;
+    touch-action: manipulation;
+  }
+
+  /* 計數器與控制 */
+  .hud{
+    position:absolute; inset: 12px 12px auto auto; display:flex; gap:10px; align-items:center;
+  }
+  .badge{
+    background: rgba(0,0,0,.42); color:#fff; font-weight:800;
+    padding:8px 12px; border-radius:12px; letter-spacing:.3px;
+    backdrop-filter: blur(2px);
+    box-shadow: 0 4px 10px rgba(0,0,0,.18);
+    white-space:nowrap;
+  }
+  .controls{
+    position:absolute; left:12px; bottom:12px; display:flex; gap:8px; flex-wrap:wrap;
+  }
+  .btn{
+    background:#ffb347; color:#fff; border:none; border-radius:10px;
+    padding:8px 12px; font-weight:700; cursor:pointer;
+    box-shadow:0 2px 6px rgba(0,0,0,.2);
+  }
+  .btn:active{ transform: translateY(1px); }
+
+  /* 泡泡：柔光亮面球（顏色會在 JS 隨機替換） */
+  .bubble{
+    position:absolute;
+    width: var(--bubble-size); height: var(--bubble-size);
+    border-radius: 50%;
+    cursor: pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:
+      0 8px 14px rgba(0,0,0,.22),
+      0 0 22px rgba(255,255,255,.25),
+      inset 0 -10px 18px rgba(0,0,0,.28),
+      inset 0 14px 20px rgba(255,255,255,.62);
+    transition: transform .08s ease;
+  }
+  .bubble:active{ transform: scale(.92); }
+
+  /* 壓扁 → 回彈一點 → 淡出 */
+  @keyframes popOut {
+    0%   { transform: scale(1);   opacity:1;   filter:saturate(1); }
+    35%  { transform: scale(0.68); box-shadow: inset 0 4px 14px rgba(0,0,0,.35); }
+    70%  { transform: scale(0.88); opacity:.9; }
+    100% { transform: scale(0.78); opacity:0;  filter:saturate(.9); }
+  }
+  .bubble.popping{
+    animation: popOut .28s cubic-bezier(.3,1.2,.5,1) forwards;
+    pointer-events:none;
+  }
+
+  /* 爆裂小粒子 */
+  .particle{
+    position:absolute; width:8px; height:8px; border-radius:50%;
+    background: rgba(255,255,255,.9); pointer-events:none;
+    box-shadow: 0 2px 6px rgba(0,0,0,.15);
+    opacity: 1; transform: translate(0,0) scale(1);
+    transition: transform .55s ease-out, opacity .55s ease-out;
+    will-change: transform, opacity;
+    mix-blend-mode: screen;
+  }
+
+  /* 略淡的 UI 提示（右下） */
+  .hint{
+    position:absolute; right:12px; bottom:12px; opacity:.55; font-size:12px;
+  }
+</style>
+</head>
+<body>
+  <div id="game" aria-label="舒壓泡泡紙">
+    <div class="hud">
+      <div id="counter" class="badge">已壓：0 顆</div>
+      <div id="status" class="badge" style="display:none;"></div>
+    </div>
+    <div class="controls">
+      <button id="reset" class="btn">重置計數</button>
+      <!-- <button id="toggleMusic" class="btn">音樂：開/關</button> -->
+      <button id="refill" class="btn">補滿泡泡</button>
+    </div>
+    <div class="hint">提示：點泡泡釋放壓力，首次點擊會啟動音樂。</div>
+  </div>
+
+  <!-- 多種 pop 音效（隨機播放） -->
+<audio class="popSound" preload="auto" src="pop-39222.mp3"></audio>
+
+  <!-- 柔和背景音樂（若被瀏覽器擋，首次互動會手動播放） -->
+  <audio id="bgm" src="https://cdn.pixabay.com/download/audio/2022/03/15/audio_3a4b8f2d57.mp3?filename=soft-ambient-110397.mp3" loop></audio>
+
+<script>
+(function(){
+  const game = document.getElementById('game');
+  const counterEl = document.getElementById('counter');
+  const resetBtn = document.getElementById('reset');
+//   const toggleMusicBtn = document.getElementById('toggleMusic');
+  const refillBtn = document.getElementById('refill');
+  const bgm = document.getElementById('bgm');
+  const sounds = Array.from(document.querySelectorAll('.popSound'));
+
+  const colorSets = [
+    ['#FFD19A','#FFCBA4','#FFB6A0','#FFD8A8','#FFE1BD'],  // 溫暖奶橘
+    ['#CDEBFF','#BEE3FF','#D6F1FF','#EAF7FF','#D2ECFF'],  // 冰藍舒緩
+    ['#FFE4EC','#FFDDE6','#FFD1DD','#FFE9F0','#FFF1F5']   // 粉霧療癒
+  ];
+  let palette = colorSets[0];
+
+  const bubbles = [];
+  let popped = 0;
+  let spawnTimer = null;
+  let musicWanted = true; // 使用者是否想聽音樂（可切換）
+
+  function updateCounter(){ counterEl.textContent = `已壓：${popped} 顆`; }
+
+  function rand(min, max){ return Math.random()*(max-min)+min; }
+
+  function pick(arr){ return arr[Math.floor(Math.random()*arr.length)]; }
+
+  function setBubbleStyle(el, color){
+    el.style.background =
+      `radial-gradient(circle at 35% 30%, rgba(255,255,255,.95) 0 22%, rgba(255,255,255,0) 23%),
+       radial-gradient(circle at 70% 75%, rgba(255,255,255,.55) 0 25%, rgba(255,255,255,0) 60%),
+       radial-gradient(circle at 50% 55%, ${shade(color, -10)} 0, ${color} 40%, ${shade(color, -12)} 65%, transparent 66%)`;
+    el.style.backgroundColor = color;
+  }
+
+  // 簡單色彩明暗調整
+  function shade(hex, percent){
+    const f = parseInt(hex.slice(1),16), t = percent<0?0:255, p = Math.abs(percent)/100;
+    const R = f>>16, G = f>>8&0x00FF, B = f&0x0000FF;
+    const to = (c)=>Math.round((t-c)*p)+c;
+    return `rgb(${to(R)},${to(G)},${to(B)})`;
+  }
+
+  function createParticles(cx, cy, baseColor){
+    for(let i=0;i<4;i++){
+      const p = document.createElement('div');
+      p.className = 'particle';
+      p.style.left = (cx - 4) + 'px';
+      p.style.top  = (cy - 4) + 'px';
+      p.style.background = 'rgba(255,255,255,.9)';
+      game.appendChild(p);
+
+      // 隨機方向與距離
+      const dx = (Math.random() - 0.5) * 120;
+      const dy = (Math.random() - 0.5) * 120;
+      requestAnimationFrame(()=>{
+        p.style.transform = `translate(${dx}px, ${dy}px) scale(${rand(0.7,1.2)})`;
+        p.style.opacity = 0;
+      });
+      setTimeout(()=>p.remove(), 600);
+    }
+  }
+
+  function playPop(){
+    const s = pick(sounds);
+    try { s.currentTime = 0; s.play(); } catch(e){}
+  }
+
+  async function ensureBgm(){
+    if(!musicWanted) return;
+    if(bgm.paused){
+      try{ await bgm.play(); }catch(e){ /* 等使用者互動再播 */ }
+    }
+  }
+
+  function createBubble(){
+    const base = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--bubble-size')) || 54;
+    const size = Math.max(36, Math.min(72, base * rand(0.85, 1.15))); // 大小有些微差
+    const pad = 6;
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.style.width = bubble.style.height = size + 'px';
+
+    // 位置（避開邊界）
+    const x = rand(pad, game.clientWidth  - size - pad);
+    const y = rand(pad, game.clientHeight - size - pad);
+    bubble.style.left = x + 'px';
+    bubble.style.top  = y + 'px';
+
+    // 柔和色彩
+    const color = pick(palette);
+    setBubbleStyle(bubble, color);
+
+    // 點擊：彈性壓扁 + 音效 + 粒子 + 計數 + 移除
+    bubble.addEventListener('pointerdown', (ev) => {
+      if(bubble.classList.contains('popping')) return;
+
+      // 啟動音樂（若尚未播放）
+      ensureBgm();
+      // 微震：在支援的裝置上更有「戳」的感覺
+      if (navigator.vibrate) { navigator.vibrate(10); }
+
+      bubble.classList.add('popping');
+      playPop();
+
+      const cx = x + size/2;
+      const cy = y + size/2;
+      createParticles(cx, cy, color);
+
+      popped += 1; updateCounter();
+
+      bubble.addEventListener('animationend', () => {
+        bubble.remove();
+        const i = bubbles.indexOf(bubble);
+        if(i>-1) bubbles.splice(i,1);
+      }, { once:true });
+    }, {passive:true});
+
+    game.appendChild(bubble);
+    bubbles.push(bubble);
+  }
+
+  function startSpawning(){
+    stopSpawning();
+    spawnTimer = setInterval(() => {
+      const max = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--max-bubbles')) || 50;
+      if (bubbles.length < max) createBubble();
+    }, parseInt(getComputedStyle(document.documentElement).getPropertyValue('--spawn-interval')) || 1600);
+  }
+  function stopSpawning(){ if (spawnTimer) clearInterval(spawnTimer); }
+
+  // UI 控制
+  resetBtn.addEventListener('click', ()=>{ popped = 0; updateCounter(); });
+//   toggleMusicBtn.addEventListener('click', async ()=>{
+//     musicWanted = !musicWanted;
+//     if(!musicWanted){ try{ bgm.pause(); }catch(e){} }
+//     else { ensureBgm(); }
+//   });
+  refillBtn.addEventListener('click', ()=>{
+    const target = parseInt(getComputedStyle(document.documentElement).getPropertyValue('--max-bubbles')) || 50;
+    while (bubbles.length < target) createBubble();
+  });
+
+  // 初始：換一組配色、生成一些泡泡、啟動定時生成
+  palette = pick(colorSets);
+  for(let i=0;i<20;i++) createBubble();
+  startSpawning();
+  updateCounter();
+
+  // 重新調整大小時，不強制重排（保留現有舒適狀態）
+  window.addEventListener('blur', stopSpawning);
+  window.addEventListener('focus', startSpawning);
+})();
+</script>
+</body>
+</html>
