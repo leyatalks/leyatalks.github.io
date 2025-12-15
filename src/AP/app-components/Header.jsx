@@ -1,9 +1,56 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faCommentDots, faBrain, faEarthAmericas, faHeart, faBook } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faCommentDots, faBrain, faEarthAmericas, faHeart, faBook, faMapLocationDot, faGamepad } from '@fortawesome/free-solid-svg-icons';
 import '../../HP/hp.css';
+
+// RWD: 針對 header 的自訂樣式
+const headerRwdStyle = `
+@media (max-width: 1024px) {
+    .hp-hamburger {
+        display: flex !important;
+    }
+    .hp-navbar-links {
+        display: none;
+        top: 60px;
+        left: 0;
+        width: 100vw;
+        z-index: 20;
+        background-color: var(--primary-color);
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-bottom: 1px solid #eee;
+    }
+    .hp-navbar-links.open {
+        display: block;
+    }
+}
+@media (min-width: 1025px) {
+    .hp-hamburger {
+        display: none !important;
+    }
+    .hp-navbar-links {
+        display: block !important;
+        position: static;
+        background: none;
+        box-shadow: none;
+        border-bottom: none;
+    }
+}
+`;
 import { useNavigate } from 'react-router-dom';
 function Header({ setActivePage, userInfo }) {
+        // 動態插入 RWD 樣式
+        useEffect(() => {
+            let style = document.getElementById('header-rwd-style');
+            if (!style) {
+                style = document.createElement('style');
+                style.id = 'header-rwd-style';
+                style.innerHTML = headerRwdStyle;
+                document.head.appendChild(style);
+            }
+            return () => {
+                if (style) style.remove();
+            };
+        }, []);
     const navigate = useNavigate();
     // 判斷是否為管理員
     const isAdmin = userInfo && userInfo.id === 'admin';
@@ -18,6 +65,7 @@ function Header({ setActivePage, userInfo }) {
         }
     };
 
+    // 預設關閉選單
     const [isMenuOpen, setMenuOpen] = useState(false);
     // 按下 ESC 也可關閉選單
     useEffect(() => {
@@ -73,6 +121,26 @@ function Header({ setActivePage, userInfo }) {
                                     </div>
                                     <div className="category-name">冥想</div>
                                 </div>
+                                <div className="category-item"
+                                    onClick={() => { setActivePage('clinic-map'); setMenuOpen(false); }}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <div className="category-icon">
+                                        <FontAwesomeIcon icon={faMapLocationDot} />
+                                    </div>
+                                    <div className="category-name">心理資源地圖</div>
+                                </div>
+                                <div className="category-item"
+                                    onClick={() => { setActivePage('game-page'); setMenuOpen(false); }}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <div className="category-icon">
+                                        <FontAwesomeIcon icon={faGamepad} />
+                                    </div>
+                                    <div className="category-name">紓壓小遊戲</div>
+                                </div>
+
+                                
                                 <hr />
                                 <div className="category-item"
                                     onClick={(e) => { e.stopPropagation(); if (isLoggedIn) { setActivePage('chat-page'); setMenuOpen(false); } else { const m = document.getElementById('login-hint-modal'); if (m) m.style.display = 'flex'; } }}
@@ -112,7 +180,7 @@ function Header({ setActivePage, userInfo }) {
                                 right: 0,
                                 bottom: 0,
                                 background: 'rgba(0,0,0,0.2)',
-                                zIndex: 10
+                                zIndex: 13,
                             }}
                         />
                     )}

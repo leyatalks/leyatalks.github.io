@@ -142,6 +142,15 @@
     height: 100% !important;
 }
 
+@media (min-width: 769px) and (max-width: 1023px) {
+    .ads-container {
+        padding: 0 2rem;
+        height: 30%;
+    }
+    
+    .main-ad{min-width: 0;}
+}
+
 @media (max-width: 768px) {
 
     .mp-container {
@@ -165,11 +174,10 @@
         top: 0;
         padding-left: 1rem;
         padding-right: 1rem;
-        height: 500px;
+        height: 90%;
         flex-direction: column;
     }
 
-    .main-ad{max-height: 50%;}
 
     .mainrole-container{gap:0;max-height: 20%;}
     

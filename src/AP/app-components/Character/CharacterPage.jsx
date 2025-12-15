@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import styles from './CharacterPage.module.css';
 
 // DailyTasks 子組件
@@ -27,11 +27,11 @@ function DailyTasks({ tasks, onTaskClick }) {
 }
 
 // CharacterPanel 子組件
-function CharacterPanel({ player, cooldowns, onInteraction }) {
+function CharacterPanel({ player, cooldowns, onInteraction, config }) {
   const interactions = [
-    { type: 'encourage', label: '鼓勵', exp: 1 },
-    { type: 'chat', label: '聊天', exp: 10 },
-    { type: 'meditate', label: '冥想', exp: 25 },
+    { type: 'encourage', label: config.encourage.label, exp: config.encourage.exp },
+    { type: 'chat', label: config.chat.label, exp: config.chat.exp },
+    { type: 'meditate', label: config.meditate.label, exp: config.meditate.exp },
   ];
 
   const progress = Math.min(100, (player.currentExp / player.maxExp) * 100);
@@ -107,6 +107,12 @@ function Achievements({ achievements }) {
 
 // 主組件 CharacterPage
 function CharacterPage() {
+  // 統一互動設定，避免顯示與實際加成不一致
+  const INTERACTION_CONFIG = {
+    encourage: { label: '鼓勵', exp: 3, cd: 2 },
+    chat: { label: '聊天', exp: 10, cd: 20 },
+    meditate: { label: '冥想', exp: 25, cd: 40 },
+  };
   // Player 狀態
   const [player, setPlayer] = useState({ level: 0, currentExp: 30, maxExp: 100 });
   // 任務狀態 (示意/可再擴充)
@@ -126,17 +132,22 @@ function CharacterPage() {
   ]);
   // 互動冷卻 (秒)
   const [cooldowns, setCooldowns] = useState({ encourage: 0, chat: 0, meditate: 0 });
+  // 以 ref 同步保存冷卻，避免同個事件循環內的連點造成誤觸發
+  const cooldownsRef = useRef(cooldowns);
+  useEffect(() => { cooldownsRef.current = cooldowns; }, [cooldowns]);
 
   // 增加經驗值並處理升級
   const addExp = useCallback((amount) => {
+    // 轉整數，避免浮點數造成視覺上的「多加/少加」錯覺
+    const inc = Math.round(amount);
     setPlayer(prev => {
       let { level, currentExp, maxExp } = prev;
-      currentExp += amount;
+      currentExp = currentExp + inc;
       // 升級邏輯：可能出現一次加很多 EXP 的情況，使用 while
       while (currentExp >= maxExp) {
         currentExp -= maxExp; // 剩餘經驗值溢出保留
         level += 1;
-        maxExp = Math.round(maxExp * 1.25); // 假設升級後需求 +25%
+        maxExp = Math.round(maxExp * 1.1); // 假設升級後需求 +10%
       }
       return { ...prev, level, currentExp, maxExp };
     });
@@ -155,22 +166,12 @@ function CharacterPage() {
 
   // 互動處理 + 冷卻設定
   const handleInteraction = useCallback((type) => {
-    setCooldowns(prev => {
-      if (prev[type] > 0) return prev; // 尚在冷卻
-      let expAmount = 0; let cd = 0;
-      switch (type) {
-        case 'encourage':
-          expAmount = 1; cd = 10; break;
-        case 'chat':
-          expAmount = 10; cd = 300; break;
-        case 'meditate':
-          expAmount = 25; cd = 900; break;
-        default:
-          return prev;
-      }
-      addExp(expAmount);
-      return { ...prev, [type]: cd };
-    });
+    // 先用 ref 立即判斷，避免同一個事件循環內因 state 尚未更新而觸發兩次
+    if (cooldownsRef.current[type] > 0) return;
+    const cfg = INTERACTION_CONFIG[type];
+    if (!cfg) return;
+    addExp(cfg.exp);
+    setCooldowns(prev => ({ ...prev, [type]: cfg.cd }));
   }, [addExp]);
 
   // 冷卻倒數 useEffect
@@ -191,7 +192,7 @@ function CharacterPage() {
   return (
     <main className={styles.pageContainer}>
       <DailyTasks tasks={tasks} onTaskClick={handleTaskClick} />
-      <CharacterPanel player={player} cooldowns={cooldowns} onInteraction={handleInteraction} />
+      <CharacterPanel player={player} cooldowns={cooldowns} onInteraction={handleInteraction} config={INTERACTION_CONFIG} />
       <Achievements achievements={achievements} />
     </main>
   );

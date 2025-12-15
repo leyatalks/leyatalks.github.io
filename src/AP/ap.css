@@ -1114,6 +1114,114 @@ body {
     background: none;
 }
 
+/* 平板專用 RWD（769px~1023px） */
+@media (min-width: 769px) and (max-width: 1023px) {
+    :root {
+        --app-max-width: 100%;
+    }
+
+    #app {
+        max-width: 100% !important;
+        min-width: 0;
+        margin: 0 !important;
+    }
+    
+    .content-area{
+        padding: 0;    
+        margin-bottom: 0;
+    }
+
+    .ap-header {
+        max-width: var(--app-max-width);
+        width: 100%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        padding: 12px 10px;
+        font-size: 1.1em;
+    }
+    .ap-header-title {
+        font-size: 1.7em;
+        height: 60px;
+    }
+    .content-area {
+        max-width: 100% !important;
+        margin-left: auto;
+        margin-right: auto;
+        padding: 0;
+    }
+    .ap-main {
+        padding: 0;
+    }
+    .footer {
+        max-width: var(--app-max-width);
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        padding: 0 10px;
+    }
+    .category-list {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .category-col {
+        width: 100%;
+        gap: 1.5rem;
+    }
+    .category-item {
+        width: 90%;
+        min-width: 220px;
+        font-size: 1.1em;
+        padding-left: 1.2rem;
+        padding-right: 1.2rem;
+        height: 3.5rem;
+    }
+    .category-icon {
+        width: 60px;
+        font-size: 22px;
+    }
+    .category-name {
+        font-size: 18px;
+    }
+    .ap-aside {
+        display: none;
+    }
+    .ap-main {
+        margin-left: 0;
+        padding-left: 0;
+    }
+    .chat-input-container {
+        max-width: var(--app-max-width);
+        margin: 0 auto;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        padding-left: 10px;
+        padding-right: 10px;
+    }
+    .chat-history {
+        padding-left: 0;
+        padding-right: 0;
+    }
+    .user-header {
+        flex-direction: row;
+        gap: 10px;
+    }
+    .user-avatar {
+        width: 70px;
+        height: 70px;
+    }
+    .logout-btn {
+        font-size: 14px;
+        padding: 10px 14px;
+    }
+    .login-hint-modal {
+        left: 10%;
+        width: 80%;
+        min-width: 0;
+        min-height: 40vh;
+    }
+}
 
 @keyframes disclaimer {
     0% {
@@ -1159,9 +1267,6 @@ body {
         right: auto;
     }
 
-    .category-list {
-        width: 80%;
-    }
 
     .category-col {
         width: 100%;

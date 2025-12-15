@@ -19,7 +19,9 @@ import StressMindMap from './app-components/StressMindMap'
 import MeditationPage from './app-components/MeditationPage'
 import AsideNav from './app-components/AsideNav'
 import HomePage from '../HP/HomePage'
-import CharacterMain from './app-components/Character/CharacterMain'
+import CharacterPage from './app-components/Character/CharacterPage'
+import GamePage from './app-components/GamePage'
+import ClinicMap from './app-components/ClinicMap'
 
 
 const DefaultRoute = () => {
@@ -152,8 +154,10 @@ function Application() {
         'mood-page': '/leya/mood',
         'stress-mind-map': '/leya/stress-mind-map',
         'meditation-page': '/leya/meditation',
+        'clinic-map': '/leya/clinic-map',
         // 新增：AP 右側容器內嵌的介紹頁面
         'intro-page': '/leya/intro',
+        'game-page': '/leya/game',
     };
     const reverseMap = Object.fromEntries(Object.entries(routeMap).map(([k, v]) => [v, k]));
     const legacySetActivePage = (pageKey) => {
@@ -206,7 +210,9 @@ function Application() {
                             <Route path="mood" element={<MoodPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="stress-mind-map" element={<StressMindMap activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="meditation" element={<MeditationPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
-                            <Route path="character" element={<CharacterMain activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
+                            <Route path="character" element={<CharacterPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
+                            <Route path="game" element={<GamePage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
+                            <Route path="clinic-map" element={<ClinicMap activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             {/* 介紹頁面內嵌顯示於 AP 右側容器（去除 HomePage Navbar）*/}
                             <Route path="home" element={<HomePage embedded />} />
                             <Route path="*" element={<Navigate to="login" replace />} />

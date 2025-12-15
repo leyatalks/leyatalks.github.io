@@ -3,9 +3,8 @@
   gap: 2rem;
   align-items: flex-start;
   justify-content: center;
-  padding: 2rem 1.5rem 4rem;
-  max-width: 1600px;
-  margin: 0 auto;
+  padding: 2rem 0 4rem;
+  margin: 0 36px;
 }
 
 /* RWD：手機垂直堆疊 */
@@ -23,6 +22,7 @@
   padding: 1.5rem 1.75rem 2rem;
   flex: 1 1 0;
   min-width: 260px;
+  max-width: 25%;
   position: relative;
   display: flex;
   flex-direction: column;
@@ -81,7 +81,7 @@
 .characterContainer {
   position: relative;
   width: 100%;
-  max-width: 320px;
+  /* max-width: 320px; */
   margin: 0 auto 1.25rem;
   aspect-ratio: 1 / 1; /* 正方形便於置中 */
 }
@@ -99,7 +99,6 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  width: 65%;
   height: auto;
   object-fit: contain;
 }
@@ -211,9 +210,9 @@
 }
 
 /* 卡片額外微調 (可依需求調整) */
-.tasksCard { max-width: 380px; }
+/* .tasksCard { max-width: 380px; }
 .characterCard { max-width: 420px; align-items: center; }
-.achievementsCard { max-width: 380px; }
+.achievementsCard { max-width: 380px; } */
 
 @media (max-width: 768px) {
   .tasksCard, .characterCard, .achievementsCard {

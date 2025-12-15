@@ -7,6 +7,8 @@ import { faInstagram } from '@fortawesome/free-brands-svg-icons';
 import Comic from './Comic';
 import Member from './Member';
 import ADs from '../AP/app-components/MainPageComponents/ADs';
+import ClinicMap from '../AP/app-components/ClinicMap';
+
 //首頁圖片
 const firstImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-first.webp";
 const secondImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-second.webp";
@@ -111,6 +113,7 @@ function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation }) {
             <Video id="video" isMobile={isMobile} />
             <ADs />
             <QRcode />
+            <ClinicMapSection />
             <Footer />
         </div>
     )
@@ -317,7 +320,7 @@ function Slogan({ isMobile }) {
             {!isMobile ? (
                 <>
                     樂壓Talk's 溫暖你的心
-                    <p style={{ letterSpacing: '1.8rem', fontSize: '3rem', fontFamily: 'Dela Gothic One' }}>如果你需要，我隨時都在</p>
+                    <p style={{ letterSpacing: '1rem', fontSize: '3rem', fontFamily: 'Dela Gothic One' }}>如果你需要，我隨時都在</p>
                 </>
             ) : (
                 <>
@@ -330,14 +333,28 @@ function Slogan({ isMobile }) {
     )
 }
 
-function ScrollBar({ id, handleLoginNavigation }) {
+function ScrollBar({ id }) {
+    const navigate = useNavigate();
+    const handleChatLoginNavigation = () => {
+        try {
+            const saved = localStorage.getItem('leyaUserInfo');
+            const userInfo = saved ? JSON.parse(saved) : null;
+            if (userInfo && userInfo.id) {
+                navigate('/leya/chat');
+            } else {
+                navigate('/leya/login');
+            }
+        } catch (error) {
+            console.error('解析用戶資料失敗:', error);
+            navigate('/leya/login');
+        }
+    };
     return (
         <div className='hp-scroll-bar' id={id}>
-            <a onClick={handleLoginNavigation} className='hp-sc-btn1'
-            >前往聊天</a>
+            <a onClick={handleChatLoginNavigation} className='hp-sc-btn1'>前往聊天</a>
             <a href="#concept" className='hp-sc-btn2'>了解更多</a>
         </div>
-    )
+    );
 }
 
 function Video({ id, isMobile }) {
@@ -533,7 +550,7 @@ function Content_Reverse({ id, isMobile }) {
 
 function QRcode() {
     return (
-        <div style={{ margin: '48px 0' }}>
+        <div style={{ margin: '48px 0'}}>
             <p className="qrcode-title">立即掃描QRcode追蹤我們</p>
             <div className='qrcode-container'>
                 <a href="https://www.instagram.com/le_ya.talks/" target="_blank">
@@ -548,7 +565,19 @@ function QRcode() {
                     <p className="qrcode-subtitle">聯絡信箱</p>
                     <img className='qrcode' src="https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/mail_qrcode.svg" alt="信箱_QRcode" />
                 </a>
+                <a href="https://store.line.me/emojishop/product/693fc2794d3bea396fe508e5/zh-Hant">
+                    <p className="qrcode-subtitle">LINE表情貼</p>
+                    <img className='qrcode' src="https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/emoji.svg" alt="LINE表情貼" />
+                </a>
             </div>
+        </div>
+    )
+}
+
+function ClinicMapSection() {
+    return (
+        <div className='cm-section'>
+            <ClinicMap />
         </div>
     )
 }
@@ -567,7 +596,7 @@ function Footer() {
                 </div>
             </div>
             <div className='hp-copyright'>
-                <p>版權所有©2025樂壓Talk's</p>
+                <p id='copyright'>版權所有©2025樂壓Talk's</p>
                 <p style={{ fontSize: '1rem' }}>Copyright©2025 Reserved by LeyaTalk's</p>
             </div>
             <div className='hp-footer-contact'>

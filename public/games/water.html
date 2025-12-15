@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>水波紋</title>
+<style>
+  * { box-sizing: border-box; margin:0; padding:0; }
+  body {
+    height:100vh; width:100vw;
+    background: radial-gradient(circle at 50% 40%, #d8f3ff 0%, #b6e2ff 45%, #9cd2ff 100%);
+    overflow:hidden;
+    display:flex; align-items:center; justify-content:center;
+    user-select:none; touch-action:manipulation;
+    font-family: "PingFang TC", "Noto Sans TC", sans-serif;
+  }
+
+  #pond {
+    position:relative;
+    width:100%; height:100%;
+    overflow:hidden;
+    background:
+      radial-gradient(ellipse at 50% 50%, rgba(255,255,255,0.25) 0%, rgba(255,255,255,0) 70%),
+      repeating-linear-gradient(45deg, rgba(255,255,255,.04) 0 20px, rgba(0,0,0,.03) 20px 40px),
+      linear-gradient(180deg, #bce6ff 0%, #a0d7ff 100%);
+  }
+
+  /* 多層水波紋 */
+  .wave {
+    position:absolute;
+    border-radius:50%;
+    border:2px solid rgba(255,255,255,0.7);
+    transform:scale(0);
+    opacity:1;
+    animation: rippleSpread 2s ease-out forwards;
+    pointer-events:none;
+  }
+
+  @keyframes rippleSpread {
+    0%   { transform:scale(0); opacity:1; border-width:2px; }
+    60%  { transform:scale(1); opacity:0.5; border-width:3px; }
+    100% { transform:scale(1.8); opacity:0; border-width:5px; }
+  }
+
+  .hint {
+    position:absolute; bottom:14px; width:100%; text-align:center;
+    font-size:14px; color:rgba(255,255,255,0.85);
+    text-shadow:0 1px 3px rgba(0,0,0,0.3);
+    letter-spacing:0.5px;
+  }
+</style>
+</head>
+<body>
+  <div id="pond">
+    <div class="hint">💧 輕點水面，看一圈圈水波紋擴散...</div>
+  </div>
+
+  <!-- 背景雨聲 -->
+  <audio id="bgm" src="https://cdn.pixabay.com/download/audio/2021/10/06/audio_1427c8d357.mp3?filename=soft-rain-ambient-10814.mp3" loop preload="auto"></audio>
+
+  <!-- 點擊水滴音效（可替換成本地 mp3） -->
+  <audio id="water" src="water-drop-stereo-257180.mp3" preload="auto"></audio>
+
+<script>
+const pond = document.getElementById('pond');
+const bgm = document.getElementById('bgm');
+const waterSound = document.getElementById('water');
+let musicStarted = false;
+
+// 建立多層水波
+function createRipple(x, y) {
+  const wavesCount = 3 + Math.floor(Math.random()*2); // 3~4層
+  for(let i=0;i<wavesCount;i++){
+    setTimeout(()=>{
+      const wave = document.createElement('div');
+      wave.classList.add('wave');
+
+      const size = 200 + Math.random() * 150;
+      wave.style.width = wave.style.height = size + 'px';
+      wave.style.left = (x - size/2) + 'px';
+      wave.style.top  = (y - size/2) + 'px';
+      wave.style.borderColor = `rgba(255,255,255,${0.5 + Math.random()*0.3})`;
+      wave.style.animationDuration = (1.6 + Math.random()*0.6) + 's';
+      pond.appendChild(wave);
+
+      wave.addEventListener('animationend', ()=> wave.remove());
+    }, i * 200); // 每層間隔 0.2 秒
+  }
+}
+
+// 點擊或觸控事件
+pond.addEventListener('pointerdown', e=>{
+  const rect = pond.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+
+  createRipple(x,y);
+
+  // 播放水滴音效
+  if(waterSound){
+    waterSound.currentTime = 0;
+    waterSound.play().catch(()=>{});
+  }
+
+  // 首次播放背景音樂
+  if(!musicStarted){
+    bgm.volume = 0.35;
+    bgm.play().catch(()=>{});
+    musicStarted = true;
+  }
+
+  // 手機振動
+  if(navigator.vibrate) navigator.vibrate(15);
+});
+</script>
+</body>
+</html>

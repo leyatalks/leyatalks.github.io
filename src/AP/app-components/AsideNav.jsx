@@ -1,7 +1,7 @@
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBook, faDiagramProject, faCommentDots, faUser, faBrain } from '@fortawesome/free-solid-svg-icons';
+import { faBook, faDiagramProject, faCommentDots, faUser, faBrain, faGamepad, faMapLocationDot } from '@fortawesome/free-solid-svg-icons';
 
 function AsideNav({ setActivePage, activePage, userInfo, collapsed }) {
   const navigate = useNavigate();
@@ -20,6 +20,18 @@ function AsideNav({ setActivePage, activePage, userInfo, collapsed }) {
           balloon-data="冥想">
             <span className="ap-aside-icon"><FontAwesomeIcon icon={faBrain} /></span>
             <span className="ap-aside-text">冥想</span>
+          </button>
+          <button className={`ap-aside-item ${activePage === 'clinic-map' ? 'active' : ''}`} 
+          onClick={() => setActivePage('clinic-map')}
+          balloon-data="心理資源地圖">
+            <span className="ap-aside-icon"><FontAwesomeIcon icon={faMapLocationDot} /></span>
+            <span className="ap-aside-text">心理資源地圖</span>
+          </button>
+          <button className={`ap-aside-item ${activePage === 'meditation-page' ? 'active' : ''}`} 
+          onClick={() => setActivePage('game-page')}
+          balloon-data="紓壓小遊戲">
+            <span className="ap-aside-icon"><FontAwesomeIcon icon={faGamepad} /></span>
+            <span className="ap-aside-text">紓壓小遊戲</span>
           </button>
           <button className={`ap-aside-item ${activePage === 'mood-page' ? 'active' : ''}`} 
           onClick={(e) => { if (isLoggedIn) { setActivePage('mood-page') } else { e.stopPropagation(); document.getElementById('login-hint-modal').style.display = 'flex' } }}

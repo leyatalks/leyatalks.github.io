@@ -1,7 +1,10 @@
 @import url('https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Noto+Sans+TC:wght@100..900&family=Noto+Serif+TC:wght@200..900&display=swap');
-html, body {
+
+html,
+body {
     background-color: #FAEAD3;
-    scrollbar-color: transparent transparent;;
+    scrollbar-color: transparent transparent;
+    ;
     scrollbar-width: none;
 }
 
@@ -509,31 +512,37 @@ html, body {
     align-items: center;
     flex-direction: row;
     margin: 24px 0;
-    gap: 20%;    
+    gap: 5%;
 }
-.qrcode-container a{
+
+.qrcode-container a {
     text-decoration: none;
 }
 
-.qrcode-title{
+.qrcode-title {
     font-family: "Dela Gothic One", sans-serif;
     text-align: center;
     font-size: 36px;
     white-space: nowrap;
 }
 
-.qrcode-subtitle{
+.qrcode-subtitle {
     font-family: 'Dela Gothic One', sans-serif;
     text-align: center;
     font-size: 24px;
     margin-bottom: 16px;
     color: var(--text-color);
+    white-space: nowrap;
 }
 
 .qrcode {
     width: 200px;
     height: 200px;
     object-fit: contain;
+}
+
+.cm-section {
+    margin: 48px 10rem;
 }
 
 /* 大螢幕設備樣式 */
@@ -568,78 +577,122 @@ html, body {
     }
 }
 
-/* 平板樣式 */
+/* 平板樣式（修正版，選單預設隱藏，漢堡顯示） */
 @media (min-width: 769px) and (max-width: 1024px) {
+    .hp-container {
+        width: 100%;
+    }
+    
     .hp-navbar {
         flex-direction: row;
         padding: 0.8em;
     }
-
     .hp-navbar-links {
+        display: none;
+        flex-direction: column;
+        width: 100vw;
+        position: fixed;
+        top: 60px;
+        left: 0;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        border-bottom: 1px solid #eee;
+        z-index: 20;
         gap: 2em;
         margin-right: 1em;
         font-size: 1.1em;
     }
-
+    .hp-navbar-links.open {
+        display: flex;
+    }
+    .hp-hamburger {
+        display: flex;
+    }
     .hp-navbar_logo {
         width: 5em;
     }
-
     .hp-slogan {
         font-size: 4rem;
         padding: 1.5rem;
+        margin-top: 2.5rem;
     }
-
     .hp-content-container {
         flex-direction: row;
         min-height: 25rem;
     }
-
     .hp-half-container {
         width: 50%;
     }
-
     .hp-content {
         padding-left: 1.5rem;
         padding-right: 20%;
         font-size: 0.95rem;
     }
-
     .hp-content-reverse {
         padding-right: 1.5rem;
         padding-left: 20%;
         font-size: 0.95rem;
     }
-
     .hp-footer {
-        padding: 1rem 0.5rem;
+        flex-direction: row;
+        align-items: stretch;
+        justify-content: space-between;
+        padding: 1.5rem 1.5rem;
+        gap: 0;
     }
-
+    .hp-footer-logo, .hp-copyright, .hp-footer-contact {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        flex: 1 1 0;
+        min-width: 0;
+        text-align: center;
+        padding: 0 0.5rem;
+    }
     .hp-footer-logo {
-        padding-left: 1rem;
+        padding-left: 0;
+    }
+    .hp-logo-container {
+        justify-content: center;
+    }
+    .hp-logo-container p[style*="font-size: 1.6rem"] {
+        font-size: 1.2rem !important;
+    }
+    .hp-logo-container p[style*="font-size: 1rem"] {
+        font-size: 0.8rem !important;
+    }
+    .hp-copyright p[id*="copyright"] {
+        font-size: 1.2rem;
+        white-space: nowrap;
     }
 
-    .hp-logo-container p[style*="font-size: '1.6rem'"] {
-        font-size: 1.4rem !important;
+    .hp-footer-contact {
+        text-align: center;
+        align-items: center;
+        padding: 0 0.5rem;
     }
-
     .hp-video {
         flex-direction: column;
     }
-
     .hp-video-title {
         writing-mode: horizontal-tb;
         text-align: center;
         letter-spacing: 2px;
     }
-
+    .qrcode-container {
+        flex-direction: column;
+        gap: 2rem;
+    }
+    .cm-section {
+        margin: 48px 0;
+    }
 }
 
 /* 手機樣式 */
 @media (max-width: 768px) {
 
-    .hp-container{
-        width: 100vw;
+    .hp-container {
+        width: 100%;
     }
 
     .hp-navbar {
@@ -692,7 +745,7 @@ html, body {
         transform: translateY(-8px);
         /* 顯示時移動到視窗內 */
         opacity: 1;
-        z-index: 11;
+        z-index: 15;
     }
 
     /* 下拉選單中的連結樣式 */
@@ -752,12 +805,12 @@ html, body {
         margin: auto;
     }
 
-    .hp-member-container{
+    .hp-member-container {
         justify-content: flex-start;
         padding-left: 18px;
     }
 
-    .hp-video{
+    .hp-video {
         height: fit-content;
     }
 
@@ -795,7 +848,7 @@ html, body {
         flex-direction: column;
     }
 
-    .hp-video-content{
+    .hp-video-content {
         flex-direction: column;
     }
 
@@ -809,23 +862,37 @@ html, body {
         min-width: 60%;
     }
 
-    .hp-sc-btn1 {font-size: 2rem;}
-    .hp-sc-btn2 {font-size: 2rem;}
+    .hp-sc-btn1 {
+        font-size: 2rem;
+    }
+
+    .hp-sc-btn2 {
+        font-size: 2rem;
+    }
 
     .qrcode-container {
         flex-direction: column;
         gap: 2rem;
     }
-    .qrcode-title{
+
+    .qrcode-title {
         font-size: 28px;
     }
-    .qrcode-subtitle{
+
+    .qrcode-subtitle {
         font-size: 24px;
+        white-space: nowrap;
     }
+
     .qrcode {
         width: 150px;
         height: 150px;
     }
+
+    .cm-section {
+        margin: 24px 0;
+    }
+    
 }
 
 /* 小手機樣式 */
@@ -880,7 +947,7 @@ html, body {
         flex-direction: column;
     }
 
-    .hp-video-content{
+    .hp-video-content {
         flex-direction: column;
     }
 
@@ -894,6 +961,15 @@ html, body {
         min-width: 60%;
     }
 
-    .hp-sc-btn1 {font-size: 1.5rem;}
-    .hp-sc-btn2 {font-size: 1.5rem;}
+    .hp-sc-btn1 {
+        font-size: 1.5rem;
+    }
+
+    .hp-sc-btn2 {
+        font-size: 1.5rem;
+    }
+
+    .cm-section {
+        margin: 48px 0;
+    }
 }

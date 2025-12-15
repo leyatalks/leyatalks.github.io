@@ -4,7 +4,7 @@
         "type": "贊助商介紹",
         "title": "Mille 米樂爆米花",
         "content": "感謝有 米樂爆米花 的香甜，成為我們暖心的後盾，讓「小小零食」在展場中化身為療癒瞬間。\n\n當在展間移動或欣賞展覽時，若感到一絲緊繃，不妨拿起一把爆米花🍿感受它的酥脆、香氣與微微鹹甜，那是用味蕾安慰心靈的小確幸。\n\n願每位來看展的人，都能在創作之外，嚐到一點「被溫柔包圍」的滋味。\n\n米樂爆米花 × 樂壓Talk’s\n小小一把，給你一刻被溫柔「撫慰」的時光。",
-        "img": "https://lh3.googleusercontent.com/d/141nvwbpjN-ok3qJIq2-LTxrVh9YLQMiz=h400",
+        "img": "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/mille.jpg",
         "url": "https://www.millerpopcorn.com.tw"
     },
     {
@@ -12,8 +12,16 @@
         "type": "贊助商介紹",
         "title": "Soothe 時氛",
         "content": "感謝有Soothe 時氛 的陪伴，讓我們的畢展空間多了一份柔和的氣息🫧\n當香味緩緩散開，緊繃的思緒也跟著舒展。\n願每位走進展場的人，都能在這份溫暖氛圍裡，感受我們創作背後的心意。\n\nSoothe 時氛 × 樂壓Talk’s\n讓香氣，成為記憶的一部分。",
-        "img": "https://lh3.googleusercontent.com/d/1a6nt5hAbfLt_zkLFdMHSLBK_Zy8j5fwU=h400",
+        "img": "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/soothe.JPG",
         "url": "https://soothe026.easy.co"
+    },
+    {
+        "id": 3,
+        "type": "贊助商介紹",
+        "title": "睡眠吐司",
+        "content": "感謝有睡眠吐司 的柔軟，讓所有觀展朋友們可以慢下腳步\n每當躺上柔軟的床墊時，感覺身心靈都被捧在溫暖的手掌心\n希望所有的朋友們，都能夠沉浸在這份舒適當中，讓懂你的人接住你。\n\n睡眠吐司 × 樂壓Talk’s\n讓你由內到外都能舒服的度過每一天。",
+        "img": "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/sleeptoast.JPG",
+        "url": "https://www.sleeptoast.com/"
     }
 
 ]
