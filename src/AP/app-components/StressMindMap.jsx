@@ -21,6 +21,160 @@ const demoData = [
 // 使用限制的最少資料筆數（> 5 => 需要至少 6 筆）
 const MIN_REQUIRED_COUNT = 10;
 
+// --- 新增 REBT 對話框元件 ---
+function RebtModal({ nodeData, onClose, onComplete }) {
+  // 定義步驟：
+  // B: 確認信念 (Belief)
+  // D: 駁斥 (Dispute)
+  // E: 新觀點 (Effective New Philosophy)
+  // F: 新感受 (New Feeling - 完成)
+  const [step, setStep] = React.useState('D'); // 直接從 D 開始，因為 B (信念) 已經在圖表上看到了
+  const [disputeInput, setDisputeInput] = React.useState(''); // 駁斥的內容
+  const [newBeliefInput, setNewBeliefInput] = React.useState(''); // 新觀點
+  
+  if (!nodeData) return null;
+
+  return (
+    <div style={{
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', 
+      display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000,
+      backdropFilter: 'blur(2px)' // 背景模糊效果
+    }}>
+      <div style={{ 
+        background: 'white', 
+        padding: '32px', 
+        borderRadius: '20px', 
+        width: '90%', 
+        maxWidth: '480px',
+        boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
+        position: 'relative',
+        display: 'flex',
+        flexDirection: 'column',
+        gap: '16px'
+      }}>
+        {/* 標題區 */}
+        <div style={{ textAlign: 'center', marginBottom: '8px' }}>
+          <div style={{ fontSize: '40px', marginBottom: '8px' }}>🍞</div>
+          <h3 style={{ margin: 0, color: '#555', fontSize: '20px' }}>吐司君的療癒時間 (REBT)</h3>
+        </div>
+
+        {/* --- 步驟 D: 駁斥 (Dispute) --- */}
+        {step === 'D' && (
+          <>
+            <div style={{ background: '#FFF0F0', padding: '16px', borderRadius: '12px', border: '1px solid #FFCDCD' }}>
+              <strong style={{ color: '#FF6B6B', display: 'block', marginBottom: '4px' }}>🚫 你的非理性信念 (B)：</strong>
+              <div style={{ color: '#555' }}>"{nodeData.belief || '我必須完美，否則就是失敗者'}"</div>
+            </div>
+
+            <div style={{ color: '#444', fontWeight: 'bold', marginTop: '8px' }}>
+              🤔 吐司君：你想怎麼挑戰這個想法？
+            </div>
+            <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
+              試著問自己：這真的是百分之百的事實嗎？有沒有反例？
+            </p>
+
+            <textarea 
+              placeholder="輸入你的反駁... (例如：失敗一次不代表我是魯蛇，只是這次沒做好)" 
+              style={{ 
+                width: '100%', height: '80px', padding: '12px', borderRadius: '8px', 
+                border: '1px solid #ccc', fontSize: '14px', resize: 'none'
+              }}
+              value={disputeInput}
+              onChange={e => setDisputeInput(e.target.value)}
+            />
+
+            <button 
+              className="application-link-button" 
+              style={{ marginTop: '8px', opacity: disputeInput ? 1 : 0.6 }}
+              disabled={!disputeInput}
+              onClick={() => setStep('E')}
+            >
+              下一步：建立新觀點 👉
+            </button>
+          </>
+        )}
+
+        {/* --- 步驟 E: 新觀點 (Effective New Philosophy) --- */}
+        {step === 'E' && (
+          <>
+            <div style={{ background: '#E0F7FA', padding: '16px', borderRadius: '12px', border: '1px solid #B2EBF2' }}>
+              <strong style={{ color: '#00838F', display: 'block', marginBottom: '4px' }}>🛡️ 你的駁斥 (D)：</strong>
+              <div style={{ color: '#555' }}>"{disputeInput}"</div>
+            </div>
+
+            <div style={{ color: '#444', fontWeight: 'bold', marginTop: '8px' }}>
+              💡 吐司君：那我們可以用什麼更健康的「新觀點」來替代舊想法？
+            </div>
+            <p style={{ margin: '0', fontSize: '14px', color: '#666' }}>
+              試著用「我希望...但如果沒有也沒關係」來造句。
+            </p>
+
+            <textarea 
+              placeholder="例如：我希望考好，但如果考不好，我可以修正錯誤，下次再來。" 
+              style={{ 
+                width: '100%', height: '80px', padding: '12px', borderRadius: '8px', 
+                border: '1px solid #ccc', fontSize: '14px', resize: 'none'
+              }}
+              value={newBeliefInput}
+              onChange={e => setNewBeliefInput(e.target.value)}
+            />
+
+            <button 
+              className="application-link-button"
+              style={{ marginTop: '8px', opacity: newBeliefInput ? 1 : 0.6 }}
+              disabled={!newBeliefInput}
+              onClick={() => setStep('F')}
+            >
+              完成轉念 ✨
+            </button>
+          </>
+        )}
+
+        {/* --- 步驟 F: 新感受 (New Feeling - 結束) --- */}
+        {step === 'F' && (
+          <div style={{ textAlign: 'center', padding: '20px 0' }}>
+            <div style={{ fontSize: '60px', marginBottom: '16px' }}>🎉</div>
+            <h4 style={{ margin: '0 0 8px', color: '#333' }}>太棒了！</h4>
+            <p style={{ color: '#666', lineHeight: '1.6' }}>
+              當你把「必須」轉化為「希望」，壓力就會釋放。<br/>
+              看看你的圓圈，它現在變成了代表平靜的綠色囉！
+            </p>
+            
+            <button 
+              className="application-link-button" 
+              style={{ width: '100%', marginTop: '20px' }}
+              onClick={() => onComplete(nodeData.name)}
+            >
+              關閉並更新圖表
+            </button>
+          </div>
+        )}
+        
+        {/* 關閉按鈕 (右上角 X) */}
+        <button 
+          onClick={onClose} 
+          style={{ 
+            position: 'absolute', top: '16px', right: '16px', 
+            background: 'none', border: 'none', fontSize: '20px', 
+            cursor: 'pointer', color: '#999' 
+          }}
+        >
+          ✕
+        </button>
+
+        {/* 底部放棄按鈕 (非 F 步驟顯示) */}
+        {step !== 'F' && (
+          <button onClick={onClose} style={{ background: 'none', border: 'none', color: '#999', cursor: 'pointer', fontSize: '13px' }}>
+            先不用，我還想再焦慮一下
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+// ---------------------------
+
+
 function AuthCheck({ count = 0, min = MIN_REQUIRED_COUNT }) {
   const navigate = useNavigate();
   return (
@@ -46,15 +200,79 @@ function AuthCheck({ count = 0, min = MIN_REQUIRED_COUNT }) {
         <button className="application-link-button"
           onClick={() => navigate('/leya/mood')}
         >
-        心情日記
-      </button>
-      <button className="application-link-button"
-        onClick={() => navigate('/leya/chat')}
-      >
-        吐司聊天室
-      </button>
-    </div>
+          心情日記
+        </button>
+        <button className="application-link-button"
+          onClick={() => navigate('/leya/chat')}
+        >
+          吐司聊天室
+        </button>
+      </div>
     </div >
+  );
+}
+
+function LegendItem({ color, title, desc, benefit }) {
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  return (
+    <div 
+      style={{ position: 'relative', cursor: 'help', padding: '4px' }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      {/* 圓點 */}
+      <div style={{ 
+        width: '14px', 
+        height: '14px', 
+        borderRadius: '50%', 
+        backgroundColor: color,
+        boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
+      }}></div>
+
+      {/* 彈窗 (Tooltip) */}
+      {isHovered && (
+        <div style={{
+          position: 'absolute',
+          bottom: '150%', // 顯示在圓點上方
+          left: '50%',
+          transform: 'translateX(-50%)',
+          width: '220px',
+          backgroundColor: '#fff',
+          padding: '12px',
+          borderRadius: '8px',
+          boxShadow: '0 4px 12px rgba(0,0,0,0.15)',
+          border: '1px solid #eee',
+          zIndex: 100,
+          textAlign: 'left',
+          fontSize: '13px',
+          lineHeight: '1.5',
+          color: '#555'
+        }}>
+          {/* 小三角形箭頭 (裝飾) */}
+          <div style={{
+            position: 'absolute',
+            bottom: '-6px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            width: 0, height: 0,
+            borderLeft: '6px solid transparent',
+            borderRight: '6px solid transparent',
+            borderTop: '6px solid #fff',
+          }}></div>
+
+          <strong style={{ display: 'block', marginBottom: '6px', color: color, fontSize: '14px' }}>
+            {title}
+          </strong>
+          <div style={{ marginBottom: '8px' }}>
+            {desc}
+          </div>
+          <div style={{ fontSize: '12px', color: '#888', background: '#f9f9f9', padding: '4px 8px', borderRadius: '4px' }}>
+            💡 {benefit}
+          </div>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -77,6 +295,8 @@ function StressMindMap({ userInfo }) {
   const [dateRange, setDateRange] = useState({ start: null, end: null });
   const [tempRange, setTempRange] = useState({ start: '', end: '' });
   const [calBase, setCalBase] = useState(null);
+  const [selectedNode, setSelectedNode] = useState(null); // 目前被點擊的節點
+  const [stressStates, setStressStates] = useState({});   // 紀錄每個節點的壓力值 { '考試': 100, '人際': 40 }
 
   // 載入用戶的壓力來源分析記錄
   useEffect(() => {
@@ -206,7 +426,7 @@ function StressMindMap({ userInfo }) {
   }
   function toZhWeek(date) {
     const d = new Date(date);
-    const ws = ['週日','週一','週二','週三','週四','週五','週六'];
+    const ws = ['週日', '週一', '週二', '週三', '週四', '週五', '週六'];
     return ws[d.getDay()];
   }
   function clampToDateStr(str) { return str ? str : ''; }
@@ -345,8 +565,25 @@ function StressMindMap({ userInfo }) {
     }
   };
 
+  // 處理圖表節點點擊
+  const handleNodeClick = (nodeData) => {
+    // 開啟 REBT 對話框
+    setSelectedNode(nodeData);
+  };
+
+  // 處理 REBT 完成
+  const handleRebtComplete = (nodeName) => {
+    // 1. 更新壓力狀態：將該節點的壓力值設為 30 (變綠色、變小)
+    setStressStates(prev => ({
+      ...prev,
+      [nodeName]: 30
+    }));
+    // 2. 關閉對話框
+    setSelectedNode(null);
+  };
+
   return (
-    <div style={{height: '100%', overflowY: 'auto', marginTop: 'calc(1.1rem + 16px)'}}>
+    <div style={{ height: '100%', overflowY: 'auto', marginTop: 'calc(1.1rem + 16px)' }}>
       <h1 className='stress-title'>壓力來源心智圖</h1>
       {!username && (
         <div style={{
@@ -395,21 +632,21 @@ function StressMindMap({ userInfo }) {
             onClick={() => setIsDatePickerOpen(true)}
             disabled={!username}
           >
-            <div style={{textAlign:'left'}}>
+            <div style={{ textAlign: 'left' }}>
               {/* <div style={{fontSize:12, color:'#6a6258'}}>去程</div> */}
-              <div style={{fontWeight:700}}>
+              <div style={{ fontWeight: 700 }}>
                 {dateRange.start ? `${toDisplay(dateRange.start)} ${toZhWeek(dateRange.start)}` : '--'}
               </div>
             </div>
-            <div style={{opacity:0.5}}>—</div>
-            <div style={{textAlign:'left'}}>
+            <div style={{ opacity: 0.5 }}>—</div>
+            <div style={{ textAlign: 'left' }}>
               {/* <div style={{fontSize:12, color:'#6a6258'}}>回程</div> */}
-              <div style={{fontWeight:700}}>
+              <div style={{ fontWeight: 700 }}>
                 {dateRange.end ? `${toDisplay(dateRange.end)} ${toZhWeek(dateRange.end)}` : '--'}
               </div>
             </div>
           </button>
-          
+
         </div>
       )}
 
@@ -425,6 +662,8 @@ function StressMindMap({ userInfo }) {
             analysisData={analysisData}
             isLoading={isLoading}
             error={error}
+            onNodeClick={handleNodeClick} 
+            stressStates={stressStates}
           />
           {/* 分析按鈕和狀態顯示 */}
           <div style={{
@@ -436,6 +675,40 @@ function StressMindMap({ userInfo }) {
             flexWrap: 'wrap',
             alignItems: 'center'
           }}>
+            <div style={{
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',       // 圓點之間的距離
+              padding: '6px 12px',
+              backgroundColor: 'rgba(250, 234, 211, 0.843)',
+              borderRadius: '24px',
+              border: '1px solid #e0e0e0',
+              boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
+            }}>
+              {/* A: 事件 (紅色) */}
+              <LegendItem 
+                color="#FF6B6B"
+                title="A：事件 (壓力源)"
+                desc="客觀發生的事實，例如：考試不及格、被主管批評、天氣變差。"
+                benefit="發覺壓力源可以幫助你區分「事實」與「想像」，確認問題核心。"
+              />
+
+              {/* B: 信念 (青色) */}
+              <LegendItem 
+                color="#4ECDC4"
+                title="B：信念 (你的想法)"
+                desc="你對事件的解讀與內在對話。例如：「我完蛋了」、「我必須完美」。"
+                benefit="這是改變的關鍵！覺察是否陷入了非理性的思考陷阱。"
+              />
+
+              {/* C: 後果 (橘色) */}
+              <LegendItem 
+                color="#FF9F43"
+                title="C：後果 (情緒/反應)"
+                desc="因信念而產生的情緒或行為。例如：焦慮、失眠、逃避社交。"
+                benefit="理解情緒源於「想法」而非「事件」，能讓你重獲掌控感。"
+              />
+            </div>
             <button
               onClick={handleAnalyzeStress}
               disabled={isAnalyzing || !username || filteredTotalCount < MIN_REQUIRED_COUNT}
@@ -505,7 +778,7 @@ function StressMindMap({ userInfo }) {
                 📊 共 {analysisData.length} 條記錄
               </div>
             )}
-            
+
           </div>
         </>
       )}
@@ -517,26 +790,26 @@ function StressMindMap({ userInfo }) {
           display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 9999
         }}>
           <div style={{ background: '#fff', borderRadius: 12, padding: 16, width: 'min(96vw, 560px)' }}>
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom: 8 }}>
-              <button onClick={() => shiftMonth(-1)} style={{ background:'none', border:'none', fontSize:20, cursor:'pointer' }}>{'‹'}</button>
-              <div style={{ fontWeight:700, fontSize:18 }}>
-                {calBase ? `${calBase.getFullYear()}年${calBase.getMonth()+1}月` : ''}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 }}>
+              <button onClick={() => shiftMonth(-1)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}>{'‹'}</button>
+              <div style={{ fontWeight: 700, fontSize: 18 }}>
+                {calBase ? `${calBase.getFullYear()}年${calBase.getMonth() + 1}月` : ''}
               </div>
-              <button onClick={() => shiftMonth(1)} style={{ background:'none', border:'none', fontSize:20, cursor:'pointer' }}>{'›'}</button>
+              <button onClick={() => shiftMonth(1)} style={{ background: 'none', border: 'none', fontSize: 20, cursor: 'pointer' }}>{'›'}</button>
             </div>
 
             {(() => {
               const first = calBase ? new Date(calBase.getFullYear(), calBase.getMonth(), 1) : new Date();
               const cells = buildMonthGrid(first);
               return (
-                <div style={{ border:'1px solid #eee', borderRadius:8, padding:8 }}>
-                  <div style={{ textAlign:'center', fontWeight:600, margin:'4px 0' }}>
-                    {first.getFullYear()}年{first.getMonth()+1}月
+                <div style={{ border: '1px solid #eee', borderRadius: 8, padding: 8 }}>
+                  <div style={{ textAlign: 'center', fontWeight: 600, margin: '4px 0' }}>
+                    {first.getFullYear()}年{first.getMonth() + 1}月
                   </div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', textAlign:'center', fontSize:12, color:'#6a6258', marginBottom:4 }}>
-                    {['週日','週一','週二','週三','週四','週五','週六'].map(w => (<div key={w}>{w}</div>))}
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', textAlign: 'center', fontSize: 12, color: '#6a6258', marginBottom: 4 }}>
+                    {['週日', '週一', '週二', '週三', '週四', '週五', '週六'].map(w => (<div key={w}>{w}</div>))}
                   </div>
-                  <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:4 }}>
+                  <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7,1fr)', gap: 4 }}>
                     {cells.map(cell => {
                       const startStr = tempRange.start;
                       const endStr = tempRange.end;
@@ -550,13 +823,13 @@ function StressMindMap({ userInfo }) {
                           key={cell.ymd}
                           onClick={() => cell.inMonth && handleDayClick(cell.ymd)}
                           style={{
-                            border:'1px solid #eee', borderRadius:8, padding:'6px 4px', textAlign:'center', minHeight: '60px', cursor: cell.inMonth ? 'pointer' : 'default',
-                            background:bg, color,
+                            border: '1px solid #eee', borderRadius: 8, padding: '6px 4px', textAlign: 'center', minHeight: '60px', cursor: cell.inMonth ? 'pointer' : 'default',
+                            background: bg, color,
                           }}
                         >
-                          <div style={{ fontWeight:600 }}>{new Date(cell.date).getDate()}</div>
+                          <div style={{ fontWeight: 600 }}>{new Date(cell.date).getDate()}</div>
                           {cell.count > 0 && (
-                            <div style={{ fontSize:10, opacity: isStart||isEnd?1:0.8 }}>{cell.count}筆</div>
+                            <div style={{ fontSize: 10, opacity: isStart || isEnd ? 1 : 0.8 }}>{cell.count}筆</div>
                           )}
                         </div>
                       );
@@ -566,13 +839,13 @@ function StressMindMap({ userInfo }) {
               );
             })()}
 
-            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginTop: 12 }}>
-              <div style={{ fontSize:14, color:'#6a6258', whiteSpace:'nowrap' }}>
-                {tempRange.start ? `${tempRange.start.replace(/-/g,'/')} ${toZhWeek(tempRange.start)}` : '未選擇'}
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: 12 }}>
+              <div style={{ fontSize: 14, color: '#6a6258', whiteSpace: 'nowrap' }}>
+                {tempRange.start ? `${tempRange.start.replace(/-/g, '/')} ${toZhWeek(tempRange.start)}` : '未選擇'}
                 {'  —  '}
-                {tempRange.end ? `${tempRange.end.replace(/-/g,'/')} ${toZhWeek(tempRange.end)}` : '未選擇'}
+                {tempRange.end ? `${tempRange.end.replace(/-/g, '/')} ${toZhWeek(tempRange.end)}` : '未選擇'}
               </div>
-              <div style={{ display:'flex', gap:0 }}>
+              <div style={{ display: 'flex', gap: 0 }}>
                 <button onClick={() => setIsDatePickerOpen(false)}>取消</button>
                 <button className="application-link-button" onClick={applyTempRange} disabled={!tempRange.start || !tempRange.end}>套用</button>
               </div>
@@ -581,6 +854,14 @@ function StressMindMap({ userInfo }) {
         </div>
       )}
 
+      {/* --- REBT 對話視窗 --- */}
+      {selectedNode && (
+        <RebtModal
+          nodeData={selectedNode}
+          onClose={() => setSelectedNode(null)}
+          onComplete={handleRebtComplete}
+        />
+      )}
     </div>
   );
 }
