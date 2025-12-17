@@ -121,3 +121,18 @@ input, select {
     justify-content: center;
     align-items: center;
 }
+
+@media (max-width: 768px) {
+    .meditation-container{
+        overflow-y: auto;
+        padding-top: 2rem;
+    } 
+
+    .breath-circle-container{
+        margin-top: 5rem;
+    }
+
+    .input-group{
+        padding-bottom: 5rem;
+    }
+}

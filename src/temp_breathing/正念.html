@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>正念冥想</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      min-height: 100vh;
+      background: #000000;
+      overflow: hidden;
+    }
+
+    /* ===== 全螢幕背景（JPG） ===== */
+    .bg {
+      position: fixed;
+      inset: 0;
+      background: url("樂壓.jpg") center / cover no-repeat;
+      z-index: 0;
+    }
+    /*.bg::after {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(
+        to bottom,
+        rgba(255, 255, 255, 0.25),
+        rgba(254, 254, 254, 0.6)
+      );
+    }*/
+
+    .screen {
+      position: relative;
+      z-index: 1;
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      padding: 18px;
+    }
+
+    .app {
+      width: min(620px, 100%);
+      background: rgba(255,255,255,0.8);
+      backdrop-filter: blur(14px);
+      border-radius: 26px;
+      padding: 26px 24px 22px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.25);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+
+  /* 👇 換成你的 JPG 檔名 */
+  background-image: url("Logo.jpg");
+  background-size: cover;
+  background-position: center;
+
+  box-shadow: 0 10px 22px rgba(255,179,71,0.32);
+  flex: 0 0 auto;
+}
+
+
+    .speech {
+      background: rgba(255,248,230,0.95);
+      border-radius: 18px;
+      padding: 10px 12px;
+      font-size: 14px;
+      line-height: 1.5;
+      position: relative;
+      color: #333;
+    }
+
+    .speech::after {
+      content: "";
+      position: absolute;
+      left: -8px;
+      top: 20px;
+      border-width: 8px;
+      border-style: solid;
+      border-color: transparent rgba(255,248,230,0.95) transparent transparent;
+    }
+
+    .title { font-size: 22px; font-weight: 900; margin-bottom: 6px; }
+    .subtitle { font-size: 13px; color: #555; margin-bottom: 16px; }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 800;
+      margin-bottom: 10px;
+      color: #2f3d52;
+    }
+
+    .mood-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .mood-btn {
+      border-radius: 999px;
+      border: none;
+      padding: 9px 12px;
+      font-size: 13px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      cursor: pointer;
+      background: #f3f6ff;
+      box-shadow: 0 6px 14px rgba(121,155,255,0.18);
+    }
+
+    .mood-btn.active {
+      background: linear-gradient(90deg, #a2c5ff, #ffc36a);
+      color: #fff;
+      transform: translateY(-2px);
+    }
+
+    .mood-desc {
+      font-size: 12px;
+      color: #555;
+      min-height: 36px;
+      margin-bottom: 12px;
+    }
+
+    .btn-primary {
+      width: 100%;
+      border-radius: 999px;
+      padding: 11px 18px;
+      border: none;
+      font-size: 15px;
+      font-weight: 800;
+      cursor: pointer;
+      background: linear-gradient(90deg, #ff9fb9, #ffc36a);
+      color: #fff;
+    }
+    .btn-primary:disabled { opacity: .5; }
+  </style>
+</head>
+
+<body>
+<div class="bg"></div>
+
+<div class="screen">
+  <div class="app">
+
+    <div class="header">
+      <div class="avatar" id="avatarEmoji"></div>
+      <div class="speech" id="speechText">
+        嗨～選一個現在的狀態，讓我們陪你慢慢呼吸。
+      </div>
+    </div>
+
+    <div class="title">正念冥想</div>
+    <div class="subtitle" id="subtitleText">
+      每個角色都有一段屬於它的正念故事。
+    </div>
+
+    <div class="section-title">今天的你，比較接近哪一種？</div>
+
+    <div class="mood-list">
+      <button class="mood-btn" data-mood="nervous">🐧 緊張</button>
+      <button class="mood-btn" data-mood="anxious">🐼 焦慮</button>
+      <button class="mood-btn" data-mood="calm">🐱 平靜</button>
+      <button class="mood-btn" data-mood="sleepy">🐰 疲累</button>
+      <button class="mood-btn" data-mood="sad">🍞 難過</button>
+      <button class="mood-btn" data-mood="excited">🦊 快樂</button>
+    </div>
+
+    <div class="mood-desc" id="moodDesc">
+      不用想太久，第一個浮現的選項就可以。
+    </div>
+
+    <button class="btn-primary" id="goStoryBtn" disabled>
+    開始
+    </button>
+
+  </div>
+</div>
+
+<!-- ===== 背景音樂（自動，第一次互動才播放） ===== -->
+<audio id="bgm" loop>
+  <source src="bgm.mp3" type="audio/mpeg">
+</audio>
+
+<script>
+/* ===== 六角色 → 故事頁 ===== */
+const moodConfig = {
+  nervous:{ emoji:"🐧", desc:"把緊張轉為穩定。", speech:"我們慢慢來。", subtitle:"企鵝CEO的定心練習。", link:"企鵝.html" },
+  anxious:{ emoji:"🐼", desc:"讓心慢下來。", speech:"我會陪著你。", subtitle:"熊貓的安定練習。", link:"竹間.html" },
+  calm:{ emoji:"🐱", desc:"回到安靜。", speech:"戴上耳機。", subtitle:"卯咪的靜謐頻率。", link:"卯咪.html" },
+  sleepy:{ emoji:"🐰", desc:"準備休息。", speech:"慢慢關機。", subtitle:"倦倦的棉花糖睡眠術。", link:"倦倦.html" },
+  sad:{ emoji:"🍞", desc:"我陪著你。", speech:"現在就很好。", subtitle:"吐司的溫柔陪伴。", link:"吐司.html" },
+  excited:{ emoji:"🦊", desc:"收藏快樂。", speech:"這份感覺很開心。", subtitle:"狐妮的陽光收藏罐。", link:"狐妮.html" }
+};
+
+const avatarEmoji = document.getElementById("avatarEmoji");
+const speechText = document.getElementById("speechText");
+const subtitleText = document.getElementById("subtitleText");
+const moodDesc = document.getElementById("moodDesc");
+const buttons = document.querySelectorAll(".mood-btn");
+const goStoryBtn = document.getElementById("goStoryBtn");
+const bgm = document.getElementById("bgm");
+
+let selectedMood = null;
+let musicStarted = false;
+
+/* ===== 第一次互動就播放背景音樂 ===== */
+function startBgmOnce(){
+  if (musicStarted) return;
+  musicStarted = true;
+  bgm.play().catch(()=>{});
+}
+
+document.addEventListener("click", startBgmOnce, { once:true });
+
+buttons.forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    startBgmOnce();
+
+    const mood = btn.dataset.mood;
+    selectedMood = mood;
+
+    buttons.forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+
+    const m = moodConfig[mood];
+    avatarEmoji.textContent = m.emoji;
+    moodDesc.textContent = m.desc;
+    speechText.textContent = m.speech;
+    subtitleText.textContent = m.subtitle;
+
+    goStoryBtn.disabled = false;
+  });
+});
+
+/* ===== 進故事前關音樂 ===== */
+goStoryBtn.addEventListener("click",()=>{
+  if (!selectedMood) return;
+  bgm.pause();
+  bgm.currentTime = 0;
+  window.location.href = moodConfig[selectedMood].link;
+});
+</script>
+</body>
+</html>

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCircleUser, faCommentDots, faBrain, faEarthAmericas, faHeart, faBook, faMapLocationDot, faGamepad } from '@fortawesome/free-solid-svg-icons';
+import { faCircleUser, faCommentDots, faBrain, faEarthAmericas, faHeart, faBook, faMapLocationDot, faGamepad, faSpa } from '@fortawesome/free-solid-svg-icons';
 import '../../HP/hp.css';
 
 // RWD: 針對 header 的自訂樣式
@@ -120,6 +120,15 @@ function Header({ setActivePage, userInfo }) {
                                         <FontAwesomeIcon icon={faBrain} />
                                     </div>
                                     <div className="category-name">冥想</div>
+                                </div>
+                                <div className="category-item"
+                                    onClick={() => { setActivePage('mindfulness'); setMenuOpen(false); }}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <div className="category-icon">
+                                        <FontAwesomeIcon icon={faSpa} />
+                                    </div>
+                                    <div className="category-name">正念</div>
                                 </div>
                                 <div className="category-item"
                                     onClick={() => { setActivePage('clinic-map'); setMenuOpen(false); }}

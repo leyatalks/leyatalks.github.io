@@ -37,8 +37,12 @@ function buildHierarchy(records, userNickname = '使用者') {
       category: r.category,             // 繼承分類以便上色
       originalNote: r.note,             // 保存原始信念 (B) 供 REBT 使用
       originalSource: r.source,         // 保存原始事件 (A) 供 REBT 使用
-      id: `record-${index}`,            // 唯一 ID
-      totalFrequency: emotionCounts[emotionName] || 1
+      id: r.id || `record-${index}`,           // 唯一 ID
+      totalFrequency: emotionCounts[emotionName] || 1, // 該情緒出現次數
+      initialStress: r.current_stress !== undefined ? r.current_stress : 100, // 初始壓力值
+      isResolved: r.is_resolved || false,
+      dispute: r.user_dispute, 
+      newBelief: r.new_belief
     };
 
     // Level 2: B (Belief) - 信念
@@ -132,8 +136,8 @@ export default function StressMindMap({
         // A (事件): 離圓心近一點 (例如 30% 的位置)
         d.y = maxRadius * 0.3; 
       } else if (d.depth === 2) {
-        // B (信念): ★ 拉長 A 到 B 的距離 (放在 75% 的位置)
-        d.y = maxRadius * 0.75; 
+        // B (信念): ★ 拉長 A 到 B 的距離 (放在 60% 的位置)
+        d.y = maxRadius * 0.6; 
       } else if (d.depth === 3) {
         // C (後果): 最外圈 (100% 的位置)
         d.y = maxRadius; 
@@ -152,13 +156,26 @@ export default function StressMindMap({
 
       // Depth 3: C (後果) - 這是主要壓力點，大小依據壓力狀態改變
       if (d.data.type === 'C (後果)') {
-        // 取得該情緒的總出現次數 (預設 1)
-        const count = d.data.totalFrequency || 1;
+        // 優先讀取 stressStates (剛點擊完的狀態)，若無則讀取 initialStress (資料庫存的狀態)
+        const keyName = d.data.originalSource || d.data.name; // 這裡要注意 key 的一致性
+        // 注意：為了對應精準，建議用 ID，但目前 stressStates 是用 name 做 key。
+        // 我們先維持用 name，但邏輯要加上 initialStress
+        
+        let stressValue = 100;
+        if (stressStates[keyName] !== undefined) {
+             stressValue = stressStates[keyName];
+        } else if (d.data.initialStress !== undefined) {
+             stressValue = d.data.initialStress;
+        }
 
-        // 基礎大小 12，每多出現一次半徑 +3 (設個上限以免大到蓋住別人)
-        // 例如出現 1 次 = 12, 出現 5 次 = 24
+        const count = d.data.totalFrequency || 1;
+        // 壓力小 (已療癒) 就不放大
+        if (stressValue < 60) {
+            return 12; // 回復到基礎大小
+        }
+        
         const size = 12 + (count * 3);
-        return Math.min(size, 40); // 最大不超過 40
+        return Math.min(size, 40);
       }
 
       return 10;
@@ -179,13 +196,18 @@ export default function StressMindMap({
 
       // Depth 3: C (後果) - 橘色 (代表情緒/壓力結果)
       if (d.data.type === 'C (後果)') {
-        // 取得壓力狀態
-        const keyName = d.data.originalSource || d.data.name;
-        const currentStress = stressStates[keyName] !== undefined ? stressStates[keyName] : 100;
 
-        // --- 療癒變色邏輯保持不變 ---
+        const keyName = d.data.originalSource || d.data.name;
+        
+        let stressValue = 100;
+        if (stressStates[keyName] !== undefined) {
+             stressValue = stressStates[keyName];
+        } else if (d.data.initialStress !== undefined) {
+             stressValue = d.data.initialStress;
+        }
+
         // 如果壓力已緩解 (< 60)，變成平靜的淡綠色
-        if (currentStress < 60) return '#A8D5BA';
+        if (stressValue < 60) return '#66b786';
 
         const count = d.data.totalFrequency || 1;
         // 基礎橘色 '#FF9F43'
@@ -285,7 +307,7 @@ export default function StressMindMap({
       .style('stroke-linejoin', 'round')
       .style('pointer-events', 'none')
       .text(d => {
-        if (d.data.type === 'B (信念)') return '';
+        if (d.data.type === 'A (事件)' || d.data.type === 'B (信念)') return '';
         return d.data.name;
       });
 
@@ -325,13 +347,44 @@ export default function StressMindMap({
         content += `<div style="margin-top:4px; font-size:10px; color:#666;">${d.data.type}</div>`;
       }
 
-      if (d.data.type === 'C (後果)' && d.data.detail) {
-        content += `<div style="margin-top:4px; border-top:1px solid #eee; padding-top:4px;">影響：${d.data.detail}</div>`;
+      const isHealed = d.data.type === 'C (後果)' && (d.data.isResolved || (d.data.initialStress && d.data.initialStress < 60));
+
+      if (isHealed) {
+        // --- 顯示 REBT 轉念成果 ---
+        content += `<div style="margin-top:6px; padding-top:6px; border-top:1px dashed #ccc;">`;
+        
+        // 顯示駁斥 (D)
+        if (d.data.dispute) {
+          content += `<div style="margin-bottom:4px; font-size:11px; color:#555;">
+            <span style="color:#e57373; font-weight:bold;">⚔️ 駁斥：</span>${d.data.dispute}
+          </div>`;
+        }
+        
+        // 顯示新觀點 (E)
+        if (d.data.newBelief) {
+          content += `<div style="font-size:11px; color:#555;">
+            <span style="color:#4ECDC4; font-weight:bold;">🌱 新觀點：</span>${d.data.newBelief}
+          </div>`;
+        } else {
+          // 如果沒有詳細文字，顯示預設訊息
+          content += `<div style="font-size:11px; color:#4ECDC4;">✨ 已完成轉念療癒</div>`;
+        }
+        
+        content += `</div>`;
+      } else {
+        // --- 未療癒：顯示原本的負面影響 ---
+        if (d.data.type === 'C (後果)' && d.data.detail) {
+          content += `<div style="margin-top:4px; border-top:1px solid #eee; padding-top:4px;">影響：${d.data.detail}</div>`;
+        }
       }
 
-      // 如果是 C，提示可以點擊
+      // 點擊提示
       if (d.data.type === 'C (後果)') {
-        content += `<div style="margin-top:4px; color:#e57373; font-weight:bold;">👉 點擊進行轉念療癒</div>`;
+        if (isHealed) {
+           content += `<div style="margin-top:6px; color:#4ECDC4; font-weight:bold; font-size:10px;">(已解決)</div>`;
+        } else {
+           content += `<div style="margin-top:4px; color:#e57373; font-weight:bold;">👉 點擊進行轉念療癒</div>`;
+        }
       }
 
       showTooltip(event, content);
@@ -341,16 +394,39 @@ export default function StressMindMap({
         hideTooltip();
       })
       .on('click', (event, d) => {
-        // 只有點擊最外層 C (後果) 才觸發
         if (d.data.type === 'C (後果)' && onNodeClick) {
+          
+          // --- ★ 新增：檢查是否已療癒 ---
+          const keyName = d.data.originalSource || d.data.name;
+          let stressValue = 100;
+          
+          // 判斷目前的壓力值 (優先讀互動狀態，沒有則讀資料庫初始值)
+          if (stressStates[keyName] !== undefined) {
+             stressValue = stressStates[keyName];
+          } else if (d.data.initialStress !== undefined) {
+             stressValue = d.data.initialStress;
+          }
+
+          // 判斷標準：資料庫記為 isResolved 或壓力值 < 60
+          const isHealed = d.data.isResolved || stressValue < 60;
+
+          // ★ 關鍵邏輯：如果已經療癒，阻止點擊事件繼續傳遞，直接結束
+          if (isHealed) {
+             event.stopPropagation();
+             // 手機上這會讓點擊只觸發 Tooltip 顯示成果，而不會打開 Modal
+             return; 
+          }
+          // ---------------------------
+
           event.stopPropagation();
 
-          // 組合需要傳給父層 Modal 的資料
+          // 未療癒 (紅色/橘色) 才執行以下開啟 Modal 的動作
           const rebtData = {
-            name: d.data.originalSource || d.data.name, // 用事件名稱作為 ID 來查找/更新壓力值
-            event: d.data.originalSource, // A
-            belief: d.data.originalNote,  // B (這是要被駁斥的)
-            consequence: d.data.name,     // C
+            id: d.data.id,
+            name: d.data.originalSource || d.data.name, 
+            event: d.data.originalSource, 
+            belief: d.data.originalNote,  
+            consequence: d.data.name,     
             impact: d.data.detail
           };
 

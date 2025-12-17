@@ -1114,6 +1114,27 @@ body {
     background: none;
 }
 
+.sm-footer {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 1rem;
+    margin-bottom: auto;
+    flex-wrap: wrap;
+    align-items: center;
+}
+
+.chat-history {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+}
+
+/* 保持底部輸入列預留空間 */
+.chat-history {
+    padding-bottom: var(--chat-input-offset);
+}
+
 /* 平板專用 RWD（769px~1023px） */
 @media (min-width: 769px) and (max-width: 1023px) {
     :root {
@@ -1125,14 +1146,13 @@ body {
         min-width: 0;
         margin: 0 !important;
     }
-    
-    .content-area{
-        padding: 0;    
+
+    .content-area {
+        padding: 0;
         margin-bottom: 0;
     }
 
     .ap-header {
-        max-width: var(--app-max-width);
         width: 100%;
         left: 0;
         right: 0;
@@ -1140,19 +1160,24 @@ body {
         padding: 12px 10px;
         font-size: 1.1em;
     }
+
     .ap-header-title {
         font-size: 1.7em;
         height: 60px;
     }
+
     .content-area {
         max-width: 100% !important;
         margin-left: auto;
         margin-right: auto;
         padding: 0;
+        margin-top: 60px;
     }
+
     .ap-main {
         padding: 0;
     }
+
     .footer {
         max-width: var(--app-max-width);
         margin: 0 auto;
@@ -1160,14 +1185,17 @@ body {
         right: 0;
         padding: 0 10px;
     }
+
     .category-list {
         padding-left: 0;
         padding-right: 0;
     }
+
     .category-col {
         width: 100%;
         gap: 1.5rem;
     }
+
     .category-item {
         width: 90%;
         min-width: 220px;
@@ -1176,20 +1204,25 @@ body {
         padding-right: 1.2rem;
         height: 3.5rem;
     }
+
     .category-icon {
         width: 60px;
         font-size: 22px;
     }
+
     .category-name {
         font-size: 18px;
     }
+
     .ap-aside {
         display: none;
     }
+
     .ap-main {
         margin-left: 0;
         padding-left: 0;
     }
+
     .chat-input-container {
         max-width: var(--app-max-width);
         margin: 0 auto;
@@ -1199,28 +1232,39 @@ body {
         padding-left: 10px;
         padding-right: 10px;
     }
+
     .chat-history {
         padding-left: 0;
         padding-right: 0;
     }
+
     .user-header {
         flex-direction: row;
         gap: 10px;
     }
+
     .user-avatar {
         width: 70px;
         height: 70px;
     }
+
     .logout-btn {
         font-size: 14px;
         padding: 10px 14px;
     }
+
     .login-hint-modal {
         left: 10%;
         width: 80%;
         min-width: 0;
         min-height: 40vh;
     }
+
+    .stress-title {
+        margin-top: 2rem;
+    }
+
+
 }
 
 @keyframes disclaimer {
@@ -1234,6 +1278,17 @@ body {
 }
 
 @media (max-width: 768px) {
+
+    .ap-header {
+        max-width: none;
+        width: 100%;
+        left: 0;
+        right: 0;
+        margin: 0 auto;
+        padding: 12px 10px;
+        font-size: 1.1em;
+    }
+
     .disclaimer-track {
         animation: disclaimer 15s linear infinite;
     }
@@ -1295,17 +1350,18 @@ body {
     .login-hint-button {
         margin-top: 10%;
     }
-}
 
-.chat-history {
-    flex: 1;
-    min-height: 0;
-    overflow-y: auto;
-}
+    .stress-title {
+        margin-top: 0;
+    }
 
-/* 保持底部輸入列預留空間 */
-.chat-history {
-    padding-bottom: var(--chat-input-offset);
-}
+    .sm-footer {
+        margin-bottom: 5rem;
+        flex-direction: column;
+        height: fit-content;
+    }
 
-/* ===== Chat layout fix end ===== */
+    .chat-history {
+        margin-bottom: 1rem;
+    }
+}

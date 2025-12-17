@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>竹間的深呼吸練習</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #000;
+      background-image: url("竹林.jpg"); /* ← 換成你的背景圖片 */
+      background-size: cover;
+      background-position: center;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      color: #eefcef;
+    }
+
+    .overlay {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.35),
+        rgba(0, 0, 0, 0.7)
+      );
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 16px 24px;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .overlay { padding: 24px 40px 32px; }
+    }
+
+    /* ===== 思緒泡泡：背景漂浮層 ===== */
+    .thought-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .thought-bubble {
+      position: absolute;
+      bottom: -40px;
+      max-width: 220px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: #e9fff2;
+      background: rgba(15, 40, 28, 0.7);
+      border: 1px solid rgba(190, 240, 210, 0.7);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      animation-name: floatBubble;
+      animation-timing-function: ease-out;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes floatBubble {
+      0% {
+        transform: translateY(0) translateX(0) scale(0.9);
+        opacity: 0;
+      }
+      10% { opacity: 0.9; }
+      50% { transform: translateY(-40vh) translateX(10px) scale(1); }
+      100% {
+        transform: translateY(-75vh) translateX(-5px) scale(0.96);
+        opacity: 0;
+      }
+    }
+
+    /* 主內容放在泡泡上面 */
+    .header,
+    .character-box,
+    .subtitle-box,
+    .controls {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ===== 右上角控制列（開始 / 暫停 / 停止 / 聲音） ===== */
+    .controls {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(210, 240, 220, 0.7);
+      background: rgba(5, 20, 12, 0.7);
+      color: #eaffea;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+      background: rgba(10, 40, 24, 0.9);
+    }
+
+    .icon-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .icon-btn span { pointer-events: none; }
+
+    /* ===== 上方標題區 ===== */
+    .header {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto 8px auto;
+      padding-top: 40px; /* 留點空間給右上角按鈕 */
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      color: #d8f4de;
+      opacity: 0.92;
+    }
+
+    /* ===== 中間角色影片區 ===== */
+    .character-box {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 0 12px;
+    }
+
+    .character-inner { text-align: center; }
+
+    .character-video {
+      width: min(260px, 55vw);
+      max-height: 50vh;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+      background: #000;
+      margin: 0 auto;
+    }
+
+    .character-video video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* 竹林呼吸提示圈（只在呼吸引導階段秀） */
+    .breathe-circle {
+      margin-top: 12px;
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(190, 240, 210, 0.9);
+      background: rgba(0, 0, 0, 0.5);
+      color: #eaffea;
+      font-size: 0.9rem;
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      white-space: nowrap;
+    }
+    .breathe-circle.show {
+      opacity: 1;
+      transform: scale(1);
+      animation: bamboo-breath 10s ease-in-out infinite;
+    }
+
+    @keyframes bamboo-breath {
+      0%   { transform: scale(0.9);  opacity: 0.8; }
+      40%  { transform: scale(1.15); opacity: 1;   }
+      100% { transform: scale(0.86); opacity: 0.85;}
+    }
+
+    /* ===== 底部字幕框（跟原本一樣） ===== */
+    .subtitle-box {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(25, 18, 10, 0.92);
+      padding: 14px 20px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(255, 214, 150, 0.55);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .subtitle-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      text-align: center;
+      min-height: 2.8em;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      white-space: pre-line;
+    }
+    .subtitle-text.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    /* ===== 返回入口按鈕 ===== */
+.back-home {
+  position: fixed;
+  top: 16px;
+  left: 16px;
+  z-index: 9999;
+
+  display: flex;
+  align-items: center;
+  gap: 6px;
+
+  padding: 8px 12px;
+  border-radius: 999px;
+  font-size: 13px;
+  font-weight: 700;
+
+  background: rgba(0,0,0,0.55);
+  color: #fff;
+  border: 1px solid rgba(255,255,255,0.4);
+  backdrop-filter: blur(8px);
+
+  cursor: pointer;
+  user-select: none;
+  transition: transform .15s ease, opacity .15s ease;
+}
+
+.back-home:hover {
+  transform: translateY(-1px);
+  opacity: 0.95;
+}
+
+  </style>
+</head>
+
+<body>
+<div class="overlay">
+  <!-- 思緒泡泡浮動層 -->
+  <div class="thought-layer" id="thoughtLayer"></div>
+
+  <!-- 控制按鈕：開始 / 暫停 / 停止 / 聲音 -->
+  <div class="controls">
+    <button class="icon-btn" id="startBtn" title="開始"><span>▶</span></button>
+    <button class="icon-btn" id="pauseBtn" title="暫停" disabled><span>⏸</span></button>
+    <button class="icon-btn" id="stopBtn" title="停止" disabled><span>⏹</span></button>
+    <button class="icon-btn" id="soundBtn" title="背景音樂開關">
+      <span id="soundIcon">🔊</span>
+    </button>
+  </div>
+
+  <!-- 上方大標＋副標 -->
+  <header class="header">
+    <div class="header-title">竹間的深呼吸練習</div>
+    <div class="header-subtitle">
+      當你焦慮、思緒混亂、壓力大時，跟竹間一起暫停一下，就幾分鐘就好。
+    </div>
+  </header>
+
+  <!-- 中間角色影片（MP4） -->
+  <div class="character-box">
+    <div class="character-inner">
+      <div class="character-video">
+        <!-- 改成你的竹間影片檔名 -->
+        <video src="熊貓.mp4" autoplay muted loop playsinline></video>
+      </div>
+      <div class="breathe-circle" id="breatheCircle">吸 4 秒 · 吐 6 秒</div>
+    </div>
+  </div>
+
+  <!-- 底部字幕 -->
+  <div class="subtitle-box">
+    <div class="subtitle-text" id="subtitleText"></div>
+  </div>
+</div>
+
+<!-- 背景音樂：把 bgm.mp3 換成你的 MP3 檔案 -->
+<audio id="bgmAudio" loop>
+  <source src="bgm.mp3" type="audio/mpeg" />
+</audio>
+
+<script>
+/* ===== 竹間：深呼吸練習（只換故事內容） ===== */
+const stages = [
+  {
+    key: "empathy",
+    dialog: [
+      "「嗨...你也覺得腦袋轉個不停，停不下來嗎？」",
+      "「我懂這種感覺。螢幕上的事情好像永遠處理不完...」",
+      "「嘿，既然我們都在這裡，不如一起暫停一下？就幾分鐘就好。」"
+    ],
+    duration: 3
+  },
+  {
+    key: "grounding",
+    dialog: [
+      "「來，試著像我一樣。」",
+      "「先把手邊的事情放下，讓雙手空出來。」",
+      "「感覺一下你的身體坐在椅子上，或是腳踩在地板上的感覺...那是大地在穩穩地支撐著你。」",
+      "「你在這裡是安全的，不需要急著去任何地方。」"
+    ],
+    duration: 3
+  },
+  {
+    key: "bamboo",
+    dialog: [
+      "「想像我們現在坐在一片安靜的竹林裡。」",
+      "「跟著我的節奏，我們來做幾次『竹林呼吸』。」",
+      "「慢慢吸氣... 想像清新的風吹進身體...（持續4秒）」",
+      "「輕輕吐氣... 把所有的焦慮像落葉一樣吹走...（持續6秒）」"
+    ],
+    breathing: true,
+    duration: 6
+  },
+  {
+    key: "visual",
+    dialog: [
+      "「你有發現嗎？當我們靜下來，剛剛那些讓你煩惱的事情，其實就像這塊石頭一樣，它待在那裡，但不會傷害你。」",
+      "「你不需要現在就搬走它，你只需要像竹子一樣，站穩，呼吸。」",
+      "「風會吹過，焦慮會經過，而你會依然在這裡，堅韌且平靜。」"
+    ],
+    duration: 4
+  },
+  {
+    key: "return",
+    dialog: [
+      "「做得很好。感覺稍微輕盈一點了嗎？」",
+      "「謝謝你陪我一起練習。」",
+      "「帶著這份平靜回到生活中吧。記住，無論多忙，你隨時都可以回到這片竹林。」",
+      "「下次見。」"
+    ],
+    duration: 4
+  }
+];
+
+const subtitleEl = document.getElementById("subtitleText");
+const breatheCircle = document.getElementById("breatheCircle");
+
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const stopBtn  = document.getElementById("stopBtn");
+const soundBtn = document.getElementById("soundBtn");
+const soundIcon = document.getElementById("soundIcon");
+const bgmAudio = document.getElementById("bgmAudio");
+
+let stageIndex = 0;
+let lineIndex = 0;
+let isRunning = false;
+let finished = false;
+let lineTimeoutId = null;
+let stageTimeoutId = null;
+let bgmEnabled = true;
+
+const lineDuration = 3200;
+
+function clearAllTimers() {
+  if (lineTimeoutId) clearTimeout(lineTimeoutId);
+  if (stageTimeoutId) clearTimeout(stageTimeoutId);
+  lineTimeoutId = null;
+  stageTimeoutId = null;
+}
+
+function resetFlow() {
+  clearAllTimers();
+  stageIndex = 0;
+  lineIndex = 0;
+  isRunning = false;
+  finished = false;
+  subtitleEl.textContent = "";
+  subtitleEl.classList.remove("show");
+  breatheCircle.classList.remove("show");
+
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+  stopBtn.disabled = true;
+}
+
+function playBgmIfNeeded() {
+  if (!bgmEnabled) return;
+  bgmAudio.play().catch(() => {});
+}
+function pauseBgm() { bgmAudio.pause(); }
+function stopBgm() { bgmAudio.pause(); bgmAudio.currentTime = 0; }
+
+function playNextLine() {
+  if (!isRunning) return;
+
+  const stage = stages[stageIndex];
+
+  if (stage.breathing) breatheCircle.classList.add("show");
+  else breatheCircle.classList.remove("show");
+
+  if (lineIndex >= stage.dialog.length) {
+    clearTimeout(stageTimeoutId);
+    stageTimeoutId = setTimeout(() => {
+      if (!isRunning) return;
+      stageIndex++;
+      if (stageIndex < stages.length) {
+        lineIndex = 0;
+        subtitleEl.classList.remove("show");
+        subtitleEl.textContent = "";
+        playNextLine();
+      } else {
+        isRunning = false;
+        finished = true;
+        pauseBtn.disabled = true;
+        startBtn.disabled = false;
+        breatheCircle.classList.remove("show");
+      }
+    }, stage.duration * 1000);
+    return;
+  }
+
+  const line = stage.dialog[lineIndex];
+  subtitleEl.classList.remove("show");
+  void subtitleEl.offsetWidth;
+  subtitleEl.textContent = line;
+  subtitleEl.classList.add("show");
+
+  lineIndex++;
+  clearTimeout(lineTimeoutId);
+  lineTimeoutId = setTimeout(playNextLine, lineDuration);
+}
+
+/* ===== 按鈕事件 ===== */
+startBtn.addEventListener("click", () => {
+  if (finished) resetFlow();
+  if (isRunning) return;
+
+  isRunning = true;
+  playBgmIfNeeded();
+
+  startBtn.disabled = true;
+  pauseBtn.disabled = false;
+  stopBtn.disabled = false;
+
+  playNextLine();
+});
+
+pauseBtn.addEventListener("click", () => {
+  if (!isRunning) return;
+  isRunning = false;
+  clearAllTimers();
+  pauseBgm();
+
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+  stopBtn.disabled = false;
+});
+
+stopBtn.addEventListener("click", () => {
+  isRunning = false;
+  finished = false;
+  clearAllTimers();
+  stopBgm();
+  resetFlow();
+});
+
+soundBtn.addEventListener("click", () => {
+  bgmEnabled = !bgmEnabled;
+  if (!bgmEnabled) {
+    soundIcon.textContent = "🔇";
+    pauseBgm();
+  } else {
+    soundIcon.textContent = "🔊";
+    if (isRunning) playBgmIfNeeded();
+  }
+});
+
+resetFlow();
+startBtn.click();
+
+/* ===== 思緒泡泡：5 秒一個，不連續重複 ===== */
+const thoughtMessages = [
+  "慢慢來，你不需要急。",
+  "先把手邊的事情放下。",
+  "你在這裡是安全的。",
+  "像竹子一樣，站穩，呼吸。",
+  "風會吹過，焦慮會經過。"
+];
+
+const thoughtLayer = document.getElementById("thoughtLayer");
+let lastMessage = null;
+
+function getRandomMessage() {
+  let msg;
+  do {
+    msg = thoughtMessages[Math.floor(Math.random() * thoughtMessages.length)];
+  } while (msg === lastMessage && thoughtMessages.length > 1);
+  lastMessage = msg;
+  return msg;
+}
+
+function spawnThought() {
+  const bubble = document.createElement("div");
+  bubble.className = "thought-bubble";
+  bubble.textContent = getRandomMessage();
+
+  bubble.style.left = (20 + Math.random() * 60) + "%";
+  const duration = 8000 + Math.random() * 6000;
+  bubble.style.animationDuration = duration + "ms";
+
+  const scale = 0.9 + Math.random() * 0.4;
+  bubble.style.transform = `scale(${scale})`;
+
+  thoughtLayer.appendChild(bubble);
+  bubble.addEventListener("animationend", () => bubble.remove());
+}
+
+setInterval(spawnThought, 5000);
+
+// 返回入口
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("backHomeBtn");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    window.location.href = "正念.html";
+  });
+});
+
+
+</script>
+<div class="back-home" id="backHomeBtn">
+  ← 返回入口
+</div>
+
+</body>
+</html>

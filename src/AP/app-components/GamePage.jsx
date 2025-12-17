@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faWater, faSoap, faExplosion, faArrowLeft } from '@fortawesome/free-solid-svg-icons';
+import './Game.css';
 
 const games = [
     {
@@ -77,7 +78,7 @@ function GamePage() {
     }
 
     return (
-        <div className="gp-container" style={{ padding: '2rem 1rem', height: '100%', overflowY: 'auto' }}>
+        <div className="gp-container">
             <h1 style={{ 
                 textAlign: 'center', 
                 marginBottom: '2rem', 
@@ -85,29 +86,14 @@ function GamePage() {
                 fontSize: '1.8rem',
                 fontWeight: 'bold'
             }}>
-                放鬆小遊戲
+                紓壓小遊戲
             </h1>
-            <div style={{ 
-                display: 'grid', 
-                gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))', 
-                gap: '1.5rem',
-                padding: '0 0.5rem'
-            }}>
+            <div className="game-grid">
                 {games.map((game) => (
                     <div 
                         key={game.id} 
                         onClick={() => handleGameClick(game)}
-                        style={{
-                            backgroundColor: '#fff',
-                            borderRadius: '1rem',
-                            overflow: 'hidden',
-                            boxShadow: '0 4px 15px rgba(0,0,0,0.08)',
-                            cursor: 'pointer',
-                            transition: 'transform 0.2s, box-shadow 0.2s',
-                            display: 'flex',
-                            flexDirection: 'column',
-                            height: '50em'
-                        }}
+                        className='game-card'
                         onMouseEnter={(e) => {
                             e.currentTarget.style.transform = 'translateY(-5px)';
                             e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.12)';
@@ -117,14 +103,9 @@ function GamePage() {
                             e.currentTarget.style.boxShadow = '0 4px 15px rgba(0,0,0,0.08)';
                         }}
                     >
-                        <div style={{ 
-                            flex: 5, 
+                        <div className='game-content' style={{
                             backgroundColor: game.color, 
-                            display: 'flex', 
-                            alignItems: 'center', 
-                            justifyContent: 'center',
                             color: game.textColor || '#333',
-                            fontSize: '3rem'
                         }}>
                             <FontAwesomeIcon icon={game.icon} />
                         </div>

@@ -1,0 +1,467 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+    <meta charset="UTF-8" />
+    <title>正念冥想</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+            background: linear-gradient(180deg, #ffe9f2, #e8f5ff);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 16px;
+        }
+
+        .app {
+            background: #ffffffcc;
+            backdrop-filter: blur(10px);
+            border-radius: 24px;
+            box-shadow: 0 14px 40px rgba(0,0,0,0.08);
+            max-width: 540px;
+            width: 100%;
+            padding: 24px 22px 20px;
+        }
+
+        .header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .avatar {
+            width: 68px;
+            height: 68px;
+            border-radius: 50%;
+            background: #ffe3b8;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 34px;
+            box-shadow: 0 6px 14px rgba(255,179,71,0.45);
+        }
+
+        .speech {
+            background: #fff8e6;
+            border-radius: 18px;
+            padding: 10px 12px;
+            font-size: 14px;
+            line-height: 1.5;
+            position: relative;
+        }
+        .speech::after {
+            content: "";
+            position: absolute;
+            left: -8px;
+            top: 20px;
+            border-width: 8px;
+            border-style: solid;
+            border-color: transparent #fff8e6 transparent transparent;
+        }
+
+        .title { font-size: 22px; font-weight: 800; margin-bottom: 6px; }
+        .subtitle { font-size: 13px; color: #666; margin-bottom: 18px; }
+
+        .section { margin-bottom: 18px; }
+        .section-title { font-size: 14px; font-weight: 700; margin-bottom: 8px; color: #374b63; }
+
+        .mood-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 6px;
+        }
+
+        .mood-btn {
+            border-radius: 999px;
+            border: none;
+            padding: 7px 11px;
+            font-size: 13px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            cursor: pointer;
+            background: #f3f6ff;
+            color: #333;
+            box-shadow: 0 3px 8px rgba(121,155,255,0.25);
+            transition: 0.1s;
+        }
+
+        .mood-btn span { font-size: 16px; }
+
+        .mood-btn.active {
+            background: linear-gradient(90deg, #a2c5ff, #ffc36a);
+            color: #fff;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 12px rgba(140,173,255,0.5);
+        }
+
+        .mood-desc { font-size: 12px; color: #555; min-height: 32px; }
+
+        .btn-primary {
+            width: 100%;
+            margin-top: 8px;
+            border-radius: 999px;
+            padding: 10px 18px;
+            border: none;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            background: linear-gradient(90deg, #ff9fb9, #ffc36a);
+            color: #fff;
+            box-shadow: 0 9px 20px rgba(255,152,114,0.45);
+            transition: 0.1s;
+        }
+        .btn-primary:disabled { opacity: .5; cursor: default; }
+
+        /* --- 影片區 --- */
+        .circle-wrapper {
+            width: 230px;
+            height: 230px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .video-shell {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            overflow: hidden;
+            box-shadow: 0 0 30px rgba(120,172,255,0.6);
+            position: relative;
+        }
+
+        .breath-video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        .circle-text {
+            position: absolute;
+            width: 100%;
+            bottom: -35px;
+            text-align: center;
+            font-size: 18px;
+            font-weight: 700;
+            color: #244c74;
+        }
+
+        .phase-text {
+            font-size: 14px;
+            font-weight: 600;
+            color: #244c74;
+            text-align: center;
+            margin-top: 12px;
+            line-height: 1.5;
+        }
+
+        .thought-layer {
+            position: absolute;
+            inset: 0;
+            overflow: visible;
+            pointer-events: none;
+        }
+
+        .thought-bubble {
+            position: absolute;
+            bottom: 0;
+            background: #ffffffdd;
+            border-radius: 16px;
+            padding: 6px 10px;
+            font-size: 11px;
+            color: #555;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.12);
+            animation: floatUp 6s ease-in forwards;
+            max-width: 150px;
+        }
+
+        @keyframes floatUp {
+            0% { transform: translateY(0) scale(.9); opacity: 0; }
+            10% { opacity: 1; }
+            100% { transform: translateY(-160px) scale(1.05); opacity: 0; }
+        }
+
+        .closing { text-align: center; font-size: 14px; color:#444; line-height: 1.6; }
+        .hidden { display: none; }
+        .tagline { font-size: 11px; color:#777; text-align:center; margin-top: 10px;}
+
+        @media (max-width: 480px) {
+            .app { padding: 20px 16px 16px; }
+            .circle-wrapper { width: 200px; height: 200px; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="app">
+
+    <!-- 開場 -->
+    <div class="header">
+        <div class="avatar" id="avatarEmoji">🍞</div>
+        <div class="speech" id="speechText">
+            嘿～今天辛苦了。接下來這幾分鐘，我陪你一起休息一下。
+        </div>
+    </div>
+
+    <div class="title">正念冥想</div>
+    <div class="subtitle" id="subtitleText">
+        選一個現在的狀態，讓我們陪你慢慢呼吸。
+    </div>
+
+    <!-- Step 1：選心情 -->
+    <div id="stepMood" class="section">
+        <div class="section-title">今天的你，比較像哪一種狀態？</div>
+
+        <div class="mood-list">
+            <button class="mood-btn" data-mood="nervous"><span>☁️</span>緊張</button>
+            <button class="mood-btn" data-mood="anxious"><span>🔥</span>焦慮</button>
+            <button class="mood-btn" data-mood="calm"><span>🍃</span>平靜</button>
+            <button class="mood-btn" data-mood="sad"><span>💧</span>難過</button>
+            <button class="mood-btn" data-mood="sleepy"><span>😴</span>睡前</button>
+            <button class="mood-btn" data-mood="excited"><span>🎉</span>快樂</button>
+        </div>
+
+        <div class="mood-desc" id="moodDesc">
+            不用想太久，第一個浮現的選項就可以。
+        </div>
+
+        <button class="btn-primary" id="startSessionBtn" disabled>選好了，開始練習</button>
+    </div>
+
+    <!-- Step 2：影片呼吸練習 -->
+    <div id="stepBreath" class="section hidden">
+        <div class="circle-wrapper">
+
+            <div class="video-shell">
+                <!-- 影片預設也給一個 src，JS 會依心情改 -->
+                <video
+                    id="breathVideo"
+                    class="breath-video"
+                    src="胡尼.mp4"
+                    autoplay
+                    loop
+                    muted
+                    playsinline
+                ></video>
+
+                <div class="circle-text" id="circleText">準備開始</div>
+            </div>
+
+            <div class="thought-layer" id="thoughtLayer"></div>
+        </div>
+
+        <div class="phase-text" id="phaseText">
+            找個舒服的姿勢坐好，讓肩膀慢慢往下掉一點。
+        </div>
+
+        <button class="btn-primary" id="breathBtn">開始正念練習</button>
+    </div>
+
+    <!-- Step 3：結尾 -->
+    <div id="closingBlock" class="section hidden">
+        <div class="closing">
+            這幾分鐘你願意停下來照顧自己，真的很棒。<br>
+            不管今天發生什麼，你已經做得很好了。
+        </div>
+        <button class="btn-primary" id="restartBtn">再來一輪</button>
+
+        <div class="tagline">下次心又累的時候，胡尼還在這裡等你。🤍</div>
+    </div>
+</div>
+
+
+<script>
+/* ----------- 心情設定文字 + 對應影片（目前都胡尼.mp4） ----------- */
+/* 之後你只要改 video: '別的檔名.mp4' 就可以換不同狀態的影片 */
+const moodConfig = {
+    nervous:{
+        emoji:"☁️",
+        desc:"今天有點緊繃、像雲捲得很緊。沒關係，我們等一下會一起慢慢鬆開。",
+        speech:"看起來你今天有些緊張，那我們一起從幾口呼吸開始好嗎？",
+        subtitle:"不用急著完全放鬆，只要願意停下來就是很棒的開始。",
+        video:"胡尼.mp4"
+    },
+    anxious:{
+        emoji:"🔥",
+        desc:"腦袋像在冒煙、事情很多。等等我們一起把火苗降一點點。",
+        speech:"辛苦了，今天好像有很多事在你腦袋裡跑。先休息一下好嗎？",
+        subtitle:"你不一定要馬上冷靜下來，只要跟著呼吸就好。",
+        video:"胡尼.mp4"
+    },
+    calm:{
+        emoji:"🍃",
+        desc:"心情還算平靜，只是想給自己一小段安靜的時間。",
+        speech:"今天的你狀態不錯，那我們把這幾分鐘當作獎勵自己的小儀式。",
+        subtitle:"平靜的時候練習，也是在替未來比較難的日子存一點力量。",
+        video:"胡尼.mp4"
+    },
+    sad:{
+        emoji:"💧",
+        desc:"心有點酸、想哭或覺得悶悶的。沒關係，我陪你。",
+        speech:"有時候說不上來為什麼，但就是覺得悶。那我們先一起呼吸一下就好。",
+        subtitle:"你不用先變堅強，才能好好呼吸。現在這樣就很好。",
+        video:"胡尼.mp4"
+    },
+    sleepy:{
+        emoji:"😴",
+        desc:"眼皮很重、腦袋糊糊的，只想慢慢關機。",
+        speech:"看起來今天真的累了。那我們就用幾口很溫柔的呼吸，當成睡前儀式。",
+        subtitle:"不用硬撐清醒，讓身體知道：可以準備休息了。",
+        video:"胡尼.mp4"
+    },
+    excited:{
+        emoji:"🎉",
+        desc:"整個人很嗨、精神比較亢奮，像腦袋在開派對。",
+        speech:"今天好像充滿能量，也很好。我們就試著把這份能量放得更穩一點。",
+        subtitle:"不是要把興奮關掉，而是幫它找到一個比較舒服的位置。",
+        video:"胡尼.mp4"
+    }
+};
+
+/* ----------- DOM  ----------- */
+const avatarEmoji = document.getElementById("avatarEmoji");
+const speechText = document.getElementById("speechText");
+const subtitleText = document.getElementById("subtitleText");
+const moodButtons = document.querySelectorAll(".mood-btn");
+const moodDesc = document.getElementById("moodDesc");
+const startSessionBtn = document.getElementById("startSessionBtn");
+const stepMood = document.getElementById("stepMood");
+const stepBreath = document.getElementById("stepBreath");
+const closingBlock = document.getElementById("closingBlock");
+const circleText = document.getElementById("circleText");
+const phaseText = document.getElementById("phaseText");
+const breathBtn = document.getElementById("breathBtn");
+const thoughtLayer = document.getElementById("thoughtLayer");
+const restartBtn = document.getElementById("restartBtn");
+const breathVideo = document.getElementById("breathVideo");
+
+/* ----------- 選心情 ----------- */
+let selectedMood = null;
+
+moodButtons.forEach(btn=>{
+    btn.addEventListener("click",()=>{
+        const mood = btn.dataset.mood;
+        selectedMood = mood;
+
+        moodButtons.forEach(b=>b.classList.remove("active"));
+        btn.classList.add("active");
+
+        const m = moodConfig[mood];
+        avatarEmoji.textContent = m.emoji;
+        moodDesc.textContent = m.desc;
+        speechText.textContent = m.speech;
+        subtitleText.textContent = m.subtitle;
+
+        // 切換影片（現在全部都是胡尼.mp4，之後你可以個別改檔名）
+        if (breathVideo) {
+            breathVideo.src = m.video;
+            breathVideo.currentTime = 0;
+            breathVideo.play().catch(()=>{});
+        }
+
+        startSessionBtn.disabled = false;
+    });
+});
+
+/* ----------- 進入練習 ----------- */
+startSessionBtn.addEventListener("click",()=>{
+    stepMood.classList.add("hidden");
+    stepBreath.classList.remove("hidden");
+    circleText.textContent = "準備開始";
+    phaseText.textContent = "等一下只要跟著胡尼的節奏，慢慢吸氣、吐氣就好。";
+});
+
+/* ----------- 思緒泡泡 ----------- */
+const thoughtMessages = [
+    "分心也沒關係，你發現了就很好。",
+    "腦袋亂很正常，我陪你一起。",
+    "不用逼自己專注，只要呼吸就好。",
+    "你正在照顧現在的自己。",
+    "就算只跟著做一點點也很棒。" 
+];
+
+function spawnThought(){
+    const bubble = document.createElement("div");
+    bubble.className = "thought-bubble";
+    bubble.textContent = thoughtMessages[Math.floor(Math.random()*thoughtMessages.length)];
+    bubble.style.left = (20 + Math.random()*60) + "%";
+
+    thoughtLayer.appendChild(bubble);
+    bubble.addEventListener("animationend",()=>bubble.remove());
+}
+
+/* ----------- 呼吸文字引導 ----------- */
+const phases = [
+    {text:"吸氣", script:"吸氣時，想像身體像小氣球慢慢變大。", duration:4000},
+    {text:"停留", script:"停下來，感受身體被溫柔地托住。", duration:4000},
+    {text:"吐氣", script:"吐氣，把今天的一點疲憊和壓力一起放掉。", duration:4000}
+];
+
+let phaseIndex = 0;
+let loopCount = 0;
+let timer = null;
+let bubbleTimer = null;
+
+function runPhase(){
+    const p = phases[phaseIndex];
+    circleText.textContent = p.text;
+    phaseText.textContent = p.script;
+
+    timer = setTimeout(()=>{
+        phaseIndex++;
+        if(phaseIndex>=phases.length){
+            phaseIndex=0;
+            loopCount++;
+            if(loopCount>=8){ endSession(); return; }
+        }
+        runPhase();
+    }, p.duration);
+}
+
+function startBreathing(){
+    clearTimeout(timer);
+    clearInterval(bubbleTimer);
+
+    phaseIndex = 0;
+    loopCount = 0;
+
+    // 讓影片重新跑一次
+    if (breathVideo) {
+        breathVideo.currentTime = 0;
+        breathVideo.play().catch(()=>{});
+    }
+
+    bubbleTimer = setInterval(spawnThought, 6000);
+    runPhase();
+}
+
+function endSession(){
+    clearTimeout(timer);
+    clearInterval(bubbleTimer);
+
+    circleText.textContent = "做得好！";
+    phaseText.textContent = "你已經完成這一小段練習，可以停在這裡，或再靜靜坐一會。";
+
+    stepBreath.classList.add("hidden");
+    closingBlock.classList.remove("hidden");
+}
+
+/* ----------- 按鈕 ----------- */
+breathBtn.addEventListener("click",()=>{ startBreathing(); });
+
+restartBtn.addEventListener("click",()=>{
+    closingBlock.classList.add("hidden");
+    stepBreath.classList.remove("hidden");
+    startBreathing();
+});
+</script>
+
+</body>
+</html>

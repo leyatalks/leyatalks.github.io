@@ -1,9 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from 'react-router-dom';
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faPaperPlane, faHandHoldingHeart, faShareFromSquare } from "@fortawesome/free-solid-svg-icons";
+import { faPaperPlane, faCircleRight } from "@fortawesome/free-solid-svg-icons";
 
 function ChatPage({ userInfo }) {
     const username = userInfo?.id || 'visitor';
+    const navigate = useNavigate();
 
     const [messages, setMessages] = useState([]);
     const [input, setInput] = useState("");
@@ -35,7 +37,8 @@ function ChatPage({ userInfo }) {
                     text: item.bot_message,
                     encouragement: item.encourage_text,
                     emotion: item.emotion,
-                    image_url: item.image_url
+                    image_url: item.image_url,
+                    recommendation: item.recommendation
                 });
             });
             setMessages(msgs);
@@ -249,7 +252,8 @@ function ChatPage({ userInfo }) {
                                     user_message: userMessage,
                                     bot_message: finalPayload.reply || '',
                                     encourage_text: finalPayload.encouragement || '',
-                                    emotion: finalPayload.emotion || ''
+                                    emotion: finalPayload.emotion || '',
+                                    recommendation: finalPayload.recommendation || ''
                                 })
                             });
                         } catch { }
@@ -318,7 +322,12 @@ function ChatPage({ userInfo }) {
                 setMessages(prev => {
                     if (!prev[botIndex]) return prev;
                     const next = [...prev];
-                    next[botIndex] = { ...next[botIndex], encouragement: data.encouragement, emotion: data.emotion };
+                    next[botIndex] = { 
+                        ...next[botIndex], 
+                        encouragement: data.encouragement, 
+                        emotion: data.emotion,
+                        recommendation: data.recommendation 
+                    };
                     return next;
                 });
                 await fetch("https://leya-backend-vercel.vercel.app/chat-history", {
@@ -329,7 +338,8 @@ function ChatPage({ userInfo }) {
                         user_message: userMessage,
                         bot_message: data.reply,
                         encourage_text: data.encouragement,
-                        emotion: data.emotion
+                        emotion: data.emotion,
+                        recommendation: data.recommendation || ''
                     })
                 });
                 const pollForImage = () => {
@@ -446,6 +456,22 @@ function ChatPage({ userInfo }) {
         }
     };
 
+    const recommendationMap = {
+        '冥想': '/leya/meditation',
+        '正念': '/leya/mindfulness',
+        '心理資源地圖': '/leya/clinic-map',
+        '紓壓小遊戲': '/leya/game',
+        '心情日記': '/leya/mood',
+        '壓力心智圖': '/leya/stress-mind-map'
+    };
+
+    const handleRecommendationClick = (rec) => {
+        const path = recommendationMap[rec];
+        if (path) {
+            navigate(path);
+        }
+    };
+
     const userAvatar = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/usericon.svg";
     const botAvatar = "https://raw.githubusercontent.com/ChenXi0731/leya-fronted/refs/heads/main/public/leyalogo.png";
 
@@ -524,6 +550,14 @@ function ChatPage({ userInfo }) {
                                                     onClick={() => handleEncouragementClick(msg)}
                                                 >
                                                     {msg.encouragement}
+                                                </div>
+                                            )}
+                                            {msg.recommendation && (
+                                                <div 
+                                                    style={{ marginTop: '0.5rem', cursor: 'pointer', color: '#2d7f27ff', textDecoration: 'none', fontWeight: 'bold', opacity: 0.85 }}
+                                                    onClick={() => handleRecommendationClick(msg.recommendation)}
+                                                >
+                                                    推薦你使用{msg.recommendation}<FontAwesomeIcon icon={faCircleRight} style={{ marginLeft: '0.25rem' }} />
                                                 </div>
                                             )}
                                             {username === 'shuics' && msg.emotion && <div style={{ marginTop: '0.5rem', color: 'blue', fontSize: '0.8rem', fontWeight: '500' }}>情緒:{msg.emotion}</div>}

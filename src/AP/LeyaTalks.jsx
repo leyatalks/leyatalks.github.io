@@ -22,6 +22,7 @@ import HomePage from '../HP/HomePage'
 import CharacterPage from './app-components/Character/CharacterPage'
 import GamePage from './app-components/GamePage'
 import ClinicMap from './app-components/ClinicMap'
+import Mindfulness from './app-components/Mindfulness'
 
 
 const DefaultRoute = () => {
@@ -158,6 +159,7 @@ function Application() {
         // 新增：AP 右側容器內嵌的介紹頁面
         'intro-page': '/leya/intro',
         'game-page': '/leya/game',
+        'mindfulness': '/leya/mindfulness',
     };
     const reverseMap = Object.fromEntries(Object.entries(routeMap).map(([k, v]) => [v, k]));
     const legacySetActivePage = (pageKey) => {
@@ -215,6 +217,7 @@ function Application() {
                             <Route path="clinic-map" element={<ClinicMap activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             {/* 介紹頁面內嵌顯示於 AP 右側容器（去除 HomePage Navbar）*/}
                             <Route path="home" element={<HomePage embedded />} />
+                            <Route path="mindfulness" element={<Mindfulness />} />
                             <Route path="*" element={<Navigate to="login" replace />} />
                         </Routes>
                     </div>

@@ -31,20 +31,20 @@ function RebtModal({ nodeData, onClose, onComplete }) {
   const [step, setStep] = React.useState('D'); // 直接從 D 開始，因為 B (信念) 已經在圖表上看到了
   const [disputeInput, setDisputeInput] = React.useState(''); // 駁斥的內容
   const [newBeliefInput, setNewBeliefInput] = React.useState(''); // 新觀點
-  
+
   if (!nodeData) return null;
 
   return (
     <div style={{
-      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)', 
+      position: 'fixed', inset: 0, background: 'rgba(0,0,0,0.6)',
       display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 10000,
       backdropFilter: 'blur(2px)' // 背景模糊效果
     }}>
-      <div style={{ 
-        background: 'white', 
-        padding: '32px', 
-        borderRadius: '20px', 
-        width: '90%', 
+      <div style={{
+        background: 'white',
+        padding: '32px',
+        borderRadius: '20px',
+        width: '90%',
         maxWidth: '480px',
         boxShadow: '0 10px 25px rgba(0,0,0,0.2)',
         position: 'relative',
@@ -73,18 +73,18 @@ function RebtModal({ nodeData, onClose, onComplete }) {
               試著問自己：這真的是百分之百的事實嗎？有沒有反例？
             </p>
 
-            <textarea 
-              placeholder="輸入你的反駁... (例如：失敗一次不代表我是魯蛇，只是這次沒做好)" 
-              style={{ 
-                width: '100%', height: '80px', padding: '12px', borderRadius: '8px', 
+            <textarea
+              placeholder="輸入你的反駁... (例如：失敗一次不代表我是魯蛇，只是這次沒做好)"
+              style={{
+                width: '100%', height: '80px', padding: '12px', borderRadius: '8px',
                 border: '1px solid #ccc', fontSize: '14px', resize: 'none'
               }}
               value={disputeInput}
               onChange={e => setDisputeInput(e.target.value)}
             />
 
-            <button 
-              className="application-link-button" 
+            <button
+              className="application-link-button"
               style={{ marginTop: '8px', opacity: disputeInput ? 1 : 0.6 }}
               disabled={!disputeInput}
               onClick={() => setStep('E')}
@@ -109,21 +109,28 @@ function RebtModal({ nodeData, onClose, onComplete }) {
               試著用「我希望...但如果沒有也沒關係」來造句。
             </p>
 
-            <textarea 
-              placeholder="例如：我希望考好，但如果考不好，我可以修正錯誤，下次再來。" 
-              style={{ 
-                width: '100%', height: '80px', padding: '12px', borderRadius: '8px', 
+            <textarea
+              placeholder="例如：我希望考好，但如果考不好，我可以修正錯誤，下次再來。"
+              style={{
+                width: '100%', height: '80px', padding: '12px', borderRadius: '8px',
                 border: '1px solid #ccc', fontSize: '14px', resize: 'none'
               }}
               value={newBeliefInput}
               onChange={e => setNewBeliefInput(e.target.value)}
             />
 
-            <button 
+            <button
               className="application-link-button"
               style={{ marginTop: '8px', opacity: newBeliefInput ? 1 : 0.6 }}
               disabled={!newBeliefInput}
-              onClick={() => setStep('F')}
+              onClick={() => onComplete({
+                name: nodeData.name,
+                id: nodeData.id,
+                event: nodeData.event,
+                belief: nodeData.belief,
+                dispute: disputeInput,      // 傳出駁斥
+                newBelief: newBeliefInput   // 傳出新信念
+              })}
             >
               完成轉念 ✨
             </button>
@@ -136,12 +143,12 @@ function RebtModal({ nodeData, onClose, onComplete }) {
             <div style={{ fontSize: '60px', marginBottom: '16px' }}>🎉</div>
             <h4 style={{ margin: '0 0 8px', color: '#333' }}>太棒了！</h4>
             <p style={{ color: '#666', lineHeight: '1.6' }}>
-              當你把「必須」轉化為「希望」，壓力就會釋放。<br/>
+              當你把「必須」轉化為「希望」，壓力就會釋放。<br />
               看看你的圓圈，它現在變成了代表平靜的綠色囉！
             </p>
-            
-            <button 
-              className="application-link-button" 
+
+            <button
+              className="application-link-button"
               style={{ width: '100%', marginTop: '20px' }}
               onClick={() => onComplete(nodeData.name)}
             >
@@ -149,14 +156,14 @@ function RebtModal({ nodeData, onClose, onComplete }) {
             </button>
           </div>
         )}
-        
+
         {/* 關閉按鈕 (右上角 X) */}
-        <button 
-          onClick={onClose} 
-          style={{ 
-            position: 'absolute', top: '16px', right: '16px', 
-            background: 'none', border: 'none', fontSize: '20px', 
-            cursor: 'pointer', color: '#999' 
+        <button
+          onClick={onClose}
+          style={{
+            position: 'absolute', top: '16px', right: '16px',
+            background: 'none', border: 'none', fontSize: '20px',
+            cursor: 'pointer', color: '#999'
           }}
         >
           ✕
@@ -216,16 +223,16 @@ function LegendItem({ color, title, desc, benefit }) {
   const [isHovered, setIsHovered] = React.useState(false);
 
   return (
-    <div 
+    <div
       style={{ position: 'relative', cursor: 'help', padding: '4px' }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       {/* 圓點 */}
-      <div style={{ 
-        width: '14px', 
-        height: '14px', 
-        borderRadius: '50%', 
+      <div style={{
+        width: '14px',
+        height: '14px',
+        borderRadius: '50%',
         backgroundColor: color,
         boxShadow: '0 1px 3px rgba(0,0,0,0.2)'
       }}></div>
@@ -572,14 +579,41 @@ function StressMindMap({ userInfo }) {
   };
 
   // 處理 REBT 完成
-  const handleRebtComplete = (nodeName) => {
-    // 1. 更新壓力狀態：將該節點的壓力值設為 30 (變綠色、變小)
+  const handleRebtComplete = async (resultData) => {
+    // resultData 包含 { name, id, event, belief, dispute, newBelief }
+    
+    // 1. 先做樂觀更新 (Optimistic UI Update) - 讓前端立刻變綠
     setStressStates(prev => ({
       ...prev,
-      [nodeName]: 30
+      [resultData.name]: 30 
     }));
-    // 2. 關閉對話框
-    setSelectedNode(null);
+    setSelectedNode(null); // 關閉視窗
+
+    // 2. 呼叫後端 API 儲存
+    try {
+      const response = await fetch(`${API_BASE_URL}/rebt/complete`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: resultData.id,
+          username: username,
+          event: resultData.event,
+          belief: resultData.belief,
+          dispute: resultData.dispute,
+          newBelief: resultData.newBelief
+        })
+      });
+      
+      const resJson = await response.json();
+      if (!resJson.success) {
+        console.error('儲存失敗:', resJson.message);
+        // 如果失敗，可能要跳個通知或把顏色改回來，這裡先省略
+      } else {
+        console.log('REBT 記錄已儲存');
+      }
+    } catch (e) {
+      console.error('API Error:', e);
+    }
   };
 
   return (
@@ -662,19 +696,11 @@ function StressMindMap({ userInfo }) {
             analysisData={analysisData}
             isLoading={isLoading}
             error={error}
-            onNodeClick={handleNodeClick} 
+            onNodeClick={handleNodeClick}
             stressStates={stressStates}
           />
           {/* 分析按鈕和狀態顯示 */}
-          <div style={{
-            display: 'flex',
-            justifyContent: 'center',
-            gap: '16px',
-            marginTop: '1rem',
-            marginBottom: 'auto',
-            flexWrap: 'wrap',
-            alignItems: 'center'
-          }}>
+          <div className='sm-footer'>
             <div style={{
               display: 'flex',
               alignItems: 'center',
@@ -686,23 +712,23 @@ function StressMindMap({ userInfo }) {
               boxShadow: '0 2px 4px rgba(0,0,0,0.05)'
             }}>
               {/* A: 事件 (紅色) */}
-              <LegendItem 
-                color="#FF6B6B"
+              <LegendItem
+                color="#4391dfff"
                 title="A：事件 (壓力源)"
                 desc="客觀發生的事實，例如：考試不及格、被主管批評、天氣變差。"
                 benefit="發覺壓力源可以幫助你區分「事實」與「想像」，確認問題核心。"
               />
 
               {/* B: 信念 (青色) */}
-              <LegendItem 
-                color="#4ECDC4"
+              <LegendItem
+                color="#a94ecdff"
                 title="B：信念 (你的想法)"
                 desc="你對事件的解讀與內在對話。例如：「我完蛋了」、「我必須完美」。"
                 benefit="這是改變的關鍵！覺察是否陷入了非理性的思考陷阱。"
               />
 
               {/* C: 後果 (橘色) */}
-              <LegendItem 
+              <LegendItem
                 color="#FF9F43"
                 title="C：後果 (情緒/反應)"
                 desc="因信念而產生的情緒或行為。例如：焦慮、失眠、逃避社交。"

@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8" />
+  <title>小吐司的暖心烘焙術</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      background: #000;
+      background-image: url("吐司.jpg"); /* ← 換成你的背景圖片 */
+      background-size: cover;
+      background-position: center;
+      font-family: "Noto Sans TC", "Microsoft JhengHei", system-ui, sans-serif;
+      color: #eefcef;
+    }
+
+    .overlay {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      background: linear-gradient(
+        to bottom,
+        rgba(0, 0, 0, 0.35),
+        rgba(0, 0, 0, 0.7)
+      );
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 20px 16px 24px;
+      overflow: hidden;
+    }
+
+    @media (min-width: 768px) {
+      .overlay { padding: 24px 40px 32px; }
+    }
+
+    /* ===== 思緒泡泡：背景漂浮層 ===== */
+    .thought-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    .thought-bubble {
+      position: absolute;
+      bottom: -40px;
+      max-width: 240px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+      color: #eaf6ff;
+      background: rgba(8, 20, 40, 0.68);
+      border: 1px solid rgba(170, 215, 255, 0.55);
+      backdrop-filter: blur(6px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6);
+      opacity: 0;
+      animation-name: floatBubble;
+      animation-timing-function: ease-out;
+      animation-fill-mode: forwards;
+    }
+
+    @keyframes floatBubble {
+      0% { transform: translateY(0) translateX(0) scale(0.9); opacity: 0; }
+      10% { opacity: 0.9; }
+      50% { transform: translateY(-40vh) translateX(10px) scale(1); }
+      100% { transform: translateY(-75vh) translateX(-5px) scale(0.96); opacity: 0; }
+    }
+
+    /* 主要內容放在泡泡上面 */
+    .header, .character-box, .subtitle-box, .controls {
+      position: relative;
+      z-index: 2;
+    }
+
+    /* ===== 右上角控制列 ===== */
+    .controls {
+      position: absolute;
+      top: 14px;
+      right: 16px;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .icon-btn {
+      width: 34px;
+      height: 34px;
+      border-radius: 999px;
+      border: 1px solid rgba(190, 225, 255, 0.55);
+      background: rgba(5, 14, 30, 0.7);
+      color: #eaf6ff;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-size: 0.9rem;
+      backdrop-filter: blur(6px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+      transition: transform 0.15s ease, box-shadow 0.15s ease, background 0.15s ease, opacity 0.15s ease;
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.7);
+      background: rgba(10, 26, 50, 0.9);
+    }
+
+    .icon-btn:disabled {
+      opacity: 0.5;
+      cursor: default;
+      transform: none;
+      box-shadow: none;
+    }
+
+    .icon-btn span { pointer-events: none; }
+
+    /* ===== 上方標題區 ===== */
+    .header {
+      max-width: 900px;
+      width: 100%;
+      margin: 0 auto 8px auto;
+      padding-top: 40px;
+    }
+
+    .header-title {
+      font-size: 1.4rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+
+    .header-subtitle {
+      font-size: 0.95rem;
+      color: #d6ecff;
+      opacity: 0.92;
+    }
+
+    /* ===== 中間角色影片區 ===== */
+    .character-box {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 8px 0 12px;
+    }
+
+    .character-inner { text-align: center; }
+
+    .character-video {
+      width: min(260px, 55vw);
+      max-height: 50vh;
+      border-radius: 20px;
+      overflow: hidden;
+      box-shadow: 0 12px 32px rgba(0, 0, 0, 0.85);
+      background: #000;
+      margin: 0 auto;
+    }
+
+    .character-video video {
+      display: block;
+      width: 100%;
+      height: 100%;
+      object-fit: contain;
+    }
+
+    /* 呼吸提示圈 */
+    .breathe-circle {
+      margin-top: 12px;
+      display: inline-block;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1px solid rgba(170, 220, 255, 0.85);
+      background: rgba(0, 0, 0, 0.5);
+      color: #eaf6ff;
+      font-size: 0.9rem;
+      backdrop-filter: blur(6px);
+      opacity: 0;
+      transform: scale(0.85);
+      transition: opacity 0.4s ease, transform 0.4s ease;
+      white-space: nowrap;
+    }
+    .breathe-circle.show {
+      opacity: 1;
+      transform: scale(1);
+      animation: cool-breath 10s ease-in-out infinite;
+    }
+
+    @keyframes cool-breath {
+      0%   { transform: scale(0.9);  opacity: 0.75; }
+      40%  { transform: scale(1.15); opacity: 1; }
+      100% { transform: scale(0.86); opacity: 0.85; }
+    }
+
+    /* ===== 底部字幕框 ===== */
+    .subtitle-box {
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      background: rgba(10, 18, 28, 0.92);
+      padding: 14px 20px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(245, 144, 30, 0.45);
+      backdrop-filter: blur(10px);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+    }
+
+    .subtitle-text {
+      font-size: 1.1rem;
+      line-height: 1.8;
+      text-align: center;
+      min-height: 2.8em;
+      opacity: 0;
+      transform: translateY(12px);
+      transition: opacity 0.45s ease, transform 0.45s ease;
+      white-space: pre-line;
+    }
+    .subtitle-text.show { opacity: 1; transform: translateY(0); }
+
+    /* ===== 返回入口按鈕 ===== */
+    .back-home {
+      position: fixed;
+      top: 16px;
+      left: 16px;
+      z-index: 9999;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 12px;
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 700;
+      background: rgba(0,0,0,0.55);
+      color: #fff;
+      border: 1px solid rgba(255,255,255,0.4);
+      backdrop-filter: blur(8px);
+      cursor: pointer;
+      user-select: none;
+      transition: transform .15s ease, opacity .15s ease;
+    }
+
+    .back-home:hover {
+      transform: translateY(-1px);
+      opacity: 0.95;
+    }
+  </style>
+</head>
+
+<body>
+<div class="overlay">
+  <!-- 思緒泡泡浮動層 -->
+  <div class="thought-layer" id="thoughtLayer"></div>
+
+  <!-- 控制按鈕：開始 / 暫停 / 停止 / 聲音 -->
+  <div class="controls">
+    <button class="icon-btn" id="startBtn" title="開始"><span>▶</span></button>
+    <button class="icon-btn" id="pauseBtn" title="暫停" disabled><span>⏸</span></button>
+    <button class="icon-btn" id="stopBtn" title="停止" disabled><span>⏹</span></button>
+    <button class="icon-btn" id="soundBtn" title="背景音樂開關">
+      <span id="soundIcon">🔊</span>
+    </button>
+  </div>
+
+  <!-- 上方大標＋副標 -->
+  <header class="header">
+    <div class="header-title">小吐司的暖心烘焙術</div>
+    <div class="header-subtitle">
+      悲傷讓心變得濕濕冷冷的，我們用溫暖把它慢慢烘乾。
+    </div>
+  </header>
+
+  <!-- 中間角色影片（MP4） -->
+  <div class="character-box">
+    <div class="character-inner">
+      <div class="character-video">
+        <video src="吐司.mp4" autoplay muted loop playsinline></video>
+      </div>
+      <div class="breathe-circle" id="breatheCircle">吸 3 秒 · 吐 5 秒</div>
+    </div>
+  </div>
+
+  <!-- 底部字幕 -->
+  <div class="subtitle-box">
+    <div class="subtitle-text" id="subtitleText"></div>
+  </div>
+</div>
+
+<audio id="bgmAudio" loop>
+  <source src="bgm.mp3" type="audio/mpeg" />
+</audio>
+
+<script>
+/* ===== 換成：小吐司的暖心烘焙術===== */
+const stages = [
+  {
+    key: "soggy",
+    dialog: [
+      "「今天的空氣，好像有點重...」",
+      "「心裡濕濕冷冷的，感覺自己變得軟趴趴，提不起勁。」",
+      "「沒關係，就算是吐司，也有不想酥脆的時候。」"
+    ],
+    duration: 3
+  },
+  {
+    key: "hug",
+    dialog: [
+      "「這時候，我們不需要急著變好。」",
+      "「像我一樣，輕輕抱住那個難過的自己。」",
+      "「告訴自己：『我不是一個人，還有人陪著你。』」",
+      "「允許這份難過存在，讓它在你懷裡休息一下。」"
+    ],
+    duration: 3
+  },
+  {
+    key: "bake",
+    dialog: [
+      "「感覺到了嗎？懷裡的愛心有一點溫度。」",
+      "「慢慢吸氣... 想像溫暖的香氣充滿全身...」",
+      "「慢慢吐氣... 把心裡的濕氣都排出去...」",
+      "「我們正在用呼吸，把自己重新烘焙得暖烘烘的。」"
+    ],
+    duration: 4
+  },
+  {
+    key: "fresh",
+    dialog: [
+      "「辛苦你了。」",
+      "「有沒有覺得身體輕了一點？溫暖了一點？」",
+      "「你擁有自我療癒的力量，就像剛出爐的麵包一樣溫暖。」",
+      "「帶著這份暖意，繼續前進吧。」"
+    ],
+    duration: 4
+  }
+];
+
+const subtitleEl = document.getElementById("subtitleText");
+const breatheCircle = document.getElementById("breatheCircle");
+
+// 控制按鈕 & 音樂
+const startBtn = document.getElementById("startBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const stopBtn = document.getElementById("stopBtn");
+const soundBtn = document.getElementById("soundBtn");
+const soundIcon = document.getElementById("soundIcon");
+const bgmAudio = document.getElementById("bgmAudio");
+
+/* 狀態 */
+let stageIndex = 0;
+let lineIndex = 0;
+let isRunning = false;
+let finished = false;
+let lineTimeoutId = null;
+let stageTimeoutId = null;
+let bgmEnabled = true;
+
+const lineDuration = 3200;
+
+function clearAllTimers() {
+  if (lineTimeoutId) clearTimeout(lineTimeoutId);
+  if (stageTimeoutId) clearTimeout(stageTimeoutId);
+  lineTimeoutId = null;
+  stageTimeoutId = null;
+}
+
+function resetFlow() {
+  clearAllTimers();
+  stageIndex = 0;
+  lineIndex = 0;
+  isRunning = false;
+  finished = false;
+  subtitleEl.textContent = "";
+  subtitleEl.classList.remove("show");
+  breatheCircle.classList.remove("show");
+
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+  stopBtn.disabled = true;
+}
+
+function playBgmIfNeeded() {
+  if (!bgmEnabled) return;
+  bgmAudio.play().catch(() => {});
+}
+function pauseBgm() { bgmAudio.pause(); }
+function stopBgm() { bgmAudio.pause(); bgmAudio.currentTime = 0; }
+
+function playNextLine() {
+  if (!isRunning) return;
+
+  const stage = stages[stageIndex];
+
+  // 吐司版
+  breatheCircle.classList.remove("show");
+
+  if (lineIndex >= stage.dialog.length) {
+    clearTimeout(stageTimeoutId);
+    stageTimeoutId = setTimeout(() => {
+      if (!isRunning) return;
+      stageIndex++;
+      if (stageIndex < stages.length) {
+        lineIndex = 0;
+        subtitleEl.classList.remove("show");
+        subtitleEl.textContent = "";
+        playNextLine();
+      } else {
+        isRunning = false;
+        finished = true;
+        pauseBtn.disabled = true;
+        startBtn.disabled = false;
+      }
+    }, stage.duration * 1000);
+    return;
+  }
+
+  const line = stage.dialog[lineIndex];
+  subtitleEl.classList.remove("show");
+  void subtitleEl.offsetWidth;
+  subtitleEl.textContent = line;
+  subtitleEl.classList.add("show");
+
+  lineIndex++;
+  clearTimeout(lineTimeoutId);
+  lineTimeoutId = setTimeout(playNextLine, lineDuration);
+}
+
+/* ===== 按鈕事件 ===== */
+startBtn.addEventListener("click", () => {
+  if (finished) resetFlow();
+  if (isRunning) return;
+
+  isRunning = true;
+  playBgmIfNeeded();
+
+  startBtn.disabled = true;
+  pauseBtn.disabled = false;
+  stopBtn.disabled = false;
+
+  playNextLine();
+});
+
+pauseBtn.addEventListener("click", () => {
+  if (!isRunning) return;
+  isRunning = false;
+  clearAllTimers();
+  pauseBgm();
+
+  startBtn.disabled = false;
+  pauseBtn.disabled = true;
+  stopBtn.disabled = false;
+});
+
+stopBtn.addEventListener("click", () => {
+  isRunning = false;
+  finished = false;
+  clearAllTimers();
+  stopBgm();
+  resetFlow();
+});
+
+soundBtn.addEventListener("click", () => {
+  bgmEnabled = !bgmEnabled;
+  if (!bgmEnabled) {
+    soundIcon.textContent = "🔇";
+    pauseBgm();
+  } else {
+    soundIcon.textContent = "🔊";
+    if (isRunning) playBgmIfNeeded();
+  }
+});
+
+resetFlow();
+startBtn.click();
+
+/* ===== 思緒泡泡：吐司版 ===== */
+const thoughtMessages = [
+  "你不需要急著變好。",
+  "抱住自己一下就好。",
+  "慢慢吸氣，讓溫度進來。",
+  "慢慢吐氣，把濕氣放掉。",
+  "你正在把自己烘乾、烘暖。"
+];
+
+const thoughtLayer = document.getElementById("thoughtLayer");
+let lastMessage = null;
+
+function getRandomMessage() {
+  let msg;
+  do {
+    msg = thoughtMessages[Math.floor(Math.random() * thoughtMessages.length)];
+  } while (msg === lastMessage && thoughtMessages.length > 1);
+  lastMessage = msg;
+  return msg;
+}
+
+function spawnThought() {
+  const bubble = document.createElement("div");
+  bubble.className = "thought-bubble";
+  bubble.textContent = getRandomMessage();
+
+  bubble.style.left = (20 + Math.random() * 60) + "%";
+
+  const duration = 9000 + Math.random() * 6000;
+  bubble.style.animationDuration = duration + "ms";
+
+  const scale = 0.9 + Math.random() * 0.35;
+  bubble.style.transform = `scale(${scale})`;
+
+  thoughtLayer.appendChild(bubble);
+  bubble.addEventListener("animationend", () => bubble.remove());
+}
+
+setInterval(spawnThought, 5000);
+
+/* 返回入口 */
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("backHomeBtn");
+  if (!btn) return;
+  btn.addEventListener("click", () => {
+    window.location.href = "正念.html";
+  });
+});
+</script>
+
+<div class="back-home" id="backHomeBtn">
+  ← 返回入口
+</div>
+
+</body>
+</html>

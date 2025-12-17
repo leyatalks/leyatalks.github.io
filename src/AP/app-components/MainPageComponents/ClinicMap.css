@@ -99,13 +99,13 @@
 /* =========================================
    RWD 手機版設定 (螢幕小於 768px 時觸發)
    ========================================= */
-@media (min-width: 769px) {
+@media (min-width: 769px) and (max-width: 1024px) {
   .map-container {
     flex-direction: column-reverse; /* 讓列表在下，地圖在上 (或用 column 看你喜好) */
     /* 這裡建議：地圖在上，列表在下，比較符合手機習慣 */
     flex-direction: column; 
 
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
   }
 
@@ -150,7 +150,7 @@
     flex-direction: column-reverse; /* 讓列表在下，地圖在上 (或用 column 看你喜好) */
     /* 這裡建議：地圖在上，列表在下，比較符合手機習慣 */
     flex-direction: column; 
-    width: 80%;
+    width: 100%;
     margin: 0 auto;
   }
 
