@@ -65,7 +65,7 @@ const mindfulnessData = {
     id: 'anxious',
     title: '熊貓的安定練習',
     subtitle: '讓心慢下來',
-    bgImage: '/mindfulness/竹間.PNG',
+    bgImage: '/mindfulness/竹林.JPG',
     videoSrc: '/mindfulness/熊貓.mp4',
     audioSrc: '/mindfulness/bgm.mp3',
     stages: [
