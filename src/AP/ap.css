@@ -1135,6 +1135,187 @@ body {
     padding-bottom: var(--chat-input-offset);
 }
 
+/* 1219事件陪伴專區Start */
+
+.support-area {
+    padding: 2rem;
+    width: 100%;
+    height: 100%;
+}
+
+.support-area>.title {
+    font-size: 4rem;
+    text-align: center;
+    letter-spacing: 4px;
+    margin-bottom: 1rem;
+    font-family: "Dela Gothic One";
+    color: #759587;
+}
+
+.support-area>.container {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+}
+
+.support-area>.container>.card {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.support-area>.container>.card.left {
+    align-items: flex-start;
+}
+
+.support-area>.container>.card.center {
+    align-items: center;
+    text-align: center;
+    justify-content: center;
+}
+
+.support-area>.container>.card.right {
+    justify-content: center;
+    padding: 0 2rem;
+}
+
+.support-area>.container>.card.right .text-content {
+    display: flex;
+    flex-direction: column;
+    color: #4a4a4a;
+    line-height: 1.6;
+    text-align: center;
+    height: 100%;
+}
+
+.support-area>.container>.card.right .text-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-evenly;
+}
+
+.support-area .text-content h3 {
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #759587;
+    font-weight: bold;
+}
+
+.support-area .text-content p {
+    font-size: 1.1rem;
+    margin: 0;
+}
+
+.support-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1.5rem;
+    background-color: #8da399;
+    /* Calm green/greyish tone suitable for support */
+    color: white;
+    text-decoration: none;
+    border-radius: 50px;
+    margin-top: 1rem;
+    font-weight: bold;
+    align-self: center;
+    transition: all 0.3s ease;
+    width: fit-content;
+}
+
+.support-btn:hover {
+    background-color: #7a8f86;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+/* Feature List Styling */
+.support-area>.container>.card.left {
+    padding: 0 2rem;
+    align-items: center;
+    justify-content: center;
+}
+
+.support-area .feature-list {
+    width: 100%;
+    height: 100%;
+    padding: 0px 2rem;
+    display: flex;
+    flex-direction: column;
+}
+
+.support-area .feature-list h3 {
+    font-size: 1.5rem;
+    margin-bottom: 1rem;
+    color: #759587;
+    font-weight: bold;
+    text-align: center;
+}
+
+.support-area .features {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    flex: 1;
+    align-content: space-evenly;
+}
+
+.support-area .feature-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    padding: 1rem;
+    background-color: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.support-area .feature-item:hover {
+    background-color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-3px);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.support-area .icon-wrapper {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
+    color: white;
+}
+
+.support-area .icon-wrapper.login {
+    background-color: #8da399;
+}
+
+.support-area .icon-wrapper.no-login {
+    background-color: #c7b299;
+}
+
+.support-area .feature-name {
+    font-weight: bold;
+    font-size: 1rem;
+    color: #333;
+    margin-bottom: 0.25rem;
+}
+
+.support-area .feature-desc {
+    font-size: 0.8rem;
+    color: #666;
+}
+
+/* 1219事件陪伴專區End */
+
 /* 平板專用 RWD（769px~1023px） */
 @media (min-width: 769px) and (max-width: 1023px) {
     :root {
@@ -1264,7 +1445,41 @@ body {
         margin-top: 2rem;
     }
 
+    /* SupportArea Tablet Styles */
+    .support-area {
+        padding: 1.5rem;
+    }
 
+    .support-area>.title {
+        font-size: 2.5rem;
+    }
+
+    .support-area>.container>.card.left>.icon {
+        font-size: 3.5rem;
+    }
+
+    .support-area .feature-item {
+        padding: 0.8rem;
+    }
+
+    .support-area .icon-wrapper {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+
+    .support-area .text-content h3 {
+        font-size: 1.25rem;
+    }
+
+    .support-area .text-content p {
+        font-size: 1rem;
+    }
+
+    .support-btn {
+        padding: 0.6rem 1.2rem;
+        font-size: 0.9rem;
+    }
 }
 
 @keyframes disclaimer {
@@ -1277,6 +1492,7 @@ body {
     }
 }
 
+/* 手機專用 RWD（768px） */
 @media (max-width: 768px) {
 
     .ap-header {
@@ -1353,6 +1569,77 @@ body {
 
     .stress-title {
         margin-top: 0;
+    }
+
+    /* SupportArea Mobile Styles */
+    .support-area {
+        padding: 1rem;
+        height: auto;
+    }
+
+    .support-area>.title {
+        font-size: 2rem;
+        margin-bottom: 2rem;
+    }
+
+    .support-area>.container {
+        flex-direction: column;
+        gap: 2rem;
+    }
+
+    .support-area>.container>.card {
+        width: 100%;
+        margin-bottom: 1rem;
+    }
+
+    .support-area>.container>.card.center img {
+        width: 60%;
+        max-width: 250px;
+    }
+
+    .support-area .features {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 0.8rem;
+    }
+
+    .support-area .feature-item {
+        padding: 0.8rem;
+    }
+
+    .support-area .icon-wrapper {
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 1rem;
+    }
+
+    .support-area .feature-name {
+        font-size: 0.9rem;
+    }
+
+    .support-area .feature-desc {
+        font-size: 0.75rem;
+    }
+
+    .support-area>.container>.card.right .text-content {
+        padding: 0;
+        text-align: center;
+    }
+
+    .support-area .text-content h3 {
+        font-size: 1.2rem;
+        margin-bottom: 1rem;
+    }
+
+    .support-area .text-content p {
+        font-size: 0.95rem;
+        margin-bottom: 0.5rem;
+    }
+
+    .support-btn {
+        width: 100%;
+        margin-top: 1.5rem;
+        padding: 0.8rem;
     }
 
     .sm-footer {

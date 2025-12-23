@@ -8,6 +8,7 @@ import Comic from './Comic';
 import Member from './Member';
 import ADs from '../AP/app-components/MainPageComponents/ADs';
 import ClinicMap from '../AP/app-components/ClinicMap';
+import SupportArea from '../AP/app-components/SupportArea';
 
 //首頁圖片
 const firstImg = "https://raw.githubusercontent.com/leyatalks/leyatalks.github.io/refs/heads/main/public/hp-first.webp";
@@ -101,13 +102,14 @@ const enablePullToRefresh = (callback) => {
 };
 
 // 內容容器
-function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation }) {
+function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation, isLoggedIn }) {
     return (
         <div className='hp-container'>
             <Slogan isMobile={isMobile} />
             <ScrollBar id="scroll-bar" isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
             <Content id="concept" isMobile={isMobile} />
             <Content_Reverse id="planning" isMobile={isMobile} />
+            <SupportArea isLoggedIn={isLoggedIn} />
             <Member id="member" isMobile={isMobile} />
             <Comic id="comic" isMobile={isMobile} />
             <Video id="video" isMobile={isMobile} />
@@ -241,7 +243,7 @@ function HomePage({ handleNavigation, embedded = false }) {
                 }} onClick={() => navigate('/')}
                 onMouseEnter={e => e.currentTarget.style.backgroundColor = '#ffe3d0ff'}
                 onMouseLeave={e => e.currentTarget.style.backgroundColor = ''}>前往專題介紹頁</button> */}
-                <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
+                <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} isLoggedIn={isLoggedIn} />
             </div>
         );
     }
@@ -303,7 +305,7 @@ function HomePage({ handleNavigation, embedded = false }) {
                 />
             )}
 
-            <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
+            <IndexContainer isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} isLoggedIn={isLoggedIn} />
         </div>
     )
 }
@@ -550,7 +552,7 @@ function Content_Reverse({ id, isMobile }) {
 
 function QRcode() {
     return (
-        <div style={{ margin: '48px 0'}}>
+        <div style={{ margin: '48px 0' }}>
             <p className="qrcode-title">立即掃描QRcode追蹤我們</p>
             <div className='qrcode-container'>
                 <a href="https://www.instagram.com/le_ya.talks/" target="_blank">

@@ -402,7 +402,7 @@ function MindfulnessMenu({ onSelectMood }) {
           <div className="menu-speech">{speechText}</div>
         </div>
 
-        <div className="menu-title">正念冥想</div>
+        <div className="menu-title">正念</div>
         <div className="menu-subtitle">{subtitleText}</div>
 
         <div className="section-title">今天的你，比較接近哪一種？</div>
@@ -479,66 +479,66 @@ function MindfulnessExercise({ config, onBack }) {
   // Sequence logic
   useEffect(() => {
     if (!isRunning) {
-        timersRef.current.forEach(clearTimeout);
-        timersRef.current = [];
-        return;
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
+      return;
     }
 
     const playNext = () => {
-        if (!isRunningRef.current) return;
+      if (!isRunningRef.current) return;
 
-        const { stageIndex, lineIndex } = stateRef.current;
-        const stages = config.stages;
+      const { stageIndex, lineIndex } = stateRef.current;
+      const stages = config.stages;
 
-        if (stageIndex >= stages.length) {
-            setFinished(true);
-            setIsRunning(false);
-            setShowBreatheCircle(false);
-            return;
-        }
+      if (stageIndex >= stages.length) {
+        setFinished(true);
+        setIsRunning(false);
+        setShowBreatheCircle(false);
+        return;
+      }
 
-        const stage = stages[stageIndex];
-        setShowBreatheCircle(!!stage.breathing);
+      const stage = stages[stageIndex];
+      setShowBreatheCircle(!!stage.breathing);
 
-        if (lineIndex >= stage.dialog.length) {
-            // Stage complete
-            const timer = setTimeout(() => {
-                stateRef.current.stageIndex++;
-                stateRef.current.lineIndex = 0;
-                setShowSubtitle(false);
-                setSubtitle("");
-                playNext();
-            }, stage.duration * 1000);
-            timersRef.current.push(timer);
-            return;
-        }
-
-        // Show line
-        const line = stage.dialog[lineIndex];
-        setShowSubtitle(false);
-        
-        setTimeout(() => {
-             setSubtitle(line);
-             setShowSubtitle(true);
-        }, 50);
-
-        stateRef.current.lineIndex++;
-        const timer = setTimeout(playNext, 3200);
+      if (lineIndex >= stage.dialog.length) {
+        // Stage complete
+        const timer = setTimeout(() => {
+          stateRef.current.stageIndex++;
+          stateRef.current.lineIndex = 0;
+          setShowSubtitle(false);
+          setSubtitle("");
+          playNext();
+        }, stage.duration * 1000);
         timersRef.current.push(timer);
+        return;
+      }
+
+      // Show line
+      const line = stage.dialog[lineIndex];
+      setShowSubtitle(false);
+
+      setTimeout(() => {
+        setSubtitle(line);
+        setShowSubtitle(true);
+      }, 50);
+
+      stateRef.current.lineIndex++;
+      const timer = setTimeout(playNext, 3200);
+      timersRef.current.push(timer);
     };
 
     playNext();
 
     return () => {
-        timersRef.current.forEach(clearTimeout);
-        timersRef.current = [];
+      timersRef.current.forEach(clearTimeout);
+      timersRef.current = [];
     };
   }, [isRunning, config]);
 
   const handleStart = () => {
     if (finished) {
-        stateRef.current = { stageIndex: 0, lineIndex: 0 };
-        setFinished(false);
+      stateRef.current = { stageIndex: 0, lineIndex: 0 };
+      setFinished(false);
     }
     setIsRunning(true);
   };
@@ -555,8 +555,8 @@ function MindfulnessExercise({ config, onBack }) {
     setShowSubtitle(false);
     setShowBreatheCircle(false);
     if (audioRef.current) {
-        audioRef.current.pause();
-        audioRef.current.currentTime = 0;
+      audioRef.current.pause();
+      audioRef.current.currentTime = 0;
     }
   };
 
@@ -567,8 +567,8 @@ function MindfulnessExercise({ config, onBack }) {
 
   // Auto start on mount
   useEffect(() => {
-      handleStart();
-      return () => handleStop();
+    handleStart();
+    return () => handleStop();
   }, []);
 
   return (
@@ -607,11 +607,11 @@ function MindfulnessExercise({ config, onBack }) {
               <video ref={videoRef} src={config.videoSrc} autoPlay muted loop playsInline />
             </div>
             <div className={`breathe-circle ${showBreatheCircle ? 'show' : ''}`}>
-              {config.id === 'calm' ? '吸氣 · 吐氣 · 跟著呼嚕' : 
-               config.id === 'nervous' ? '吸氣 · 吐氣 · 降溫' :
-               config.id === 'anxious' ? '吸氣 · 吐氣 · 吹走焦慮' :
-               config.id === 'excited' ? '深深吸氣 · 慢慢吐氣' :
-               config.id === 'sad' ? '慢慢吸氣 · 慢慢吐氣' : '吸氣 · 吐氣'}
+              {config.id === 'calm' ? '吸氣 · 吐氣 · 跟著呼嚕' :
+                config.id === 'nervous' ? '吸氣 · 吐氣 · 降溫' :
+                  config.id === 'anxious' ? '吸氣 · 吐氣 · 吹走焦慮' :
+                    config.id === 'excited' ? '深深吸氣 · 慢慢吐氣' :
+                      config.id === 'sad' ? '慢慢吸氣 · 慢慢吐氣' : '吸氣 · 吐氣'}
             </div>
           </div>
         </div>

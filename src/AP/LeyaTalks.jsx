@@ -23,6 +23,7 @@ import CharacterPage from './app-components/Character/CharacterPage'
 import GamePage from './app-components/GamePage'
 import ClinicMap from './app-components/ClinicMap'
 import Mindfulness from './app-components/Mindfulness'
+import SupportArea from './app-components/SupportArea'
 
 
 const DefaultRoute = () => {
@@ -160,6 +161,7 @@ function Application() {
         'intro-page': '/leya/intro',
         'game-page': '/leya/game',
         'mindfulness': '/leya/mindfulness',
+        // 'support-area': '/leya/support-area'
     };
     const reverseMap = Object.fromEntries(Object.entries(routeMap).map(([k, v]) => [v, k]));
     const legacySetActivePage = (pageKey) => {
@@ -194,11 +196,11 @@ function Application() {
                     />
                 )}
                 <div className={`ap-main ${asideCollapsed ? 'aside-collapsed' : ''}`}>
-                    {!hideLayout&& !isDesktop && (<Header setActivePage={legacySetActivePage} userInfo={userInfo} />)}
+                    {!hideLayout && !isDesktop && (<Header setActivePage={legacySetActivePage} userInfo={userInfo} />)}
                     <div className="content-area">
                         <Routes>
                             <Route index element={<DefaultRoute />} />
-                            <Route path="login" element={<LoginPage activePage={activePage} setActivePage={legacySetActivePage} setUserInfo={setUserInfo}/>} />
+                            <Route path="login" element={<LoginPage activePage={activePage} setActivePage={legacySetActivePage} setUserInfo={setUserInfo} />} />
                             <Route path="register" element={<RegisterPage activePage={activePage} setActivePage={legacySetActivePage} />} />
                             <Route path="forgot-password" element={<ForgotPassword setActivePage={legacySetActivePage} />} />
                             <Route path="reset-password" element={<ResetPassword setActivePage={legacySetActivePage} />} />
@@ -215,6 +217,7 @@ function Application() {
                             <Route path="character" element={<CharacterPage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="game" element={<GamePage activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
                             <Route path="clinic-map" element={<ClinicMap activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} />
+                            {/* <Route path="support-area" element={<SupportArea activePage={activePage} setActivePage={legacySetActivePage} userInfo={userInfo} />} /> */}
                             {/* 介紹頁面內嵌顯示於 AP 右側容器（去除 HomePage Navbar）*/}
                             <Route path="home" element={<HomePage embedded />} />
                             <Route path="mindfulness" element={<Mindfulness />} />
