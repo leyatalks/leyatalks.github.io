@@ -109,7 +109,7 @@ function IndexContainer({ isMobile, handleNavigation, handleLoginNavigation, isL
             <ScrollBar id="scroll-bar" isMobile={isMobile} handleNavigation={handleNavigation} handleLoginNavigation={handleLoginNavigation} />
             <Content id="concept" isMobile={isMobile} />
             <Content_Reverse id="planning" isMobile={isMobile} />
-            <SupportArea isLoggedIn={isLoggedIn} />
+            <SupportArea id="support" isLoggedIn={isLoggedIn} />
             <Member id="member" isMobile={isMobile} />
             <Comic id="comic" isMobile={isMobile} />
             <Video id="video" isMobile={isMobile} />
@@ -351,10 +351,28 @@ function ScrollBar({ id }) {
             navigate('/leya/login');
         }
     };
+
+    const handleScrollToMember = (e) => {
+        e.preventDefault();
+        const element = document.getElementById('member');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
+    const handleScrollToSupport = (e) => {
+        e.preventDefault();
+        const element = document.getElementById('support');
+        if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+        }
+    };
+
     return (
         <div className='hp-scroll-bar' id={id}>
             <a onClick={handleChatLoginNavigation} className='hp-sc-btn1'>前往聊天</a>
-            <a href="#concept" className='hp-sc-btn2'>了解更多</a>
+            <a href="#support" className='hp-sc-btn3' onClick={handleScrollToSupport}>1219陪伴專區</a>
+            <a href="#member" className='hp-sc-btn2' onClick={handleScrollToMember}>了解更多</a>
         </div>
     );
 }

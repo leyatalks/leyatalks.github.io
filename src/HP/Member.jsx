@@ -1,6 +1,6 @@
 import { useState } from 'react';
 
-function Member() {
+function Member({ id, isMobile }) {
     const members = [
         {
             role: '指導老師',
@@ -64,7 +64,8 @@ function Member() {
     return (
         <>
             <p
-                style={{ fontSize: '4rem', textAlign: 'center', marginTop: '20px', marginBottom: '20px', fontFamily: 'Dela Gothic One'}}
+                style={{ fontSize: '4rem', textAlign: 'center', marginTop: '20px', marginBottom: '20px', fontFamily: 'Dela Gothic One' }}
+                id={id}
             >
                 成員介紹
             </p>
@@ -94,7 +95,7 @@ function Member() {
                             </div>
                             <div className="member-face member-back">
                                 <h3 className="member-role">{m.crole}</h3>
-                                <img src={m.cimage} alt={`成員 ${m.name} - ${m.cimage}`} className="member-photo" loading="lazy" style={{maxHeight: '175px'}} />
+                                <img src={m.cimage} alt={`成員 ${m.name} - ${m.cimage}`} className="member-photo" loading="lazy" style={{ maxHeight: '175px' }} />
                                 <p className="member-desc" style={{ textAlign: 'center', lineHeight: 1.6 }}>{m.back}</p>
                             </div>
                         </div>

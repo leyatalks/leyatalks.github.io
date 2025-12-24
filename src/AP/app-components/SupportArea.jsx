@@ -4,7 +4,7 @@ import { faHandHoldingHeart, faComments, faPenToSquare, faBrain, faSpa, faMapLoc
 import { Link, useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 
-function SupportArea({ isLoggedIn }) {
+function SupportArea({ isLoggedIn, id }) {
     const navigate = useNavigate();
     const [showModal, setShowModal] = useState(false);
 
@@ -18,7 +18,7 @@ function SupportArea({ isLoggedIn }) {
     };
 
     return (
-        <div className='support-area'>
+        <div className='support-area' id={id}>
             <p className="title">1219事件陪伴專區</p>
             <div className="container">
                 <div className="card left">

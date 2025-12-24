@@ -156,6 +156,25 @@ body {
     background-color: #c49349;
 }
 
+.hp-sc-btn3 {
+    border: 2px solid #759587;
+    background-color: #759587;
+    border-radius: 0.5rem;
+    padding: 0.1rem 1.5rem;
+    color: #F8EBD8;
+    cursor: pointer;
+    font-weight: 600;
+    text-decoration: none;
+    transition: all 0.3s ease;
+}
+
+.hp-sc-btn3:hover {
+    color: #f8eBD8;
+    transition: all 0.3s ease;
+    border: 2px solid #abc5ba;
+    background-color: #abc5ba;
+}
+
 .hp-video {
     width: 100%;
     height: 100%;
@@ -583,11 +602,12 @@ body {
     .hp-container {
         width: 100%;
     }
-    
+
     .hp-navbar {
         flex-direction: row;
         padding: 0.8em;
     }
+
     .hp-navbar-links {
         display: none;
         flex-direction: column;
@@ -595,44 +615,53 @@ body {
         position: fixed;
         top: 60px;
         left: 0;
-        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         border-bottom: 1px solid #eee;
         z-index: 20;
         gap: 2em;
         margin-right: 1em;
         font-size: 1.1em;
     }
+
     .hp-navbar-links.open {
         display: flex;
     }
+
     .hp-hamburger {
         display: flex;
     }
+
     .hp-navbar_logo {
         width: 5em;
     }
+
     .hp-slogan {
         font-size: 4rem;
         padding: 1.5rem;
         margin-top: 2.5rem;
     }
+
     .hp-content-container {
         flex-direction: row;
         min-height: 25rem;
     }
+
     .hp-half-container {
         width: 50%;
     }
+
     .hp-content {
         padding-left: 1.5rem;
         padding-right: 20%;
         font-size: 0.95rem;
     }
+
     .hp-content-reverse {
         padding-right: 1.5rem;
         padding-left: 20%;
         font-size: 0.95rem;
     }
+
     .hp-footer {
         flex-direction: row;
         align-items: stretch;
@@ -640,7 +669,10 @@ body {
         padding: 1.5rem 1.5rem;
         gap: 0;
     }
-    .hp-footer-logo, .hp-copyright, .hp-footer-contact {
+
+    .hp-footer-logo,
+    .hp-copyright,
+    .hp-footer-contact {
         display: flex;
         flex-direction: column;
         align-items: center;
@@ -650,18 +682,23 @@ body {
         text-align: center;
         padding: 0 0.5rem;
     }
+
     .hp-footer-logo {
         padding-left: 0;
     }
+
     .hp-logo-container {
         justify-content: center;
     }
+
     .hp-logo-container p[style*="font-size: 1.6rem"] {
         font-size: 1.2rem !important;
     }
+
     .hp-logo-container p[style*="font-size: 1rem"] {
         font-size: 0.8rem !important;
     }
+
     .hp-copyright p[id*="copyright"] {
         font-size: 1.2rem;
         white-space: nowrap;
@@ -672,18 +709,22 @@ body {
         align-items: center;
         padding: 0 0.5rem;
     }
+
     .hp-video {
         flex-direction: column;
     }
+
     .hp-video-title {
         writing-mode: horizontal-tb;
         text-align: center;
         letter-spacing: 2px;
     }
+
     .qrcode-container {
         flex-direction: column;
         gap: 2rem;
     }
+
     .cm-section {
         margin: 48px 0;
     }
@@ -863,11 +904,9 @@ body {
         min-width: 60%;
     }
 
-    .hp-sc-btn1 {
-        font-size: 2rem;
-    }
-
-    .hp-sc-btn2 {
+    .hp-sc-btn1,
+    .hp-sc-btn2,
+    .hp-sc-btn3 {
         font-size: 2rem;
     }
 
@@ -893,7 +932,7 @@ body {
     .cm-section {
         margin: 24px 0;
     }
-    
+
 }
 
 /* 小手機樣式 */
@@ -962,11 +1001,9 @@ body {
         min-width: 60%;
     }
 
-    .hp-sc-btn1 {
-        font-size: 1.5rem;
-    }
-
-    .hp-sc-btn2 {
+    .hp-sc-btn1,
+    .hp-sc-btn2,
+    .hp-sc-btn3 {
         font-size: 1.5rem;
     }
 
