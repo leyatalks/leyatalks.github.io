@@ -6,7 +6,8 @@
   height: 100vh;
   width: 100%;
   font-family: "微軟正黑體", sans-serif;
-  overflow: hidden; /* 防止整個網頁出現卷軸 */
+  overflow: hidden;
+  /* 防止整個網頁出現卷軸 */
 }
 
 /* 左側：列表區塊 */
@@ -15,13 +16,15 @@
   display: flex;
   flex-direction: column;
   background-color: #f8f9fa;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  z-index: 11; /* 確保列表陰影壓在地圖上 */
+  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
+  z-index: 11;
+  /* 確保列表陰影壓在地圖上 */
 }
 
 /* 右側：地圖區塊 */
 .map-wrapper {
-  flex: 1; /* 佔據剩餘空間 */
+  flex: 1;
+  /* 佔據剩餘空間 */
   position: relative;
 }
 
@@ -32,17 +35,85 @@
   color: #fff;
 }
 
-.header h2 {
-  margin: 0 0 10px 0;
+.filter-head {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.filter-head h2 {
+  display: inline-block;
   font-size: 1.2rem;
+}
+
+/* --- 篩選區塊樣式 --- */
+.filter-row {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.filter-group .filter-label {
+  font-size: 0.9rem;
+  color: #fff;
+  /* Header text is white */
+  font-weight: bold;
+  white-space: nowrap;
 }
 
 .district-select {
   width: 100%;
-  padding: 8px;
-  border-radius: 4px;
-  border: none;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
   font-size: 1rem;
+  color: #333;
+  background-color: #fff;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  margin: 0;
+}
+
+.district-select:hover {
+  border-color: #aaa;
+}
+
+.district-select:focus {
+  outline: none;
+  border-color: #B5EAD7;
+  box-shadow: 0 0 0 3px rgba(181, 234, 215, 0.3);
+}
+
+.filter-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: -10px;
+  margin-bottom: 15px;
+}
+
+.reset-btn {
+  font-size: 0.85rem;
+  color: #eee;
+  background: rgba(255, 255, 255, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  padding: 4px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin: 0;
+}
+
+.reset-btn:hover {
+  background-color: rgba(255, 255, 255, 0.3);
 }
 
 /* 列表滾動區域 */
@@ -101,45 +172,111 @@
    ========================================= */
 @media (min-width: 769px) and (max-width: 1024px) {
   .map-container {
-    flex-direction: column-reverse; /* 讓列表在下，地圖在上 (或用 column 看你喜好) */
-    /* 這裡建議：地圖在上，列表在下，比較符合手機習慣 */
-    flex-direction: column; 
-
+    flex-direction: column;
     width: 100%;
     margin: 0 auto;
   }
 
-  .district-select{
-    width: 95%;
-  }
-
   .sidebar {
     width: 100%;
-    height: 35%; /* 列表佔 35% 高度 */
+    height: 45%;
+    /* Slightly taller for more filter space */
     z-index: 5;
   }
 
   .map-wrapper {
-    height: 65%; /* 地圖佔 65% 高度 */
-    flex: none; /* 取消 flex:1，改用固定高度 */
+    height: 60%;
+    flex: none;
   }
 
-  /* 調整手機版字體大小，避免太擠 */
+  /* Filter layout for tablet: 2 columns? or 3 small ones? Let's use flex-wrap */
+  .filter-row {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 10px;
+  }
+
+  .filter-group {
+    flex: 1 1 30%;
+    /* Try to fit 3 in a row, or wrap */
+    min-width: 150px;
+  }
+
   .header {
-    padding: 10px 15px;
+    padding: 15px 15px 0px;
   }
-  
+
   .header h2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
-  .leaflet-pane{
-    z-index: 5;
-  }
-
-  .leaflet-control{
+  .leaflet-control {
     display: none;
   }
+}
+
+/* Multi-Select Styles */
+.multi-select-wrapper {
+  position: relative;
+  width: 100%;
+}
+
+.multi-select-btn {
+  width: 100%;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  color: #333;
+  background: white;
+  text-align: left;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.2s ease;
+}
+
+.multi-select-btn:hover {
+  border-color: #aaa;
+}
+
+
+.multi-select-dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 100%;
+  min-width: 200px;
+  max-height: 300px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  padding: 8px;
+  display: none;
+}
+
+.multi-select-dropdown.open {
+  display: block;
+}
+
+.multi-select-option {
+  display: flex;
+  align-items: center;
+  padding: 6px 4px;
+  cursor: pointer;
+  color: #333;
+}
+
+.multi-select-option:hover {
+  background-color: #f5f5f5;
+}
+
+.multi-select-option input {
+  margin-right: 8px;
 }
 
 /* =========================================
@@ -147,44 +284,52 @@
    ========================================= */
 @media (max-width: 768px) {
   .map-container {
-    flex-direction: column-reverse; /* 讓列表在下，地圖在上 (或用 column 看你喜好) */
-    /* 這裡建議：地圖在上，列表在下，比較符合手機習慣 */
-    flex-direction: column; 
+    flex-direction: column;
     width: 100%;
     margin: 0 auto;
   }
 
-
   .sidebar {
     width: 100%;
-    height: 45%; /* 列表佔 45% 高度 */
+    height: 50%;
+    /* More height for stacked filters */
     z-index: 5;
   }
 
   .map-wrapper {
-    height: 55%; /* 地圖佔 55% 高度 */
-    flex: none; /* 取消 flex:1，改用固定高度 */
+    height: 50%;
+    flex: none;
+    z-index: 0;
   }
 
-  /* 調整手機版字體大小，避免太擠 */
+  /* Stack filters on mobile */
+  .filter-row {
+    flex-direction: row;
+    gap: 8px;
+  }
+
+  .filter-group {
+    width: 100%;
+  }
+
   .header {
-    padding: 10px 15px;
+    padding: 15px 15px 0px;
   }
-  
+
   .header h2 {
-    font-size: 1rem;
+    font-size: 1.1rem;
   }
 
-  .district-select{
-    width: 95%;
+  .district-select {
+    width: 100%;
   }
 
-  .leaflet-pane{
-    z-index: 5;
-  }
-
-  .leaflet-control{
+  .leaflet-control {
     display: none;
   }
 
+  .multi-select-dropdown {
+    left: auto;
+    right: 0;
+  }
 }

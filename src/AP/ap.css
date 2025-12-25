@@ -1560,7 +1560,7 @@ body {
         left: auto;
         width: 80%;
         min-height: 40%;
-        z-index: 12;
+        z-index: 15;
     }
 
     .login-hint-button {
